@@ -1,0 +1,34 @@
+[package]
+name = "vigil-server"
+version = "0.0.1"
+description = "Microservices Status Page. Monitors a distributed infrastructure and sends alerts to Slack."
+readme = "README.md"
+license = "MPL-2.0"
+homepage = "https://github.com/valeriansaliou/vigil"
+repository = "https://github.com/valeriansaliou/vigil.git"
+keywords = ["microservices", "infrastructure", "page", "status", "monitor", "probe", "health", "slack"]
+categories = ["web-programming"]
+authors = ["Valerian Saliou <valerian@valeriansaliou.name>"]
+
+[badges]
+travis-ci = { repository = "valeriansaliou/vigil", branch = "master" }
+coveralls = { repository = "valeriansaliou/vigil", branch = "master", service = "github" }
+
+[[bin]]
+name = "vigil"
+path = "src/main.rs"
+doc = false
+
+[dependencies]
+log = "0.3"
+
+[profile.dev]
+opt-level = 0
+debug = true
+debug-assertions = true
+
+[profile.release]
+opt-level = "s"
+lto = true
+debug = false
+debug-assertions = false
