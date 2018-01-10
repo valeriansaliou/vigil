@@ -1,12 +1,12 @@
 [package]
 name = "vigil-server"
-version = "0.0.3"
+version = "0.0.4"
 description = "Microservices Status Page. Monitors a distributed infrastructure and sends alerts to Slack."
 readme = "README.md"
 license = "MPL-2.0"
 homepage = "https://github.com/valeriansaliou/vigil"
 repository = "https://github.com/valeriansaliou/vigil.git"
-keywords = ["microservices", "infrastructure", "status", "monitor", "probe", "slack"]
+keywords = ["microservices", "infrastructure", "status", "monitor", "slack"]
 categories = ["web-programming"]
 authors = ["Valerian Saliou <valerian@valeriansaliou.name>"]
 exclude = ["dev/*"]
