@@ -13,6 +13,8 @@ It is useful in microservices contexts to monitor both apps and backends. If a n
 
 **🚨 Vigil is currently Work In Progress (WIP). Stable version is coming soon (2 months ETA).**
 
+![Vigil](https://valeriansaliou.github.io/vigil/images/vigil.png)
+
 ## Who uses it?
 
 <table>
