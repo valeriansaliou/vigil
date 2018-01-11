@@ -28,6 +28,14 @@ It is useful in microservices contexts to monitor both apps and backends. If a n
 
 _👋 You use Vigil and you want to be listed there? [Contact me](https://valeriansaliou.name/)._
 
+## What status variants look like?
+
+Vigil has 3 status variants, either `healthy` (no issue ongoing), `sick` (services under high load) or `dead` (outage):
+
+![Status Healthy](https://valeriansaliou.github.io/vigil/images/status-healthy.png "Healthy status variant")
+![Status Sick](https://valeriansaliou.github.io/vigil/images/status-sick.png "Sick status variant")
+![Status Dead](https://valeriansaliou.github.io/vigil/images/status-dead.png "Dead status variant")
+
 ## How can I integrate Vigil Reporter in my code?
 
 Vigil Reporter is used to actively submit health information to Vigil from your apps. Apps are best monitored via application probes, which are able to report detailed system information such as CPU and RAM load. This lets Vigil show if an application host system is under high load.
