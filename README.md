@@ -32,9 +32,17 @@ _👋 You use Vigil and you want to be listed there? [Contact me](https://valeri
 
 Vigil has 3 status variants, either `healthy` (no issue ongoing), `sick` (services under high load) or `dead` (outage):
 
-![Status Healthy](https://valeriansaliou.github.io/vigil/images/status-healthy.png "Healthy status variant")
-![Status Sick](https://valeriansaliou.github.io/vigil/images/status-sick.png "Sick status variant")
-![Status Dead](https://valeriansaliou.github.io/vigil/images/status-dead.png "Dead status variant")
+### Healthy status variant
+
+![Status Healthy](https://valeriansaliou.github.io/vigil/images/status-healthy.png)
+
+### Sick status variant
+
+![Status Sick](https://valeriansaliou.github.io/vigil/images/status-sick.png)
+
+### Dead status variant
+
+![Status Dead](https://valeriansaliou.github.io/vigil/images/status-dead.png)
 
 ## How can I integrate Vigil Reporter in my code?
 
