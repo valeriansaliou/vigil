@@ -14,6 +14,7 @@ extern crate lazy_static;
 extern crate serde_derive;
 extern crate toml;
 extern crate rocket;
+extern crate rocket_contrib;
 
 mod config;
 
