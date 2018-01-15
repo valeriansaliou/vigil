@@ -24,10 +24,12 @@ doc = false
 log = "0.3"
 clap = { version = "2.29", default-features = false }
 lazy_static = "1.0"
+interpolate_idents = "0.2"
 serde = "1.0"
 serde_derive = "1.0"
 toml = "0.4"
 rocket = "0.3"
+rocket_codegen = "0.3"
 rocket_contrib = { version = "0.3", features = ["tera_templates"] }
 
 [profile.dev]
