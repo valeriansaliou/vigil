@@ -22,6 +22,12 @@ doc = false
 
 [dependencies]
 log = "0.3"
+clap = { version = "2.29", default-features = false }
+lazy_static = "1.0"
+serde = "1.0"
+serde_derive = "1.0"
+toml = "0.4"
+rocket = "0.3"
 
 [profile.dev]
 opt-level = 0

@@ -28,6 +28,77 @@ It is useful in microservices contexts to monitor both apps and backends. If a n
 
 _👋 You use Vigil and you want to be listed there? [Contact me](https://valeriansaliou.name/)._
 
+## Features
+
+* **Monitors automatically your infrastructure services**
+* **Notifies you when a service gets down** or gets back up (via a configured channel, eg. Slack or Email)
+* **Generates a status page**, that you can host on your domain for your public users (eg. `https://status.example.com`)
+
+## How does it work?
+
+Vigil monitors all your infrastructure services. You first need to configure target services to be monitored, and then Vigil does the rest for you.
+
+**There are two kinds of services Vigil can monitor:**
+
+* **HTTP / TCP services**: Vigil frequently probe a HTTP or TCP target and checks for reachability
+* **Application services**: Install the Vigil Reporter library eg. on your NodeJS app and get reports when your app gets down, as well as when the host server system is overloaded
+
+It is recommended to configure Vigil or Vigil Reporter to send frequent probe checks, as to ensure you are quickly notified when a service gets down (thus to reduce unexpected downtime on your services).
+
+## How to use it?
+
+### Installation
+
+**Install from releases:**
+
+The best way to install Vigil is to pull the latest release from the [Vigil releases](https://github.com/valeriansaliou/vigil/releases) page.
+
+Make sure to pick the correct server architecture (either Intel 32 bits, Intel 64 bits, or ARM).
+
+**Install from Cargo:**
+
+If you prefer managing `vigil` via Rust's Cargo, install it directly via `cargo install`:
+
+```bash
+cargo install vigil-server
+```
+
+Ensure that your `$PATH` is properly configured to source the Crates binaries, and then run Vigil using the `vigil` command.
+
+**Install from sources:**
+
+The last option is to pull the source code from Git and compile Vigil via `cargo`:
+
+```bash
+cargo build --release
+```
+
+You can find the built binaries in the `./target/release` directory.
+
+### Configuration
+
+Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/config.cfg) configuration file and adjust it to your own environment.
+
+**Available configuration options are commented below, with allowed values:**
+
+**[server]**
+
+* `log_level` (type: _string_, allowed: `debug`, `info`, `warn`, `error`, default: `warn`) — Verbosity of logging, set it to `error` in production
+* `inet` (type: _string_, allowed: IPv4 / IPv6 + port, default: `[::1]:8080`) — Host and TCP port the Vigil public status page should listen on
+
+### Run Vigil
+
+Vigil can be run as such:
+
+`./vigil -c /path/to/config.cfg`
+
+## Usage recommendations
+
+**Consider the following recommendations when using Vigil:**
+
+* **Vigil should be hosted on a safe, separate server.** This server should run on a different physical machine and network than your monitored infrastructure servers.
+* **Make sure to whitelist the Vigil server public IP (both IPv4 and IPv6)** on your monitored HTTP services; this applies if you use a bot protection service that challenges bot IPs, eg. Distil Networks or Cloudflare. Vigil will see the HTTP service as down if a bot challenge is raised.
+
 ## What status variants look like?
 
 Vigil has 3 status variants, either `healthy` (no issue ongoing), `sick` (services under high load) or `dead` (outage):
