@@ -20,7 +20,7 @@ lazy_static! {
 #[get("/")]
 fn index() -> Template {
     Template::render("index", &IndexContext {
-        // TODO: non static
+        // TODO: non static data (source from shared context)
         status: context::Status::Healthy,
         refreshed_at: time::strftime("%H:%M:%S UTC%z", &time::now()).unwrap_or("".to_string()),
         groups: Vec::new(),
@@ -40,15 +40,21 @@ fn badge(size: u16) -> String {
 
 #[get("/assets/fonts/<file..>")]
 fn assets_fonts(file: PathBuf) -> Option<NamedFile> {
+    // TODO: expire + cache header
+
     NamedFile::open(APP_CONF.assets.path.join("./fonts").join(file)).ok()
 }
 
 #[get("/assets/images/<file..>")]
 fn assets_images(file: PathBuf) -> Option<NamedFile> {
+    // TODO: expire + cache header
+
     NamedFile::open(APP_CONF.assets.path.join("./images").join(file)).ok()
 }
 
 #[get("/assets/stylesheets/<file..>")]
 fn assets_stylesheets(file: PathBuf) -> Option<NamedFile> {
+    // TODO: expire + cache header
+
     NamedFile::open(APP_CONF.assets.path.join("./stylesheets").join(file)).ok()
 }

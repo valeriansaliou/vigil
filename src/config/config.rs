@@ -16,6 +16,7 @@ pub struct Config {
     pub server: ConfigServer,
     pub assets: ConfigAssets,
     pub branding: ConfigBranding,
+    pub probe: ConfigProbe,
 }
 
 #[derive(Deserialize)]
@@ -46,4 +47,33 @@ pub struct ConfigBranding {
     pub website_url: SerdeUrl,
     pub support_url: SerdeUrl,
     pub custom_html: Option<String>,
+}
+
+#[derive(Deserialize)]
+pub struct ConfigProbe {
+    pub service: Vec<ConfigProbeService>,
+}
+
+#[derive(Deserialize)]
+pub struct ConfigProbeService {
+    pub id: String,
+    pub label: String,
+    pub node: Vec<ConfigProbeServiceNode>,
+}
+
+#[derive(Deserialize)]
+pub struct ConfigProbeServiceNode {
+    pub id: String,
+    pub label: String,
+    pub mode: ConfigProbeServiceNodeMode,
+    pub replicas: Vec<String>,
+}
+
+#[derive(Deserialize)]
+pub enum ConfigProbeServiceNodeMode {
+    #[serde(rename = "poll")]
+    Poll,
+
+    #[serde(rename = "push")]
+    Push,
 }

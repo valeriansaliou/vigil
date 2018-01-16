@@ -86,6 +86,36 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 * `log_level` (type: _string_, allowed: `debug`, `info`, `warn`, `error`, default: `warn`) — Verbosity of logging, set it to `error` in production
 * `inet` (type: _string_, allowed: IPv4 / IPv6 + port, default: `[::1]:8080`) — Host and TCP port the Vigil public status page should listen on
 
+**[assets]**
+
+* `path` (type: _string_, allowed: UNIX path, default: `./res/assets/`) — Path to Vigil assets directory
+
+**[branding]**
+
+* `page_title` (type: _string_, allowed: any string, default: `Status Page`) — Status page title
+* `company_name` (type: _string_, allowed: any string, no default) — Company name (ie. your company)
+* `icon_color` (type: _string_, allowed: any valid hexadecimal color code, no default) — Icon color (ie. your icon background color)
+* `icon_url` (type: _string_, allowed: any valid URL, no default) — Icon URL, the icon should be your squared logo, used as status page favicon (PNG format recommended)
+* `logo_color` (type: _string_, allowed: any valid hexadecimal color code, no default) — Logo color (ie. your logo primary color)
+* `logo_url` (type: _string_, allowed: any valid URL, no default) — Logo URL, the logo should be your full-width logo, used as status page header logo (SVG format recommended)
+* `website_url` (type: _string_, allowed: any valid URL, no default) — Website URL to be used in status page header
+* `support_url` (type: _string_, allowed: any valid URL, no default) — Support URL to be used in status page header (ie. where users can contact you if something is wrong)
+* `custom_html` (type: _string_, allowed: any valid HTML, default: empty) — Custom HTML to include in status page `head` (optional)
+
+**[probe]**
+
+**[[probe.service]]**
+
+* `id` (type: _string_, allowed: any unique lowercase string, no default) — Unique identifier of the probed service (not visible on the status page)
+* `label` (type: _string_, allowed: any string, no default) — Name of the probed service (visible on the status page)
+
+**[[probe.service.node]]**
+
+* `id` (type: _string_, allowed: any unique lowercase string, no default) — Unique identifier of the probed service node (not visible on the status page)
+* `label` (type: _string_, allowed: any string, no default) — Name of the probed service node (visible on the status page)
+* `mode` (type: _string_, allowed: `poll`, `push`, no default) — Probe mode for this node (ie. `poll` is direct HTTP or TCP poll to the service set in `replicas`, `push` is for Vigil Reporter)
+* `replicas` (type: _array[string]_, allowed: any valid array of TCP or HTTP URLs, default: `[]`) — Node replica URLs to be probed (only used if `mode` is `poll`)
+
 ### Run Vigil
 
 Vigil can be run as such:

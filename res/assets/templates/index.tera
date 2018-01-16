@@ -88,14 +88,14 @@
 
           <p class="font-sans-regular">
             {% if status == "dead" %}
-              Our team has been notified of the issue. If the outage persists
+              Our team has been notified of the issue. If the outage persists,
             {% elif status == "sick" %}
-              Services are slower than usual at the moment. If you are encountering an issue
+              Services are slower than usual at the moment. If you are encountering an issue,
             {% else %}
-              All systems are healthy at the moment. If you are encountering an issue
+              All systems are healthy at the moment. If you are encountering an issue,
             {% endif %}
 
-            , please <a href="{{ config.support_url | escape }}" class="font-sans-semibold">contact our support</a>.
+            please <a href="{{ config.support_url | escape }}" class="font-sans-semibold">contact our support</a>.
           </p>
         </div>
       </section>

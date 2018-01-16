@@ -39,11 +39,11 @@ pub enum Status {
 
 #[derive(Serialize)]
 pub enum ProbeType {
-    #[serde(rename = "passive")]
-    Passive,
+    #[serde(rename = "poll")]
+    Poll,
 
-    #[serde(rename = "active")]
-    Active,
+    #[serde(rename = "push")]
+    Push,
 }
 
 #[derive(Serialize)]
