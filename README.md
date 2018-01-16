@@ -11,7 +11,7 @@ It is useful in microservices contexts to monitor both apps and backends. If a n
 
 **👉 See a live demo of Vigil on [Crisp Status Page](https://status.crisp.chat).**
 
-**🚨 Vigil is currently Work In Progress (WIP). Stable version is coming soon (2 months ETA).**
+**🚨 Vigil is currently Work In Progress (WIP). Stable version is coming soon (1 week ETA).**
 
 ![Vigil](https://valeriansaliou.github.io/vigil/images/vigil.png)
 

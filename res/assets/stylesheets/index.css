@@ -1,0 +1,402 @@
+@charset "UTF-8";
+
+header {
+  background: #ffffff;
+  height: 62px;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.03);
+}
+
+header .header-inner {
+  padding: 0 10px;
+}
+
+header .logo {
+  margin-top: 17px;
+  float: left;
+}
+
+header .logo img,
+header .logo .logo-label {
+  vertical-align: middle;
+  display: inline-block;
+}
+
+header .logo img {
+  height: 26px;
+  max-width: 160px;
+}
+
+header .logo .logo-label {
+  color: rgba(0, 0, 0, 0.80);
+  border-left: 1px solid rgba(0, 0, 0, 0.08);
+  font-size: 15px;
+  text-transform: lowercase;
+  line-height: 24px;
+  letter-spacing: -0.15px;
+  margin-top: -2px;
+  margin-left: 9px;
+  padding-left: 12px;
+}
+
+header nav {
+  margin-top: 13px;
+  float: right;
+}
+
+header nav ul {
+  display: block;
+}
+
+header nav ul li {
+  list-style-type: none;
+  display: inline-block;
+}
+
+header nav ul li a {
+  font-size: 11.5px;
+  line-height: 32px;
+  height: 33px;
+  margin-left: 8px;
+  display: inline-block;
+  border-radius: 2px;
+}
+
+header nav ul li a.nav-support {
+  color: #ffffff;
+  background-color: rgba(0, 0, 0, 0.85);
+  letter-spacing: 0.10px;
+  padding: 0 17px;
+  box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.04);
+  transition: all 0.15s ease 0.10s;
+}
+
+header nav ul li a.nav-support:active {
+  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.04);
+  transform: translateY(1px);
+}
+
+header nav ul li a.nav-website {
+  color: #000000;
+  background-color: #ffffff;
+  text-decoration: underline;
+  padding: 0 15px;
+}
+
+aside {
+  color: #ffffff;
+  padding: 16px 0 18px;
+  text-align: center;;
+  overflow: hidden;
+  display: flex;
+}
+
+aside .wrapper {
+  padding: 0 8px;
+}
+
+aside h1,
+aside h4,
+aside .separator {
+  vertical-align: middle;
+  display: inline-block;
+}
+
+aside h1,
+aside h4 {
+  line-height: 20px;
+  flex: 1;
+}
+
+aside h1 {
+  font-size: 15px;
+  text-align: right;
+}
+
+aside h4 {
+  font-size: 14px;
+  text-align: left;
+  opacity: 0.85;
+}
+
+aside .separator {
+  background-color: rgba(255, 255, 255, 0.25);
+  width: 1px;
+  height: 21px;
+  margin: 0 22px;
+}
+
+main {
+  padding: 38px 0 48px;
+}
+
+main section {
+  background: #FFFFFF;
+  padding: 0 92px;
+  position: relative;
+  box-shadow: 0 2px 3px 0 rgba(15, 31, 64, 0.12);
+  border-radius: 2px;
+}
+
+main section.general .general-icon .badge {
+  width: 42px;
+  height: 42px;
+}
+
+main section.general {
+  margin-bottom: 30px;
+  padding-top: 22px;
+  padding-bottom: 24px;
+  display: flex;
+  position: relative;
+}
+
+main section.general:before {
+  content: "";
+  width: 4px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+}
+
+main section.general:before {
+  border-top-left-radius: 2px;
+  border-bottom-left-radius: 2px;
+}
+
+main section.general .general-icon {
+  padding-top: 2px;
+  padding-right: 36px;
+}
+
+main section.general .general-inner {
+  border-left: 1px solid rgba(0, 0, 0, 0.08);
+  letter-spacing: -0.10px;
+  hyphens: auto;
+  word-wrap: break-word;
+  word-break: break-word;
+  padding: 0 0 1px 24px;
+  flex: 1;
+}
+
+main section.general .general-inner h2 {
+  font-size: 15.5px;
+  margin-bottom: 11px;
+}
+
+main section.general .general-inner p,
+main section.general .general-inner p a {
+  color: rgba(0, 0, 0, 0.65);
+}
+
+main section.general .general-inner p {
+  font-size: 13px;
+  line-height: 18px;
+  margin-top: 3px;
+}
+
+main section.general .general-inner p a {
+  text-decoration: underline;
+}
+
+main section.group {
+  margin-top: 24px;
+  padding-top: 22px;
+  padding-bottom: 32px;
+}
+
+main section.group .title .badge,
+main section.group .title h3 {
+  vertical-align: middle;
+  display: inline-block;
+}
+
+main section.group .title .badge {
+  margin-right: 8px;
+}
+
+main section.group .title h3 {
+  font-size: 15px;
+  line-height: 20px;
+}
+
+main section.group ul {
+  margin-top: 20px;
+  display: block;
+}
+
+main section.group ul li {
+  list-style-type: none;
+  margin-top: 9px;
+  display: flex;
+  position: relative;
+  border-radius: 2px;
+}
+
+main section.group ul li:before {
+  content: "";
+  width: 3px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  border-top-left-radius: 2px;
+  border-bottom-left-radius: 2px;
+}
+
+main section.group ul li label {
+  color: rgba(0, 0, 0, 0.85);
+  border-width: 0 1px 0 0;
+  border-style: solid;
+  font-size: 13px;
+  letter-spacing: -0.10px;
+  line-height: 16px;
+  hyphens: auto;
+  word-wrap: break-word;
+  word-break: break-word;
+  padding: 16px 14px 18px 32px;
+  flex: 0.35;
+}
+
+main section.group ul li .nodes {
+  background-color: #F7F8FA;
+  padding: 9px 20px 8px 24px;
+  flex: 0.65;
+}
+
+main section.group ul li .nodes .node {
+  color: #ffffff;
+  font-size: 12px;
+  text-align: center;
+  line-height: 23px;
+  height: 23px;
+  margin: 4px 2px;
+  padding: 0 8px;
+  display: inline-block;
+  border-radius: 2px;
+}
+
+footer {
+  text-align: center;
+  letter-spacing: -0.05px;
+  padding-bottom: 36px;
+}
+
+footer p,
+footer p a {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+footer p {
+  font-size: 11.5px;
+  line-height: 17px;
+  margin-top: 2px;
+}
+
+footer p a {
+  text-decoration: underline;
+}
+
+@media screen and (max-width: 1020px) {
+  main section {
+    padding-left: 54px;
+    padding-right: 54px;
+  }
+}
+
+@media screen and (max-width: 720px) {
+  main section.group ul li label,
+  main section.group ul li .nodes {
+    flex: 0.5;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  header nav ul li a.nav-website {
+    display: none;
+  }
+
+  aside h1 {
+    text-align: center;
+  }
+
+  aside h4,
+  aside .separator {
+    display: none;
+  }
+
+  main section {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+
+  main section.general .general-icon {
+    display: none;
+  }
+
+  main section.general .general-inner {
+    border-left: 0 none;
+    padding-left: 0;
+  }
+
+  main section.general .general-inner h2,
+  main section.general .general-inner p {
+    text-align: justify;
+  }
+
+  main section.general .general-inner p {
+    margin-top: 9px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  header {
+    text-align: center;
+  }
+
+  header .logo {
+    display: inline-block;
+    float: none;
+  }
+
+  header nav {
+    display: none;
+  }
+
+  main {
+    padding-top: 28px;
+    padding-bottom: 32px;
+  }
+
+  main section {
+    padding-left: 28px;
+    padding-right: 28px;
+  }
+
+  main section.general {
+    padding-top: 20px;
+    padding-bottom: 22px;
+  }
+
+  main section.group {
+    padding-top: 22px;
+    padding-bottom: 28px;
+  }
+
+  main section.group ul li label {
+    padding-left: 20px;
+    padding-right: 10px;
+  }
+
+  main section.group ul li .nodes {
+    padding-left: 18px;
+    padding-right: 14px;
+  }
+
+  footer {
+    padding-bottom: 28px;
+  }
+}

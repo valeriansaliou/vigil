@@ -5,12 +5,17 @@
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
 use std::net::SocketAddr;
+use std::path::PathBuf;
+
+use url_serde::SerdeUrl;
 
 use super::defaults;
 
 #[derive(Deserialize)]
 pub struct Config {
     pub server: ConfigServer,
+    pub assets: ConfigAssets,
+    pub branding: ConfigBranding,
 }
 
 #[derive(Deserialize)]
@@ -20,4 +25,25 @@ pub struct ConfigServer {
 
     #[serde(default = "defaults::server_inet")]
     pub inet: SocketAddr,
+}
+
+#[derive(Deserialize)]
+pub struct ConfigAssets {
+    #[serde(default = "defaults::assets_path")]
+    pub path: PathBuf,
+}
+
+#[derive(Deserialize)]
+pub struct ConfigBranding {
+    #[serde(default = "defaults::branding_page_title")]
+    pub page_title: String,
+
+    pub company_name: String,
+    pub icon_color: String,
+    pub icon_url: SerdeUrl,
+    pub logo_color: String,
+    pub logo_url: SerdeUrl,
+    pub website_url: SerdeUrl,
+    pub support_url: SerdeUrl,
+    pub custom_html: Option<String>,
 }

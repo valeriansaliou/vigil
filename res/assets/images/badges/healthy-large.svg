@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="42px" height="42px" viewBox="0 0 42 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs></defs>
+    <g id="Status-Page" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(-286.000000, -187.000000)">
+        <g id="Content" transform="translate(190.000000, 163.000000)">
+            <g id="Box-Wrap">
+                <g id="Box-(Healthy)">
+                    <g id="Inner" transform="translate(96.000000, 20.000000)">
+                        <g id="Icon" transform="translate(0.000000, 4.000000)">
+                            <rect id="Box" fill="#0EB033" x="0" y="0" width="42" height="42" rx="2"></rect>
+                            <g id="Checkmark" transform="translate(11.025000, 13.650000)" stroke="#FFFFFF" stroke-linecap="square" stroke-width="4">
+                                <path d="M0,8.4 L6.3,14.7" id="Line"></path>
+                                <path d="M19.95,1.05 L6.3,14.7" id="Line"></path>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

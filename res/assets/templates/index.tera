@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+
+<html lang="en" dir="ltr">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="icon" href="{{ config.icon_url | escape }}" type="{{ config.icon_mime | escape }}">
+    <link rel="apple-touch-icon" href="{{ config.icon_url | escape }}" type="{{ config.icon_mime | escape }}">
+
+    <meta name="msapplication-TileColor" content="{{ config.icon_color | escape }}">
+    <meta name="msapplication-TileImage" content="{{ config.icon_url | escape }}">
+    <meta property="og:image" content="{{ config.icon_url | escape }}">
+
+    <title>{{ config.page_title | escape }}</title>
+
+    <link rel="stylesheet" href="/assets/stylesheets/common.css" type="text/css" />
+    <link rel="stylesheet" href="/assets/stylesheets/index.css" type="text/css" />
+
+    {% if config.custom_html %}
+      {{ config.custom_html | safe }}
+    {% endif %}
+  </head>
+
+  <body>
+    <header>
+      <div class="wrapper">
+        <div class="header-inner">
+          <a href="/" class="logo">
+            <img src="{{ config.logo_url | escape }}" alt="" />
+
+            <span class="logo-label font-sans-semibold">Status</span>
+          </a>
+
+          <nav>
+            <ul>
+              <li>
+                <a href="{{ config.support_url | escape }}" style="background-color: {{ config.logo_color | escape }};" class="nav-support font-sans-semibold">Contact support</a>
+              </li>
+
+              <li>
+                <a href="{{ config.website_url | escape }}" target="_blank" class="nav-website font-sans-bold">Go to website</a>
+              </li>
+            </ul>
+          </nav>
+
+          <div class="clear"></div>
+        </div>
+      </div>
+    </header>
+
+    <aside class="status-{{ status | escape }}-background">
+      <div class="wrapper">
+        <h1 class="font-sans-semibold">
+          {% if status == "dead" %}
+            Partial service outage ongoing
+          {% elif status == "sick" %}
+            Minor service slowdown ongoing
+          {% else %}
+            All systems report as healthy
+          {% endif %}
+        </h1>
+
+        <div class="separator"></div>
+
+        <h4 class="font-sans-light">refreshed {{ refreshed_at | escape }}</h4>
+      </div>
+    </aside>
+
+    <main class="wrapper">
+      <section class="general status-{{ status | escape }}-background-before">
+        <div class="general-icon">
+          <div class="badge badge-large badge-status-{{ status | escape }}"></div>
+        </div>
+
+        <div class="general-inner">
+          <h2 class="font-sans-bold">
+            {% if status == "dead" %}
+              Looks like some services are not working.
+            {% elif status == "sick" %}
+              Looks like services are under high load.
+            {% else %}
+              Looks like everything is operating normally.
+            {% endif %}
+          </h2>
+
+          <p class="font-sans-semibold">This status page automatically monitors our systems and alerts if something is not working as expected.</p>
+
+          <p class="font-sans-regular">
+            {% if status == "dead" %}
+              Our team has been notified of the issue. If the outage persists
+            {% elif status == "sick" %}
+              Services are slower than usual at the moment. If you are encountering an issue
+            {% else %}
+              All systems are healthy at the moment. If you are encountering an issue
+            {% endif %}
+
+            , please <a href="{{ config.support_url | escape }}" class="font-sans-semibold">contact our support</a>.
+          </p>
+        </div>
+      </section>
+
+      <section class="group">
+        <div class="title">
+          <div class="badge badge-small badge-status-healthy"></div>
+
+          <h3 class="font-sans-bold">Web nodes</h3>
+        </div>
+
+        <ul>
+          <li class="status-healthy-background-before">
+            <label class="font-sans-semibold status-healthy-background-subtle status-healthy-border-subtle">Core main load balancer</label>
+
+            <div class="nodes">
+              <span class="node status-healthy-background has-tooltip font-sans-semibold">
+                1
+
+                <span class="tooltip">
+                  <span class="tooltip-value">
+                    <span class="tooltip-main font-sans-semibold">This node reports as healthy.</span>
+                    <span class="tooltip-label font-sans-light">Checked via an external HTTP probe.</span>
+                  </span>
+                </span>
+              </span>
+
+              <span class="node status-healthy-background has-tooltip font-sans-semibold">2</span>
+              <span class="node status-healthy-background has-tooltip font-sans-semibold">3</span>
+            </div>
+          </li>
+
+          <li class="status-sick-background-before">
+            <label class="font-sans-semibold status-sick-background-subtle status-sick-border-subtle">Core help load balancer</label>
+
+            <div class="nodes">
+              <span class="node status-sick-background has-tooltip font-sans-semibold">
+                1
+
+                <span class="tooltip">
+                  <span class="tooltip-value">
+                    <span class="tooltip-main font-sans-semibold">This node reports as sick.</span>
+                    <span class="tooltip-label font-sans-light">Reported by internal node probe.</span>
+                  </span>
+                </span>
+              </span>
+
+              <span class="node status-healthy-background has-tooltip font-sans-semibold">2</span>
+            </div>
+          </li>
+
+          <li class="status-dead-background-before">
+            <label class="font-sans-semibold status-dead-background-subtle status-dead-border-subtle">Core collector tunnel</label>
+
+            <div class="nodes">
+              <span class="node status-dead-background has-tooltip font-sans-semibold">
+                1
+
+                <span class="tooltip">
+                  <span class="tooltip-value">
+                    <span class="tooltip-main font-sans-semibold">This node reports as dead.</span>
+                    <span class="tooltip-label font-sans-light">Checked via an external TCP probe.</span>
+                  </span>
+                </span>
+              </span>
+            </div>
+          </li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="wrapper">
+      <p class="font-sans-semibold">© 2018 {{ config.company_name | escape }}</p>
+      <p class="font-sans-regular">This status page is powered by <a href="https://github.com/valeriansaliou/vigil" target="_blank" class="font-sans-semibold">Vigil</a>.</p>
+    </footer>
+  </body>
+</html>

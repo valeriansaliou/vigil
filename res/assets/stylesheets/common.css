@@ -1,0 +1,262 @@
+@charset "UTF-8";
+
+@font-face {
+  font-family: "Vigil Open Sans Light";
+  src: url("/assets/fonts/open_sans/open_sans_light.woff2") format("woff2"), url("/assets/fonts/open_sans/open_sans_light.woff") format("woff");
+  font-weight: 100;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Vigil Open Sans Regular";
+  src: url("/assets/fonts/open_sans/open_sans_regular.woff2") format("woff2"), url("/assets/fonts/open_sans/open_sans_regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Vigil Open Sans Semibold";
+  src: url("/assets/fonts/open_sans/open_sans_semibold.woff2") format("woff2"), url("/assets/fonts/open_sans/open_sans_semibold.woff") format("woff");
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Vigil Open Sans Bold";
+  src: url("/assets/fonts/open_sans/open_sans_bold.woff2") format("woff2"), url("/assets/fonts/open_sans/open_sans_bold.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+}
+
+.font-sans-light {
+  font-family: "Vigil Open Sans Light", sans-serif;
+}
+
+.font-sans-regular {
+  font-family: "Vigil Open Sans Regular", sans-serif;
+}
+
+.font-sans-semibold {
+  font-family: "Vigil Open Sans Semibold", sans-serif;
+}
+
+.font-sans-bold {
+  font-family: "Vigil Open Sans Bold", sans-serif;
+}
+
+body {
+  font-family: "Vigil Open Sans Regular", sans-serif;
+  font-size: 14px;
+  background: #F7F8FA !important;
+  color: rgba(0, 0, 0, 0.95);
+}
+
+* {
+  font-weight: normal !important;
+  margin: 0;
+  padding: 0;
+}
+
+a,
+button {
+  outline: 0 none !important;
+}
+
+a {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+a:hover {
+  cursor: pointer;
+}
+
+.clear {
+  display: block !important;
+  clear: both !important;
+}
+
+.wrapper {
+  width: 980px;
+  max-width: 980px;
+  margin: 0 auto;
+  display: block;
+}
+
+.badge {
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  display: inline-block;
+}
+
+.badge.badge-small {
+  width: 20px;
+  height: 20px;
+}
+
+.badge.badge-large {
+  width: 42px;
+  height: 42px;
+}
+
+.has-tooltip {
+  cursor: crosshair;
+  position: relative;
+}
+
+.has-tooltip .tooltip {
+  line-height: 19px;
+  text-align: center;
+  cursor: default;
+  pointer-events: none;
+  width: 1000px;
+  margin-left: -500px;
+  margin-top: 6px;
+  visibility: hidden;
+  opacity: 0;
+  display: block;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  z-index: 100;
+  transition: all 0.15s ease 0.10s;
+  transform: translateY(-4px);
+}
+
+.has-tooltip .tooltip:after {
+  content: "";
+  border-bottom: 4px solid rgba(0, 0, 0, 0.94);
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  height: 0;
+  width: 0;
+  margin-left: -4px;
+  position: absolute;
+  left: 50%;
+  top: -4px;
+}
+
+.has-tooltip .tooltip .tooltip-value {
+  background-color: rgba(0, 0, 0, 0.94);
+  font-size: 11px;
+  line-height: 16px;
+  text-align: center;
+  text-shadow: none;
+  text-transform: initial;
+  padding: 6px 20px 7px;
+  display: inline-block;
+  left: 50%;
+  border-radius: 1px;
+}
+
+.has-tooltip .tooltip .tooltip-value .tooltip-main,
+.has-tooltip .tooltip .tooltip-value .tooltip-label {
+  display: block;
+}
+
+.has-tooltip .tooltip .tooltip-value .tooltip-main {
+  color: #ffffff;
+}
+
+.has-tooltip .tooltip .tooltip-value .tooltip-label {
+  color: rgba(255, 255, 255, 0.75);
+  margin-top: 1px;
+}
+
+.has-tooltip:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  transition: all 0.15s ease;
+  transform: translateY(0);
+}
+
+.badge.badge-status-healthy.badge-small {
+  background-image: url("/assets/images/badges/healthy-small.svg");
+}
+
+.badge.badge-status-healthy.badge-large {
+  background-image: url("/assets/images/badges/healthy-large.svg");
+}
+
+.status-healthy-background,
+.status-healthy-background-before:before {
+  background-color: #0EB033;
+}
+
+.status-healthy-color {
+  color: #0EB033;
+}
+
+.status-healthy-background-subtle {
+  background-color: rgba(14, 176, 51, 0.10);
+}
+
+.status-healthy-border-subtle {
+  border-color: rgba(14, 176, 51, 0.17);
+}
+
+.badge-status-sick.badge-small {
+  background-image: url("/assets/images/badges/sick-small.svg");
+}
+
+.badge-status-sick.badge-large {
+  background-image: url("/assets/images/badges/sick-large.svg");
+}
+
+.status-sick-background,
+.status-sick-background-before:before {
+  background-color: #F18000;
+}
+
+.status-sick-color {
+  color: #F18000;
+}
+
+.status-sick-background-subtle {
+  background-color: rgba(241, 128, 0, 0.10);
+}
+
+.status-sick-border-subtle {
+  border-color: rgba(241, 128, 0, 0.17);
+}
+
+.badge-status-dead.badge-small {
+  background-image: url("/assets/images/badges/dead-small.svg");
+}
+
+.badge-status-dead.badge-large {
+  background-image: url("/assets/images/badges/dead-large.svg");
+}
+
+.status-dead-background,
+.status-dead-background-before:before {
+  background-color: #E10000;
+}
+
+.status-dead-color {
+  color: #E10000;
+}
+
+.status-dead-background-subtle {
+  background-color: rgba(225, 0, 0, 0.08);
+}
+
+.status-dead-border-subtle {
+  border-color: rgba(225, 0, 0, 0.10);
+}
+
+@media screen and (max-width: 1020px) {
+  .wrapper {
+    width: calc(100% - 40px);
+    max-width: calc(100% - 40px);
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .wrapper {
+    width: calc(100% - 18px);
+    max-width: calc(100% - 18px);
+  }
+}
