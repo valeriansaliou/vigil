@@ -19,7 +19,7 @@ It is useful in microservices contexts to monitor both apps and backends. If a n
 
 <table>
 <tr>
-<td align="center"><a href="https://crisp.chat/"><img src="https://valeriansaliou.github.io/vigil/images/crisp.png" height="64" /></a></td>
+<td align="center"><a href="https://crisp.chat/"><img src="https://valeriansaliou.github.io/vigil/images/crisp-icon.png" height="64" /></a></td>
 </tr>
 <tr>
 <td align="center">Crisp</td>
