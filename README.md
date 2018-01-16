@@ -114,7 +114,7 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 * `id` (type: _string_, allowed: any unique lowercase string, no default) — Unique identifier of the probed service node (not visible on the status page)
 * `label` (type: _string_, allowed: any string, no default) — Name of the probed service node (visible on the status page)
 * `mode` (type: _string_, allowed: `poll`, `push`, no default) — Probe mode for this node (ie. `poll` is direct HTTP or TCP poll to the URLs set in `replicas`, while `push` is for Vigil Reporter nodes)
-* `replicas` (type: _array[string]_, allowed: any valid array of TCP or HTTP URLs, default: `[]`) — Node replica URLs to be probed (only used if `mode` is `poll`)
+* `replicas` (type: _array[string]_, allowed: any valid array of TCP or HTTP URLs, default: empty) — Node replica URLs to be probed (only used if `mode` is `poll`)
 
 ### Run Vigil
 

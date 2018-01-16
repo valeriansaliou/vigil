@@ -66,7 +66,7 @@ pub struct ConfigProbeServiceNode {
     pub id: String,
     pub label: String,
     pub mode: ConfigProbeServiceNodeMode,
-    pub replicas: Vec<String>,
+    pub replicas: Option<Vec<String>>,
 }
 
 #[derive(Deserialize)]
