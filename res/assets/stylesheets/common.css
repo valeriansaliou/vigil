@@ -90,7 +90,7 @@ a:hover {
   display: inline-block;
 }
 
-.badge.badge-small {
+.badge.badge-default {
   width: 20px;
   height: 20px;
 }
@@ -172,12 +172,12 @@ a:hover {
   transform: translateY(0);
 }
 
-.badge.badge-status-healthy.badge-small {
-  background-image: url("/assets/images/badges/healthy-small.svg");
+.badge.badge-status-healthy.badge-default {
+  background-image: url("/assets/images/badges/icon-healthy-default.svg");
 }
 
 .badge.badge-status-healthy.badge-large {
-  background-image: url("/assets/images/badges/healthy-large.svg");
+  background-image: url("/assets/images/badges/icon-healthy-large.svg");
 }
 
 .status-healthy-background,
@@ -197,12 +197,12 @@ a:hover {
   border-color: rgba(14, 176, 51, 0.17);
 }
 
-.badge-status-sick.badge-small {
-  background-image: url("/assets/images/badges/sick-small.svg");
+.badge-status-sick.badge-default {
+  background-image: url("/assets/images/badges/icon-sick-default.svg");
 }
 
 .badge-status-sick.badge-large {
-  background-image: url("/assets/images/badges/sick-large.svg");
+  background-image: url("/assets/images/badges/icon-sick-large.svg");
 }
 
 .status-sick-background,
@@ -222,12 +222,12 @@ a:hover {
   border-color: rgba(241, 128, 0, 0.17);
 }
 
-.badge-status-dead.badge-small {
-  background-image: url("/assets/images/badges/dead-small.svg");
+.badge-status-dead.badge-default {
+  background-image: url("/assets/images/badges/icon-dead-default.svg");
 }
 
 .badge-status-dead.badge-large {
-  background-image: url("/assets/images/badges/dead-large.svg");
+  background-image: url("/assets/images/badges/icon-dead-large.svg");
 }
 
 .status-dead-background,

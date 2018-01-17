@@ -10,12 +10,14 @@ use std::path::PathBuf;
 use url_serde::SerdeUrl;
 
 use super::defaults;
+use prober::mode::Mode;
 
 #[derive(Deserialize)]
 pub struct Config {
     pub server: ConfigServer,
     pub assets: ConfigAssets,
     pub branding: ConfigBranding,
+    pub metrics: ConfigMetrics,
     pub probe: ConfigProbe,
 }
 
@@ -50,6 +52,30 @@ pub struct ConfigBranding {
 }
 
 #[derive(Deserialize)]
+pub struct ConfigMetrics {
+    #[serde(default = "defaults::metrics_poll_interval")]
+    pub poll_interval: u16,
+
+    #[serde(default = "defaults::metrics_poll_retry")]
+    pub poll_retry: u16,
+
+    #[serde(default = "defaults::metrics_poll_http_status_healthy_above")]
+    pub poll_http_status_healthy_above: u16,
+
+    #[serde(default = "defaults::metrics_poll_http_status_healthy_below")]
+    pub poll_http_status_healthy_below: u16,
+
+    #[serde(default = "defaults::metrics_poll_delay_dead")]
+    pub poll_delay_dead: u16,
+
+    #[serde(default = "defaults::metrics_poll_delay_sick")]
+    pub poll_delay_sick: u16,
+
+    #[serde(default = "defaults::metrics_push_delay_dead")]
+    pub push_delay_dead: u16,
+}
+
+#[derive(Deserialize)]
 pub struct ConfigProbe {
     pub service: Vec<ConfigProbeService>,
 }
@@ -65,15 +91,6 @@ pub struct ConfigProbeService {
 pub struct ConfigProbeServiceNode {
     pub id: String,
     pub label: String,
-    pub mode: ConfigProbeServiceNodeMode,
+    pub mode: Mode,
     pub replicas: Option<Vec<String>>,
-}
-
-#[derive(Deserialize)]
-pub enum ConfigProbeServiceNodeMode {
-    #[serde(rename = "poll")]
-    Poll,
-
-    #[serde(rename = "push")]
-    Push,
 }

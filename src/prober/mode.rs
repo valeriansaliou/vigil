@@ -4,8 +4,11 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
-mod context;
-mod routes;
-mod asset_file;
+#[derive(Serialize, Deserialize, Clone)]
+pub enum Mode {
+    #[serde(rename = "poll")]
+    Poll,
 
-pub mod manager;
+    #[serde(rename = "push")]
+    Push,
+}

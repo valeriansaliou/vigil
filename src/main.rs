@@ -18,10 +18,12 @@ extern crate serde_derive;
 extern crate time;
 extern crate toml;
 extern crate url_serde;
+extern crate ordermap;
 extern crate rocket;
 extern crate rocket_contrib;
 
 mod config;
+mod aggregator;
 mod prober;
 mod responder;
 
@@ -36,7 +38,8 @@ use log::LogLevelFilter;
 use config::config::Config;
 use config::logger::ConfigLogger;
 use config::reader::ConfigReader;
-use prober::manager::run as run_prober;
+use prober::manager::{run as run_prober, initialize_store as initialize_store_prober};
+use aggregator::manager::run as run_aggregator;
 use responder::manager::run as run_responder;
 
 struct AppArgs {
@@ -44,6 +47,7 @@ struct AppArgs {
 }
 
 pub static THREAD_NAME_PROBER: &'static str = "vigil-prober";
+pub static THREAD_NAME_AGGREGATOR: &'static str = "vigil-aggregator";
 pub static THREAD_NAME_RESPONDER: &'static str = "vigil-responder";
 
 macro_rules! gen_spawn_managed {
@@ -80,8 +84,24 @@ lazy_static! {
     static ref APP_CONF: Config = ConfigReader::make();
 }
 
-gen_spawn_managed!("prober", spawn_prober, THREAD_NAME_PROBER, run_prober);
-gen_spawn_managed!("responder", spawn_responder, THREAD_NAME_RESPONDER, run_responder);
+gen_spawn_managed!(
+    "prober",
+    spawn_prober,
+    THREAD_NAME_PROBER,
+    run_prober
+);
+gen_spawn_managed!(
+    "aggregator",
+    spawn_aggregator,
+    THREAD_NAME_AGGREGATOR,
+    run_aggregator
+);
+gen_spawn_managed!(
+    "responder",
+    spawn_responder,
+    THREAD_NAME_RESPONDER,
+    run_responder
+);
 
 fn make_app_args() -> AppArgs {
     let matches = App::new(crate_name!())
@@ -104,7 +124,16 @@ fn make_app_args() -> AppArgs {
 
 fn ensure_states() {
     // Ensure all statics are valid (a `deref` is enough to lazily initialize them)
+    APP_ARGS.deref();
     APP_CONF.deref();
+
+    // Ensure assets path exists
+    assert_eq!(
+        APP_CONF.assets.path.exists(),
+        true,
+        "assets directory not found: {:?}",
+        APP_CONF.assets.path
+    );
 }
 
 fn main() {
@@ -117,8 +146,14 @@ fn main() {
     // Ensure all states are bound
     ensure_states();
 
+    // Initialize prober store
+    initialize_store_prober();
+
     // Spawn probes (background thread)
     thread::spawn(spawn_prober);
+
+    // Spawn aggregator (background thread)
+    thread::spawn(spawn_aggregator);
 
     // Spawn Web responder (foreground thread)
     spawn_responder();

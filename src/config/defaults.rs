@@ -22,3 +22,31 @@ pub fn assets_path() -> PathBuf {
 pub fn branding_page_title() -> String {
     "Status Page".to_string()
 }
+
+pub fn metrics_poll_interval() -> u16 {
+    120
+}
+
+pub fn metrics_poll_retry() -> u16 {
+    2
+}
+
+pub fn metrics_poll_http_status_healthy_above() -> u16 {
+    200
+}
+
+pub fn metrics_poll_http_status_healthy_below() -> u16 {
+    400
+}
+
+pub fn metrics_poll_delay_dead() -> u16 {
+    30
+}
+
+pub fn metrics_poll_delay_sick() -> u16 {
+    10
+}
+
+pub fn metrics_push_delay_dead() -> u16 {
+    20
+}

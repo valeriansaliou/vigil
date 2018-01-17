@@ -28,21 +28,30 @@ pub fn run() {
 
     extras.insert(
         "template_dir".to_string(),
-        APP_CONF.assets.path.join("./templates").to_str().unwrap().into()
+        APP_CONF
+            .assets
+            .path
+            .join("./templates")
+            .to_str()
+            .unwrap()
+            .into(),
     );
 
     config.set_extras(extras);
 
     // Build and run Rocket instance
     rocket::custom(config, false)
-        .mount("/", routes![
+        .mount(
+            "/",
+            routes![
             routes::index,
             routes::robots,
             routes::badge,
             routes::assets_fonts,
             routes::assets_images,
             routes::assets_stylesheets,
-        ])
+        ],
+        )
         .attach(Template::fairing())
         .launch();
 }
