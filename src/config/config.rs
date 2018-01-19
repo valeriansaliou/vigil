@@ -47,7 +47,7 @@ pub struct ConfigBranding {
     #[serde(default = "defaults::branding_page_title")]
     pub page_title: String,
 
-    pub page_url: String,
+    pub page_url: SerdeUrl,
     pub company_name: String,
     pub icon_color: String,
     pub icon_url: SerdeUrl,
@@ -114,7 +114,7 @@ pub struct ConfigNotifyEmail {
 
 #[derive(Deserialize)]
 pub struct ConfigNotifySlack {
-    pub hook_url: String,
+    pub hook_url: SerdeUrl,
 }
 
 #[derive(Deserialize)]

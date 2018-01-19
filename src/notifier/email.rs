@@ -37,7 +37,7 @@ impl GenericNotifier for EmailNotifier {
                 message.push_str(&format!("Status: {:?}\n", notification.status));
                 message.push_str(&format!("Nodes: {}\n", notification.replicas.join(", ")));
                 message.push_str(&format!("Time: {}\n", &notification.time));
-                message.push_str(&format!("URL: {}", APP_CONF.branding.page_url));
+                message.push_str(&format!("URL: {}", APP_CONF.branding.page_url.as_str()));
 
                 message.push_str("\n--\n");
                 message.push_str("\n");

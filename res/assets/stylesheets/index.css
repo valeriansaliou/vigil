@@ -87,7 +87,7 @@ header nav ul li a.nav-website {
 
 aside {
   color: #ffffff;
-  padding: 16px 0 18px;
+  padding: 16px 0 19px;
   text-align: center;;
   overflow: hidden;
   display: flex;
@@ -106,7 +106,7 @@ aside .separator {
 
 aside h1,
 aside h4 {
-  line-height: 20px;
+  line-height: 21px;
   flex: 1;
 }
 

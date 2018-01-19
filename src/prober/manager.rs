@@ -9,6 +9,8 @@ use std::sync::Arc;
 use std::time::Duration;
 use std::thread;
 
+use reqwest::{Client, RedirectPolicy};
+use reqwest::header::{Headers, UserAgent};
 use ordermap::OrderMap;
 
 use prober::manager::{STORE as PROBER_STORE};
@@ -31,10 +33,27 @@ lazy_static! {
             probes: OrderMap::new(),
         }
     }));
+
+    static ref PROBE_HTTP_CLIENT: Client = Client::builder()
+        .timeout(Duration::from_secs(APP_CONF.metrics.poll_delay_dead))
+        .gzip(false)
+        .redirect(RedirectPolicy::none())
+        .enable_hostname_verification()
+        .default_headers(make_default_headers())
+        .build()
+        .unwrap();
 }
 
 pub struct Store {
     pub states: ServiceStates,
+}
+
+fn make_default_headers() -> Headers {
+    let mut headers = Headers::new();
+
+    headers.set(UserAgent::new(format!("vigil (+{})", APP_CONF.branding.page_url.as_str())));
+
+    headers
 }
 
 fn map_poll_replicas() -> Vec<(String, String, String, ReplicaURL)> {
@@ -69,20 +88,44 @@ fn map_poll_replicas() -> Vec<(String, String, String, ReplicaURL)> {
 }
 
 fn proceed_replica_probe(replica_url: &ReplicaURL) -> Status {
-    match replica_url {
+    let is_up = match replica_url {
         &ReplicaURL::TCP(ref host, port) => proceed_replica_probe_tcp(host, port),
-        &ReplicaURL::HTTP(ref host, port) => proceed_replica_probe_http(host, port),
+        &ReplicaURL::HTTP(ref url) => proceed_replica_probe_http(url),
+        &ReplicaURL::HTTPS(ref url) => proceed_replica_probe_http(url),
+    };
+
+    if is_up == true {
+        // TODO: check delay for sick?
+        Status::Healthy
+    } else {
+        Status::Dead
     }
 }
 
-fn proceed_replica_probe_tcp(host: &str, port: u16) -> Status {
+fn proceed_replica_probe_tcp(host: &str, port: u16) -> bool {
     // TODO
-    Status::Sick
+    false
 }
 
-fn proceed_replica_probe_http(host: &str, port: u16) -> Status {
-    // TODO
-    Status::Sick
+fn proceed_replica_probe_http(url: &str) -> bool {
+    let response = PROBE_HTTP_CLIENT
+        .head(url)
+        .send();
+
+    if let Ok(response_inner) = response {
+        let status_code = response_inner.status().as_u16();
+
+        debug!("prober poll result received for url: {} with status: {}", url, status_code);
+
+        // Consider as UP?
+        if status_code >= APP_CONF.metrics.poll_http_status_healthy_above &&
+            status_code < APP_CONF.metrics.poll_http_status_healthy_below {
+            return true;
+        }
+    }
+
+    // Consider as DOWN.
+    false
 }
 
 fn dispatch_polls() {

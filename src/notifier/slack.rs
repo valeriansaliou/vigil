@@ -85,7 +85,7 @@ impl GenericNotifier for SlackNotifier {
 
                 attachment.fields.push(SlackPayloadAttachmentField {
                     title: "Monitor Page",
-                    value: &APP_CONF.branding.page_url,
+                    value: APP_CONF.branding.page_url.as_str(),
                     short: false
                 });
 
@@ -109,7 +109,7 @@ impl GenericNotifier for SlackNotifier {
 
                 // Submit payload to Slack
                 let response = SLACK_HTTP_CLIENT
-                    .post(&slack.hook_url)
+                    .post(slack.hook_url.as_str())
                     .json(&payload)
                     .send();
 
