@@ -202,33 +202,33 @@ main section.general .general-inner p a {
   text-decoration: underline;
 }
 
-main section.group {
+main section.probe {
   margin-top: 24px;
   padding-top: 22px;
   padding-bottom: 32px;
 }
 
-main section.group .title .badge,
-main section.group .title h3 {
+main section.probe .title .badge,
+main section.probe .title h3 {
   vertical-align: middle;
   display: inline-block;
 }
 
-main section.group .title .badge {
+main section.probe .title .badge {
   margin-right: 8px;
 }
 
-main section.group .title h3 {
+main section.probe .title h3 {
   font-size: 15px;
   line-height: 20px;
 }
 
-main section.group ul {
+main section.probe ul {
   margin-top: 20px;
   display: block;
 }
 
-main section.group ul li {
+main section.probe ul li {
   list-style-type: none;
   margin-top: 9px;
   display: flex;
@@ -236,7 +236,7 @@ main section.group ul li {
   border-radius: 2px;
 }
 
-main section.group ul li:before {
+main section.probe ul li:before {
   content: "";
   width: 3px;
   position: absolute;
@@ -247,7 +247,7 @@ main section.group ul li:before {
   border-bottom-left-radius: 2px;
 }
 
-main section.group ul li label {
+main section.probe ul li label {
   color: rgba(0, 0, 0, 0.85);
   border-width: 0 1px 0 0;
   border-style: solid;
@@ -261,13 +261,13 @@ main section.group ul li label {
   flex: 0.35;
 }
 
-main section.group ul li .nodes {
+main section.probe ul li .node {
   background-color: #F7F8FA;
   padding: 9px 20px 8px 24px;
   flex: 0.65;
 }
 
-main section.group ul li .nodes .node {
+main section.probe ul li .node .replica {
   color: #ffffff;
   font-size: 12px;
   text-align: center;
@@ -308,8 +308,8 @@ footer p a {
 }
 
 @media screen and (max-width: 720px) {
-  main section.group ul li label,
-  main section.group ul li .nodes {
+  main section.probe ul li label,
+  main section.probe ul li .node {
     flex: 0.5;
   }
 }
@@ -381,17 +381,17 @@ footer p a {
     padding-bottom: 22px;
   }
 
-  main section.group {
+  main section.probe {
     padding-top: 22px;
     padding-bottom: 28px;
   }
 
-  main section.group ul li label {
+  main section.probe ul li label {
     padding-left: 20px;
     padding-right: 10px;
   }
 
-  main section.group ul li .nodes {
+  main section.probe ul li .node {
     padding-left: 18px;
     padding-right: 14px;
   }

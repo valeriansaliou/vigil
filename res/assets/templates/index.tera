@@ -107,7 +107,7 @@
       </section>
 
       {% for _, probe in states.probes %}
-        <section class="group">
+        <section class="probe">
           <div class="title">
             <div class="badge badge-default badge-status-{{ probe.status | escape }}"></div>
 
@@ -119,20 +119,20 @@
               <li class="status-{{ node.status | escape }}-background-before">
                 <label class="font-sans-semibold status-{{ node.status | escape }}-background-subtle status-{{ node.status | escape }}-border-subtle">{{ node.label | escape }}</label>
 
-                <div class="nodes">
+                <div class="node">
                   {% for _, replica in node.replicas %}
-                    <span class="node status-{{ replica.status | escape }}-background has-tooltip font-sans-semibold">
+                    <span class="replica status-{{ replica.status | escape }}-background has-tooltip font-sans-semibold">
                       {{ loop.index }}
 
                       <span class="tooltip">
                         <span class="tooltip-value">
                           <span class="tooltip-main font-sans-semibold">
-                            {% if node.status == "dead" %}
-                              This node reports as dead.
-                            {% elif node.status == "sick" %}
-                              This node reports as sick.
+                            {% if replica.status == "dead" %}
+                              This replica reports as dead.
+                            {% elif replica.status == "sick" %}
+                              This replica reports as sick.
                             {% else %}
-                              This node reports as healthy.
+                              This replica reports as healthy.
                             {% endif %}
                           </span>
 

@@ -6,8 +6,9 @@
 
 use std::sync::RwLock;
 use std::sync::Arc;
-use std::time::Duration;
 use std::thread;
+use std::net::{TcpStream, ToSocketAddrs};
+use std::time::{SystemTime, Duration};
 
 use reqwest::{Client, RedirectPolicy};
 use reqwest::header::{Headers, UserAgent};
@@ -24,6 +25,8 @@ use super::states::{
 use super::replica::ReplicaURL;
 use super::status::Status;
 use APP_CONF;
+
+const PROBE_HOLD_MILLISECONDS: u64 = 250;
 
 lazy_static! {
     pub static ref STORE: Arc<RwLock<Store>> = Arc::new(RwLock::new(Store {
@@ -87,7 +90,26 @@ fn map_poll_replicas() -> Vec<(String, String, String, ReplicaURL)> {
     replica_list
 }
 
+fn proceed_replica_probe_with_retry(replica_url: &ReplicaURL) -> Status {
+    let mut status = Status::Dead;
+    let mut retry_count = 0;
+
+    while retry_count < APP_CONF.metrics.poll_retry && status == Status::Dead {
+        retry_count += 1;
+
+        debug!("will probe replica: {:?} with retry count: {}", replica_url, retry_count);
+
+        thread::sleep(Duration::from_millis(PROBE_HOLD_MILLISECONDS));
+
+        status = proceed_replica_probe(replica_url);
+    }
+
+    status
+}
+
 fn proceed_replica_probe(replica_url: &ReplicaURL) -> Status {
+    let start_time = SystemTime::now();
+
     let is_up = match replica_url {
         &ReplicaURL::TCP(ref host, port) => proceed_replica_probe_tcp(host, port),
         &ReplicaURL::HTTP(ref url) => proceed_replica_probe_http(url),
@@ -95,7 +117,13 @@ fn proceed_replica_probe(replica_url: &ReplicaURL) -> Status {
     };
 
     if is_up == true {
-        // TODO: check delay for sick?
+        // Probe reports as sick?
+        if let Ok(duration_since) = SystemTime::now().duration_since(start_time) {
+            if duration_since >= Duration::from_secs(APP_CONF.metrics.poll_delay_sick) {
+                return Status::Sick;
+            }
+        }
+
         Status::Healthy
     } else {
         Status::Dead
@@ -103,11 +131,27 @@ fn proceed_replica_probe(replica_url: &ReplicaURL) -> Status {
 }
 
 fn proceed_replica_probe_tcp(host: &str, port: u16) -> bool {
-    // TODO
+    let address_results = (host, port).to_socket_addrs();
+
+    if let Ok(mut address) = address_results {
+        if let Some(address_value) = address.next() {
+            debug!("prober poll will fire for tcp target: {}", address_value);
+
+            return match TcpStream::connect_timeout(
+                &address_value, Duration::from_secs(APP_CONF.metrics.poll_delay_dead)
+            ) {
+                Ok(_) => true,
+                Err(_) => false,
+            }
+        }
+    }
+
     false
 }
 
 fn proceed_replica_probe_http(url: &str) -> bool {
+    debug!("prober poll will fire for http target: {}", url);
+
     let response = PROBE_HTTP_CLIENT
         .head(url)
         .send();
@@ -131,7 +175,7 @@ fn proceed_replica_probe_http(url: &str) -> bool {
 fn dispatch_polls() {
     // Probe hosts
     for probe_replica in map_poll_replicas() {
-        let replica_status = proceed_replica_probe(&probe_replica.3);
+        let replica_status = proceed_replica_probe_with_retry(&probe_replica.3);
 
         debug!(
             "probe result: {}:{}:{} => {:?}", &probe_replica.0, &probe_replica.1, &probe_replica.2,

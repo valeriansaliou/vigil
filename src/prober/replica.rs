@@ -6,7 +6,7 @@
 
 use url::Url;
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Debug, Clone)]
 pub enum ReplicaURL {
     TCP(String, u16),
     HTTP(String),
