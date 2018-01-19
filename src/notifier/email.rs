@@ -24,14 +24,16 @@ impl GenericNotifier for EmailNotifier {
             if let Some(ref email_config) = APP_CONF.notify.email {
                 debug!(
                     "dispatch email notification for status: {:?} and replicas: {:?}",
-                    notification.status, notification.replicas
+                    notification.status,
+                    notification.replicas
                 );
 
                 // Build up the message text
                 let mut message = String::new();
 
                 message.push_str(&format!(
-                    "Status change report from: {}\n", APP_CONF.branding.page_title
+                    "Status change report from: {}\n",
+                    APP_CONF.branding.page_title
                 ));
                 message.push_str("\n--\n");
                 message.push_str(&format!("Status: {:?}\n", notification.status));
@@ -41,16 +43,22 @@ impl GenericNotifier for EmailNotifier {
 
                 message.push_str("\n--\n");
                 message.push_str("\n");
-                message.push_str("To unsubscribe, please edit your status page configuration.");
+                message.push_str(
+                    "To unsubscribe, please edit your status page configuration.",
+                );
 
                 debug!("will send email notification with message: {}", &message);
 
                 // Build up the email
                 let email_message = EmailBuilder::new()
                     .to(email_config.to.as_str())
-                    .from((email_config.from.as_str(), APP_CONF.branding.page_title.as_str()))
+                    .from((
+                        email_config.from.as_str(),
+                        APP_CONF.branding.page_title.as_str(),
+                    ))
                     .subject(format!(
-                        "[{}] {}", notification.status.as_str().to_uppercase(),
+                        "[{}] {}",
+                        notification.status.as_str().to_uppercase(),
                         &APP_CONF.branding.page_title
                     ))
                     .text(message)
@@ -63,9 +71,8 @@ impl GenericNotifier for EmailNotifier {
                     email_config.smtp_port,
                     email_config.smtp_username.to_owned(),
                     email_config.smtp_password.to_owned(),
-                    email_config.smtp_encrypt
-                )
-                    .map(|mut transport| transport.send(&email_message))
+                    email_config.smtp_encrypt,
+                ).map(|mut transport| transport.send(&email_message))
                     .and(Ok(()))
                     .or(Err(true));
             }
@@ -84,7 +91,7 @@ fn acquire_transport(
     smtp_port: u16,
     smtp_username: Option<String>,
     smtp_password: Option<String>,
-    smtp_encrypt: bool
+    smtp_encrypt: bool,
 ) -> Result<SmtpTransport, ()> {
     let mut security = ClientSecurity::None;
 
@@ -115,11 +122,12 @@ fn acquire_transport(
 
             match (smtp_username, smtp_password) {
                 (Some(smtp_username_value), Some(smtp_password_value)) => {
-                    transport_builder = transport_builder.credentials(
-                        Credentials::new(smtp_username_value, smtp_password_value)
-                    );
-                },
-                _ => {},
+                    transport_builder = transport_builder.credentials(Credentials::new(
+                        smtp_username_value,
+                        smtp_password_value,
+                    ));
+                }
+                _ => {}
             }
 
             Ok(transport_builder.build())

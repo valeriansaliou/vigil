@@ -56,12 +56,13 @@ impl<'r> Responder<'r> for AssetFile {
         // Set cache headers
         response.set_header(CacheControl(vec![
             CacheDirective::Public,
-            CacheDirective::MaxAge(ASSETS_EXPIRE_SECONDS)
+            CacheDirective::MaxAge(ASSETS_EXPIRE_SECONDS),
         ]));
 
-        response.set_header(Expires(
-            HttpDate(time::now() + Duration::seconds(ASSETS_EXPIRE_SECONDS as i64)))
-        );
+        response.set_header(Expires(HttpDate(
+            time::now() +
+                Duration::seconds(ASSETS_EXPIRE_SECONDS as i64),
+        )));
 
         // Set content type header?
         if let Some(ext) = self.0.extension() {

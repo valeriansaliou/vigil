@@ -6,19 +6,16 @@
 
 use std::time::{SystemTime, Duration};
 
-use super::states::{
-    ServiceStatesProbeNodeReplica,
-    ServiceStatesProbeNodeReplicaLoad,
-    ServiceStatesProbeNodeReplicaReport
-};
-use prober::manager::{STORE as PROBER_STORE};
+use super::states::{ServiceStatesProbeNodeReplica, ServiceStatesProbeNodeReplicaLoad,
+                    ServiceStatesProbeNodeReplicaReport};
+use prober::manager::STORE as PROBER_STORE;
 use prober::status::Status;
 use prober::mode::Mode;
 
 pub enum HandleError {
     InvalidLoad,
     WrongMode,
-    NotFound
+    NotFound,
 }
 
 pub fn handle(
@@ -27,7 +24,7 @@ pub fn handle(
     replica_id: &str,
     interval: u64,
     load_cpu: f32,
-    load_ram: f32
+    load_ram: f32,
 ) -> Result<(), HandleError> {
     debug!("report handle: {}:{}:{}", probe_id, node_id, replica_id);
 
@@ -53,24 +50,32 @@ pub fn handle(
             };
 
             // Bump stored replica
-            node.replicas.insert(replica_id.to_string(), ServiceStatesProbeNodeReplica {
-                status: status,
-                url: None,
-                load: Some(ServiceStatesProbeNodeReplicaLoad {
-                    cpu: load_cpu,
-                    ram: load_ram,
-                }),
-                report: Some(ServiceStatesProbeNodeReplicaReport {
-                    time: SystemTime::now(),
-                    interval: Duration::from_secs(interval),
-                }),
-            });
+            node.replicas.insert(
+                replica_id.to_string(),
+                ServiceStatesProbeNodeReplica {
+                    status: status,
+                    url: None,
+                    load: Some(ServiceStatesProbeNodeReplicaLoad {
+                        cpu: load_cpu,
+                        ram: load_ram,
+                    }),
+                    report: Some(ServiceStatesProbeNodeReplicaReport {
+                        time: SystemTime::now(),
+                        interval: Duration::from_secs(interval),
+                    }),
+                },
+            );
 
             return Ok(());
         }
     }
 
-    warn!("report could not be stored: {}:{}:{}", probe_id, node_id, replica_id);
+    warn!(
+        "report could not be stored: {}:{}:{}",
+        probe_id,
+        node_id,
+        replica_id
+    );
 
     Err(HandleError::NotFound)
 }

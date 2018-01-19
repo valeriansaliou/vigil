@@ -14,14 +14,10 @@ use reqwest::{Client, RedirectPolicy};
 use reqwest::header::{Headers, UserAgent};
 use ordermap::OrderMap;
 
-use prober::manager::{STORE as PROBER_STORE};
+use prober::manager::STORE as PROBER_STORE;
 use prober::mode::Mode;
-use super::states::{
-    ServiceStates,
-    ServiceStatesProbe,
-    ServiceStatesProbeNode,
-    ServiceStatesProbeNodeReplica
-};
+use super::states::{ServiceStates, ServiceStatesProbe, ServiceStatesProbeNode,
+                    ServiceStatesProbeNodeReplica};
 use super::replica::ReplicaURL;
 use super::status::Status;
 use APP_CONF;
@@ -54,7 +50,9 @@ pub struct Store {
 fn make_default_headers() -> Headers {
     let mut headers = Headers::new();
 
-    headers.set(UserAgent::new(format!("vigil (+{})", APP_CONF.branding.page_url.as_str())));
+    headers.set(UserAgent::new(
+        format!("vigil (+{})", APP_CONF.branding.page_url.as_str()),
+    ));
 
     headers
 }
@@ -79,7 +77,7 @@ fn map_poll_replicas() -> Vec<(String, String, String, ReplicaURL)> {
                             probe_id.to_owned(),
                             node_id.to_owned(),
                             replica_id.to_owned(),
-                            replica_url.to_owned()
+                            replica_url.to_owned(),
                         ));
                     }
                 }
@@ -97,7 +95,11 @@ fn proceed_replica_probe_with_retry(replica_url: &ReplicaURL) -> Status {
     while retry_count < APP_CONF.metrics.poll_retry && status == Status::Dead {
         retry_count += 1;
 
-        debug!("will probe replica: {:?} with retry count: {}", replica_url, retry_count);
+        debug!(
+            "will probe replica: {:?} with retry count: {}",
+            replica_url,
+            retry_count
+        );
 
         thread::sleep(Duration::from_millis(PROBE_HOLD_MILLISECONDS));
 
@@ -138,11 +140,12 @@ fn proceed_replica_probe_tcp(host: &str, port: u16) -> bool {
             debug!("prober poll will fire for tcp target: {}", address_value);
 
             return match TcpStream::connect_timeout(
-                &address_value, Duration::from_secs(APP_CONF.metrics.poll_delay_dead)
+                &address_value,
+                Duration::from_secs(APP_CONF.metrics.poll_delay_dead),
             ) {
                 Ok(_) => true,
                 Err(_) => false,
-            }
+            };
         }
     }
 
@@ -152,18 +155,21 @@ fn proceed_replica_probe_tcp(host: &str, port: u16) -> bool {
 fn proceed_replica_probe_http(url: &str) -> bool {
     debug!("prober poll will fire for http target: {}", url);
 
-    let response = PROBE_HTTP_CLIENT
-        .head(url)
-        .send();
+    let response = PROBE_HTTP_CLIENT.head(url).send();
 
     if let Ok(response_inner) = response {
         let status_code = response_inner.status().as_u16();
 
-        debug!("prober poll result received for url: {} with status: {}", url, status_code);
+        debug!(
+            "prober poll result received for url: {} with status: {}",
+            url,
+            status_code
+        );
 
         // Consider as UP?
         if status_code >= APP_CONF.metrics.poll_http_status_healthy_above &&
-            status_code < APP_CONF.metrics.poll_http_status_healthy_below {
+            status_code < APP_CONF.metrics.poll_http_status_healthy_below
+        {
             return true;
         }
     }
@@ -178,7 +184,10 @@ fn dispatch_polls() {
         let replica_status = proceed_replica_probe_with_retry(&probe_replica.3);
 
         debug!(
-            "probe result: {}:{}:{} => {:?}", &probe_replica.0, &probe_replica.1, &probe_replica.2,
+            "probe result: {}:{}:{} => {:?}",
+            &probe_replica.0,
+            &probe_replica.1,
+            &probe_replica.2,
             replica_status
         );
 
@@ -205,7 +214,7 @@ pub fn initialize_store() {
         let mut probe = ServiceStatesProbe {
             status: Status::Healthy,
             label: service.label.to_owned(),
-            nodes: OrderMap::new()
+            nodes: OrderMap::new(),
         };
 
         debug!("prober store: got service {}", service.id);
@@ -217,7 +226,7 @@ pub fn initialize_store() {
                 status: Status::Healthy,
                 label: node.label.to_owned(),
                 mode: node.mode.to_owned(),
-                replicas: OrderMap::new()
+                replicas: OrderMap::new(),
             };
 
             if let Some(ref replicas) = node.replicas {
@@ -226,16 +235,24 @@ pub fn initialize_store() {
                 }
 
                 for replica in replicas {
-                    debug!("prober store: got replica {}:{}:{}", service.id, node.id, replica);
+                    debug!(
+                        "prober store: got replica {}:{}:{}",
+                        service.id,
+                        node.id,
+                        replica
+                    );
 
                     let replica_url = ReplicaURL::parse_from(replica).expect("invalid replica url");
 
-                    probe_node.replicas.insert(replica.to_string(), ServiceStatesProbeNodeReplica {
-                        status: Status::Healthy,
-                        url: Some(replica_url),
-                        load: None,
-                        report: None,
-                    });
+                    probe_node.replicas.insert(
+                        replica.to_string(),
+                        ServiceStatesProbeNodeReplica {
+                            status: Status::Healthy,
+                            url: Some(replica_url),
+                            load: None,
+                            report: None,
+                        },
+                    );
                 }
             }
 

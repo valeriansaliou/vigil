@@ -49,7 +49,8 @@ impl GenericNotifier for SlackNotifier {
             if let Some(ref slack) = APP_CONF.notify.slack {
                 debug!(
                     "dispatch slack notification for status: {:?} and replicas: {:?}",
-                    notification.status, notification.replicas
+                    notification.status,
+                    notification.replicas
                 );
 
                 let status_label = format!("{:?}", notification.status);
@@ -61,32 +62,32 @@ impl GenericNotifier for SlackNotifier {
                 // Build paylaod
                 let mut payload = SlackPayload {
                     text: format!("<!channel> {}", &message_text),
-                    attachments: Vec::new()
+                    attachments: Vec::new(),
                 };
 
                 let mut attachment = SlackPayloadAttachment {
                     fallback: message_text,
                     color: status_to_color(&notification.status),
-                    fields: Vec::new()
+                    fields: Vec::new(),
                 };
 
                 // Append attachment fields
                 attachment.fields.push(SlackPayloadAttachmentField {
                     title: "Status",
                     value: &status_label,
-                    short: true
+                    short: true,
                 });
 
                 attachment.fields.push(SlackPayloadAttachmentField {
                     title: "Time",
                     value: &notification.time,
-                    short: true
+                    short: true,
                 });
 
                 attachment.fields.push(SlackPayloadAttachmentField {
                     title: "Monitor Page",
                     value: APP_CONF.branding.page_url.as_str(),
-                    short: false
+                    short: false,
                 });
 
                 if notification.replicas.len() > 0 {
@@ -100,7 +101,7 @@ impl GenericNotifier for SlackNotifier {
                     attachment.fields.push(SlackPayloadAttachmentField {
                         title: "Nodes",
                         value: &nodes_label,
-                        short: false
+                        short: false,
                     });
                 }
 

@@ -13,7 +13,7 @@ use rocket_contrib::{Template, Json};
 use super::context::{INDEX_CONFIG, IndexContext};
 use super::asset_file::AssetFile;
 use super::reporter_guard::ReporterGuard;
-use prober::manager::{STORE as PROBER_STORE};
+use prober::manager::STORE as PROBER_STORE;
 use prober::report::{handle as handle_report, HandleError};
 use APP_CONF;
 
@@ -48,10 +48,15 @@ fn reporter(
     _auth: ReporterGuard,
     probe_id: String,
     node_id: String,
-    data: Json<ReporterData>
+    data: Json<ReporterData>,
 ) -> Result<(), Failure> {
     match handle_report(
-        &probe_id, &node_id, &data.replica, data.interval, data.load.cpu, data.load.ram
+        &probe_id,
+        &node_id,
+        &data.replica,
+        data.interval,
+        data.load.cpu,
+        data.load.ram,
     ) {
         Ok(_) => Ok(()),
         Err(HandleError::InvalidLoad) => Err(Failure(Status::BadRequest)),
@@ -72,9 +77,11 @@ fn badge(kind: String) -> Option<NamedFile> {
         &PROBER_STORE.read().unwrap().states.status.as_str()
     };
 
-    NamedFile::open(APP_CONF.assets.path.join(
-        format!("./images/badges/{}-{}-default.svg", kind, status)
-    )).ok()
+    NamedFile::open(APP_CONF.assets.path.join(format!(
+        "./images/badges/{}-{}-default.svg",
+        kind,
+        status
+    ))).ok()
 }
 
 #[get("/assets/fonts/<file..>")]

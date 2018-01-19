@@ -91,12 +91,7 @@ lazy_static! {
     static ref APP_CONF: Config = ConfigReader::make();
 }
 
-gen_spawn_managed!(
-    "prober",
-    spawn_prober,
-    THREAD_NAME_PROBER,
-    run_prober
-);
+gen_spawn_managed!("prober", spawn_prober, THREAD_NAME_PROBER, run_prober);
 gen_spawn_managed!(
     "aggregator",
     spawn_aggregator,

@@ -11,7 +11,7 @@ use time;
 
 use prober::status::Status;
 use prober::mode::Mode;
-use prober::manager::{STORE as PROBER_STORE};
+use prober::manager::STORE as PROBER_STORE;
 use notifier::generic::{Notification, GenericNotifier};
 use notifier::email::EmailNotifier;
 use notifier::slack::SlackNotifier;
@@ -58,13 +58,18 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
                 if node.mode == Mode::Push {
                     // Compare delays and compute a new status?
                     if let Some(ref replica_report) = replica.report {
-                        if let Ok(duration_since_report) = SystemTime::now().duration_since(
-                            replica_report.time) {
-                            if duration_since_report >= (replica_report.interval +
-                                Duration::from_secs(APP_CONF.metrics.push_delay_dead)) {
+                        if let Ok(duration_since_report) =
+                            SystemTime::now().duration_since(replica_report.time)
+                        {
+                            if duration_since_report >=
+                                (replica_report.interval +
+                                     Duration::from_secs(APP_CONF.metrics.push_delay_dead))
+                            {
                                 debug!(
                                     "replica: {}:{}:{} is dead because it didnt report in a while",
-                                    probe_id, node_id, replica_id
+                                    probe_id,
+                                    node_id,
+                                    replica_id
                                 );
 
                                 replica_status = Status::Dead;
@@ -76,10 +81,13 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
                     if replica_status == Status::Healthy {
                         if let Some(ref replica_load) = replica.load {
                             if (replica_load.cpu > APP_CONF.metrics.push_system_cpu_sick_above) ||
-                                (replica_load.ram > APP_CONF.metrics.push_system_ram_sick_above) {
+                                (replica_load.ram > APP_CONF.metrics.push_system_ram_sick_above)
+                            {
                                 debug!(
                                     "replica: {}:{}:{} is sick because it is overloaded",
-                                    probe_id, node_id, replica_id
+                                    probe_id,
+                                    node_id,
+                                    replica_id
                                 );
 
                                 replica_status = Status::Sick;
@@ -97,7 +105,10 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
 
                 debug!(
                     "aggregated status for replica: {}:{}:{} => {:?}",
-                    probe_id, node_id, replica_id, replica_status
+                    probe_id,
+                    node_id,
+                    replica_id,
+                    replica_status
                 );
 
                 // Append bumped replica path?
@@ -113,7 +124,12 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
                 probe_status = worst_status;
             }
 
-            debug!("aggregated status for node: {}:{} => {:?}", probe_id, node_id, node_status);
+            debug!(
+                "aggregated status for node: {}:{} => {:?}",
+                probe_id,
+                node_id,
+                node_status
+            );
 
             node.status = node_status;
         }
@@ -123,7 +139,11 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
             general_status = worst_status;
         }
 
-        debug!("aggregated status for probe: {} => {:?}", probe_id, probe_status);
+        debug!(
+            "aggregated status for probe: {} => {:?}",
+            probe_id,
+            probe_status
+        );
 
         probe.status = probe_status;
     }
@@ -174,8 +194,9 @@ pub fn run() {
 
             for result in [
                 ("email", EmailNotifier::dispatch(&notification)),
-                ("slack", SlackNotifier::dispatch(&notification))
-            ].iter() {
+                ("slack", SlackNotifier::dispatch(&notification)),
+            ].iter()
+            {
                 if result.1.is_ok() == true {
                     debug!("dispatched notification to provider: {}", result.0);
                 } else {
@@ -188,7 +209,10 @@ pub fn run() {
             }
         }
 
-        info!("ran aggregate operation (notified: {})", bumped_states.is_some());
+        info!(
+            "ran aggregate operation (notified: {})",
+            bumped_states.is_some()
+        );
 
         // Hold for next aggregate run
         thread::sleep(Duration::from_secs(AGGREGATE_INTERVAL_SECONDS));

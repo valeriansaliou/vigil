@@ -31,7 +31,7 @@ impl Authorization {
                     if parts.len() == 2 {
                         Ok(Authorization {
                             username: parts[0].to_owned(),
-                            password: parts[1].to_owned()
+                            password: parts[1].to_owned(),
                         })
                     } else {
                         Err(())
