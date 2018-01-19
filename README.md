@@ -93,6 +93,7 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 **[branding]**
 
 * `page_title` (type: _string_, allowed: any string, default: `Status Page`) — Status page title
+* `page_url` (type: _string_, allowed: any valid URL, no default) — Status page URL
 * `company_name` (type: _string_, allowed: any string, no default) — Company name (ie. your company)
 * `icon_color` (type: _string_, allowed: any valid hexadecimal color code, no default) — Icon color (ie. your icon background color)
 * `icon_url` (type: _string_, allowed: any valid URL, no default) — Icon URL, the icon should be your squared logo, used as status page favicon (PNG format recommended)
@@ -111,6 +112,8 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 * `poll_delay_dead` (type: _integer_, allowed: seconds, default: `30`) — Delay after which a node in `poll` mode is to be considered `dead` (ie. check response delay)
 * `poll_delay_sick` (type: _integer_, allowed: seconds, default: `10`) — Delay after which a node in `poll` mode is to be considered `sick` (ie. check response delay)
 * `push_delay_dead` (type: _integer_, allowed: seconds, default: `20`) — Delay after which a node in `push` mode is to be considered `dead` (ie. time after which the node did not report)
+* `push_system_cpu_sick_above` (type: _float_, allowed: system CPU loads, default: `0.90`) — System load indice for CPU above which to consider a node in `push` mode `sick` (ie. UNIX system load)
+* `push_system_ram_sick_above` (type: _float_, allowed: system RAM loads, default: `0.90`) — System load indice for RAM above which to consider a node in `push` mode `sick` (ie. percent RAM used)
 
 **[probe]**
 

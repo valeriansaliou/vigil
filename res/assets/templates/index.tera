@@ -121,7 +121,7 @@
 
                 <div class="nodes">
                   {% for _, replica in node.replicas %}
-                    <span class="node status-{{ replica | escape }}-background has-tooltip font-sans-semibold">
+                    <span class="node status-{{ replica.status | escape }}-background has-tooltip font-sans-semibold">
                       {{ loop.index }}
 
                       <span class="tooltip">

@@ -45,6 +45,7 @@ pub fn run() {
             "/",
             routes![
             routes::index,
+            routes::reporter,
             routes::robots,
             routes::badge,
             routes::assets_fonts,

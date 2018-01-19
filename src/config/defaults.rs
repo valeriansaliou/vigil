@@ -23,11 +23,11 @@ pub fn branding_page_title() -> String {
     "Status Page".to_string()
 }
 
-pub fn metrics_poll_interval() -> u16 {
+pub fn metrics_poll_interval() -> u64 {
     120
 }
 
-pub fn metrics_poll_retry() -> u16 {
+pub fn metrics_poll_retry() -> u64 {
     2
 }
 
@@ -39,14 +39,34 @@ pub fn metrics_poll_http_status_healthy_below() -> u16 {
     400
 }
 
-pub fn metrics_poll_delay_dead() -> u16 {
+pub fn metrics_poll_delay_dead() -> u64 {
     30
 }
 
-pub fn metrics_poll_delay_sick() -> u16 {
+pub fn metrics_poll_delay_sick() -> u64 {
     10
 }
 
-pub fn metrics_push_delay_dead() -> u16 {
+pub fn metrics_push_delay_dead() -> u64 {
     20
+}
+
+pub fn metrics_push_system_cpu_sick_above() -> f32 {
+    0.99
+}
+
+pub fn metrics_push_system_ram_sick_above() -> f32 {
+    0.99
+}
+
+pub fn notify_email_smtp_host() -> String {
+    "localhost".to_string()
+}
+
+pub fn notify_email_smtp_port() -> u16 {
+    587
+}
+
+pub fn notify_email_smtp_encrypt() -> bool {
+    false
 }

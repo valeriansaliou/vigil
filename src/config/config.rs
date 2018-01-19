@@ -18,6 +18,7 @@ pub struct Config {
     pub assets: ConfigAssets,
     pub branding: ConfigBranding,
     pub metrics: ConfigMetrics,
+    pub notify: ConfigNotify,
     pub probe: ConfigProbe,
 }
 
@@ -41,6 +42,7 @@ pub struct ConfigBranding {
     #[serde(default = "defaults::branding_page_title")]
     pub page_title: String,
 
+    pub page_url: String,
     pub company_name: String,
     pub icon_color: String,
     pub icon_url: SerdeUrl,
@@ -54,10 +56,10 @@ pub struct ConfigBranding {
 #[derive(Deserialize)]
 pub struct ConfigMetrics {
     #[serde(default = "defaults::metrics_poll_interval")]
-    pub poll_interval: u16,
+    pub poll_interval: u64,
 
     #[serde(default = "defaults::metrics_poll_retry")]
-    pub poll_retry: u16,
+    pub poll_retry: u64,
 
     #[serde(default = "defaults::metrics_poll_http_status_healthy_above")]
     pub poll_http_status_healthy_above: u16,
@@ -66,13 +68,48 @@ pub struct ConfigMetrics {
     pub poll_http_status_healthy_below: u16,
 
     #[serde(default = "defaults::metrics_poll_delay_dead")]
-    pub poll_delay_dead: u16,
+    pub poll_delay_dead: u64,
 
     #[serde(default = "defaults::metrics_poll_delay_sick")]
-    pub poll_delay_sick: u16,
+    pub poll_delay_sick: u64,
 
     #[serde(default = "defaults::metrics_push_delay_dead")]
-    pub push_delay_dead: u16,
+    pub push_delay_dead: u64,
+
+    #[serde(default = "defaults::metrics_push_system_cpu_sick_above")]
+    pub push_system_cpu_sick_above: f32,
+
+    #[serde(default = "defaults::metrics_push_system_ram_sick_above")]
+    pub push_system_ram_sick_above: f32,
+}
+
+#[derive(Deserialize)]
+pub struct ConfigNotify {
+    pub email: Option<ConfigNotifyEmail>,
+    pub slack: Option<ConfigNotifySlack>,
+}
+
+#[derive(Deserialize)]
+pub struct ConfigNotifyEmail {
+    pub to: String,
+    pub from: String,
+
+    #[serde(default = "defaults::notify_email_smtp_host")]
+    pub smtp_host: String,
+
+    #[serde(default = "defaults::notify_email_smtp_port")]
+    pub smtp_port: u16,
+
+    pub smtp_username: Option<String>,
+    pub smtp_password: Option<String>,
+
+    #[serde(default = "defaults::notify_email_smtp_encrypt")]
+    pub smtp_encrypt: bool,
+}
+
+#[derive(Deserialize)]
+pub struct ConfigNotifySlack {
+    pub hook_url: String,
 }
 
 #[derive(Deserialize)]

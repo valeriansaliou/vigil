@@ -21,11 +21,16 @@ extern crate url_serde;
 extern crate ordermap;
 extern crate rocket;
 extern crate rocket_contrib;
+extern crate native_tls;
+extern crate reqwest;
+extern crate lettre;
+extern crate lettre_email;
 
 mod config;
 mod aggregator;
 mod prober;
 mod responder;
+mod notifier;
 
 use std::thread;
 use std::ops::Deref;

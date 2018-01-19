@@ -17,10 +17,6 @@ use rocket::http::hyper::header::{CacheControl, CacheDirective, Expires, HttpDat
 
 const ASSETS_EXPIRE_SECONDS: u32 = 10800;
 
-lazy_static! {
-    static ref ASSETS_EXPIRE_DURATION: Duration = Duration::seconds(ASSETS_EXPIRE_SECONDS as i64);
-}
-
 #[derive(Debug)]
 pub struct AssetFile(PathBuf, File);
 
@@ -64,7 +60,7 @@ impl<'r> Responder<'r> for AssetFile {
         ]));
 
         response.set_header(Expires(
-            HttpDate(time::now() + *ASSETS_EXPIRE_DURATION))
+            HttpDate(time::now() + Duration::seconds(ASSETS_EXPIRE_SECONDS as i64)))
         );
 
         // Set content type header?

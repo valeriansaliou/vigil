@@ -4,6 +4,8 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
+use std::time::{SystemTime, Duration};
+
 use ordermap::OrderMap;
 
 use super::status::Status;
@@ -28,5 +30,24 @@ pub struct ServiceStatesProbeNode {
     pub status: Status,
     pub label: String,
     pub mode: Mode,
-    pub replicas: OrderMap<String, Status>,
+    pub replicas: OrderMap<String, ServiceStatesProbeNodeReplica>,
+}
+
+#[derive(Serialize)]
+pub struct ServiceStatesProbeNodeReplica {
+    pub status: Status,
+    pub load: Option<ServiceStatesProbeNodeReplicaLoad>,
+    pub report: Option<ServiceStatesProbeNodeReplicaReport>,
+}
+
+#[derive(Serialize)]
+pub struct ServiceStatesProbeNodeReplicaLoad {
+    pub cpu: f32,
+    pub ram: f32,
+}
+
+#[derive(Serialize)]
+pub struct ServiceStatesProbeNodeReplicaReport {
+    pub time: SystemTime,
+    pub interval: Duration,
 }
