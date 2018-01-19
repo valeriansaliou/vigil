@@ -85,6 +85,7 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 
 * `log_level` (type: _string_, allowed: `debug`, `info`, `warn`, `error`, default: `warn`) — Verbosity of logging, set it to `error` in production
 * `inet` (type: _string_, allowed: IPv4 / IPv6 + port, default: `[::1]:8080`) — Host and TCP port the Vigil public status page should listen on
+* `workers` (type: _integer_, allowed: any number, default: `4`) — Number of workers for the Vigil public status page to run on
 
 **[assets]**
 
@@ -93,27 +94,43 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 **[branding]**
 
 * `page_title` (type: _string_, allowed: any string, default: `Status Page`) — Status page title
-* `page_url` (type: _string_, allowed: any valid URL, no default) — Status page URL
+* `page_url` (type: _string_, allowed: URL, no default) — Status page URL
 * `company_name` (type: _string_, allowed: any string, no default) — Company name (ie. your company)
-* `icon_color` (type: _string_, allowed: any valid hexadecimal color code, no default) — Icon color (ie. your icon background color)
-* `icon_url` (type: _string_, allowed: any valid URL, no default) — Icon URL, the icon should be your squared logo, used as status page favicon (PNG format recommended)
-* `logo_color` (type: _string_, allowed: any valid hexadecimal color code, no default) — Logo color (ie. your logo primary color)
-* `logo_url` (type: _string_, allowed: any valid URL, no default) — Logo URL, the logo should be your full-width logo, used as status page header logo (SVG format recommended)
-* `website_url` (type: _string_, allowed: any valid URL, no default) — Website URL to be used in status page header
-* `support_url` (type: _string_, allowed: any valid URL, no default) — Support URL to be used in status page header (ie. where users can contact you if something is wrong)
-* `custom_html` (type: _string_, allowed: any valid HTML, default: empty) — Custom HTML to include in status page `head` (optional)
+* `icon_color` (type: _string_, allowed: hexadecimal color code, no default) — Icon color (ie. your icon background color)
+* `icon_url` (type: _string_, allowed: URL, no default) — Icon URL, the icon should be your squared logo, used as status page favicon (PNG format recommended)
+* `logo_color` (type: _string_, allowed: hexadecimal color code, no default) — Logo color (ie. your logo primary color)
+* `logo_url` (type: _string_, allowed: URL, no default) — Logo URL, the logo should be your full-width logo, used as status page header logo (SVG format recommended)
+* `website_url` (type: _string_, allowed: URL, no default) — Website URL to be used in status page header
+* `support_url` (type: _string_, allowed: URL, no default) — Support URL to be used in status page header (ie. where users can contact you if something is wrong)
+* `custom_html` (type: _string_, allowed: HTML, default: empty) — Custom HTML to include in status page `head` (optional)
 
 **[metrics]**
 
 * `poll_interval` (type: _integer_, allowed: seconds, default: `120`) — Interval for which to probe nodes in `poll` mode
 * `poll_retry` (type: _integer_, allowed: seconds, default: `2`) — Interval after which to try probe for a second time nodes in `poll` mode (only when the first check fails)
-* `poll_http_status_healthy_above` (type: _integer_, allowed: any valid HTTP status, default: `200`) — HTTP status above which `poll` checks to HTTP replicas reports as `healthy`
-* `poll_http_status_healthy_below` (type: _integer_, allowed: any valid HTTP status, default: `400`) — HTTP status under which `poll` checks to HTTP replicas reports as `healthy`
+* `poll_http_status_healthy_above` (type: _integer_, allowed: HTTP status code, default: `200`) — HTTP status above which `poll` checks to HTTP replicas reports as `healthy`
+* `poll_http_status_healthy_below` (type: _integer_, allowed: HTTP status code, default: `400`) — HTTP status under which `poll` checks to HTTP replicas reports as `healthy`
 * `poll_delay_dead` (type: _integer_, allowed: seconds, default: `30`) — Delay after which a node in `poll` mode is to be considered `dead` (ie. check response delay)
 * `poll_delay_sick` (type: _integer_, allowed: seconds, default: `10`) — Delay after which a node in `poll` mode is to be considered `sick` (ie. check response delay)
 * `push_delay_dead` (type: _integer_, allowed: seconds, default: `20`) — Delay after which a node in `push` mode is to be considered `dead` (ie. time after which the node did not report)
 * `push_system_cpu_sick_above` (type: _float_, allowed: system CPU loads, default: `0.90`) — System load indice for CPU above which to consider a node in `push` mode `sick` (ie. UNIX system load)
 * `push_system_ram_sick_above` (type: _float_, allowed: system RAM loads, default: `0.90`) — System load indice for RAM above which to consider a node in `push` mode `sick` (ie. percent RAM used)
+
+**[notify]**
+
+**[notify.email]**
+
+* `to` (type: _string_, allowed: email address, no default) — Email address to which to send emails
+* `from` (type: _string_, allowed: email address, no default) — Email address from which to send emails
+* `smtp_host` (type: _string_, allowed: hostname, IPv4, IPv6, default: `localhost`) — SMTP host to connect to
+* `smtp_port` (type: _integer_, allowed: TCP port, default: `587`) — SMTP TCP port to connect to
+* `smtp_username` (type: _string_, allowed: any string, no default) — SMTP username to use for authentication (if any)
+* `smtp_password` (type: _string_, allowed: any string, no default) — SMTP password to use for authentication (if any)
+* `smtp_encrypt` (type: _boolean_, allowed: `true`, `false`, default: `true`) — Whether to encrypt SMTP connection with `STARTTLS` or not
+
+**[notify.slack]**
+
+* `hook_url` (type: _string_, allowed: URL, no default) — Slack hook URL (ie. `https://hooks.slack.com/[..]`)
 
 **[probe]**
 
@@ -127,7 +144,7 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 * `id` (type: _string_, allowed: any unique lowercase string, no default) — Unique identifier of the probed service node (not visible on the status page)
 * `label` (type: _string_, allowed: any string, no default) — Name of the probed service node (visible on the status page)
 * `mode` (type: _string_, allowed: `poll`, `push`, no default) — Probe mode for this node (ie. `poll` is direct HTTP or TCP poll to the URLs set in `replicas`, while `push` is for Vigil Reporter nodes)
-* `replicas` (type: _array[string]_, allowed: any valid array of TCP or HTTP URLs, default: empty) — Node replica URLs to be probed (only used if `mode` is `poll`)
+* `replicas` (type: _array[string]_, allowed: TCP or HTTP URLs, default: empty) — Node replica URLs to be probed (only used if `mode` is `poll`)
 
 ### Run Vigil
 
