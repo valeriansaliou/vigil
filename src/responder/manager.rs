@@ -19,7 +19,7 @@ pub fn run() {
     let mut config = Config::build(Environment::Production)
         .address(APP_CONF.server.inet.ip().to_string())
         .port(APP_CONF.server.inet.port())
-        .workers(2)
+        .workers(APP_CONF.server.workers)
         .finalize()
         .unwrap();
 

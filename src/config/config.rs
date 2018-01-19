@@ -29,6 +29,9 @@ pub struct ConfigServer {
 
     #[serde(default = "defaults::server_inet")]
     pub inet: SocketAddr,
+
+    #[serde(default = "defaults::server_workers")]
+    pub workers: u16,
 }
 
 #[derive(Deserialize)]

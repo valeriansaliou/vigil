@@ -15,6 +15,10 @@ pub fn server_inet() -> SocketAddr {
     "[::1]:8080".parse().unwrap()
 }
 
+pub fn server_workers() -> u16 {
+    4
+}
+
 pub fn assets_path() -> PathBuf {
     PathBuf::from("./res/assets/")
 }
@@ -68,5 +72,5 @@ pub fn notify_email_smtp_port() -> u16 {
 }
 
 pub fn notify_email_smtp_encrypt() -> bool {
-    false
+    true
 }

@@ -4,14 +4,44 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
+use std::time::Duration;
+
 use reqwest::{Client, StatusCode};
 
-use super::generic::{Notification, GenericNotifier};
+use super::generic::{DISPATCH_TIMEOUT_SECONDS, Notification, GenericNotifier};
+use prober::status::Status;
 use APP_CONF;
 
-// TODO: enforce a timeout
+lazy_static! {
+    static ref SLACK_HTTP_CLIENT: Client = Client::builder()
+        .timeout(Duration::from_secs(DISPATCH_TIMEOUT_SECONDS))
+        .gzip(true)
+        .enable_hostname_verification()
+        .build()
+        .unwrap();
+}
 
 pub struct SlackNotifier;
+
+#[derive(Serialize)]
+struct SlackPayload<'a> {
+    text: String,
+    attachments: Vec<SlackPayloadAttachment<'a>>,
+}
+
+#[derive(Serialize)]
+struct SlackPayloadAttachment<'a> {
+    fallback: String,
+    color: &'a str,
+    fields: Vec<SlackPayloadAttachmentField<'a>>,
+}
+
+#[derive(Serialize)]
+struct SlackPayloadAttachmentField<'a> {
+    title: &'a str,
+    value: &'a str,
+    short: bool,
+}
 
 impl GenericNotifier for SlackNotifier {
     fn dispatch(notification: &Notification) -> Result<(), bool> {
@@ -22,13 +52,75 @@ impl GenericNotifier for SlackNotifier {
                     notification.status, notification.replicas
                 );
 
-                // let response = Client::new().post(slack.hook_url).json(payload).send()?;
+                let status_label = format!("{:?}", notification.status);
+                let time_label = format!("{:?}", notification.time);
+                let mut nodes_label = String::new();
 
-                // if response.status() == StatusCode::Ok {
-                //     return Ok(());
-                // } else {
-                    return Err(true);
-                // }
+                // Build message
+                let message_text = format!("Status changed to: *{}*", &status_label);
+
+                // Build paylaod
+                let mut payload = SlackPayload {
+                    text: format!("<!channel> {}", &message_text),
+                    attachments: Vec::new()
+                };
+
+                let mut attachment = SlackPayloadAttachment {
+                    fallback: message_text,
+                    color: status_to_color(&notification.status),
+                    fields: Vec::new()
+                };
+
+                // Append attachment fields
+                attachment.fields.push(SlackPayloadAttachmentField {
+                    title: "Status",
+                    value: &status_label,
+                    short: true
+                });
+
+                attachment.fields.push(SlackPayloadAttachmentField {
+                    title: "Time",
+                    value: &time_label,
+                    short: true
+                });
+
+                attachment.fields.push(SlackPayloadAttachmentField {
+                    title: "Monitor Page",
+                    value: &APP_CONF.branding.page_url,
+                    short: false
+                });
+
+                if notification.replicas.len() > 0 {
+                    nodes_label.push_str(&notification.replicas.join(", "));
+
+                    let nodes_label_titled = format!(" Nodes: *{}*.", nodes_label);
+
+                    payload.text.push_str(&nodes_label_titled);
+                    attachment.fallback.push_str(&nodes_label_titled);
+
+                    attachment.fields.push(SlackPayloadAttachmentField {
+                        title: "Nodes",
+                        value: &nodes_label,
+                        short: false
+                    });
+                }
+
+                // Append attachment
+                payload.attachments.push(attachment);
+
+                // Submit payload to Slack
+                let response = SLACK_HTTP_CLIENT
+                    .post(&slack.hook_url)
+                    .json(&payload)
+                    .send();
+
+                if let Ok(response_inner) = response {
+                    if response_inner.status() == StatusCode::Ok {
+                        return Ok(());
+                    }
+                }
+
+                return Err(true);
             }
         }
 
@@ -37,5 +129,13 @@ impl GenericNotifier for SlackNotifier {
 
     fn is_enabled() -> bool {
         APP_CONF.notify.slack.is_some()
+    }
+}
+
+fn status_to_color(status: &Status) -> &'static str {
+    match status {
+        &Status::Healthy => "good",
+        &Status::Sick => "warning",
+        &Status::Dead => "danger",
     }
 }
