@@ -14,7 +14,8 @@ We consider here the packaging flow of Vigil version `1.0.0`, for target archite
     2. Execute `cargo update` to bump `Cargo.lock`
 
 3. **How to build Vigil for Linux on macOS:**
-    1. `cargo build --target=i686-unknown-linux-musl --release`
+    1. `env CC_i686-unknown-linux-musl=i486-linux-musl-gcc`
+    2. `cargo build --target=i686-unknown-linux-musl --release`
 
 4. **How to package built binary and release it on GitHub:**
     1. `mkdir vigil`
