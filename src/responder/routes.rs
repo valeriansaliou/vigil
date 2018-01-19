@@ -18,9 +18,7 @@ use APP_CONF;
 
 #[derive(Deserialize)]
 pub struct ReporterData {
-    probe_id: String,
-    node_id: String,
-    replica_id: String,
+    replica: String,
     interval: u64,
     load: ReporterDataLoad,
 }
@@ -44,10 +42,10 @@ fn index() -> Template {
     Template::render("index", &context)
 }
 
-#[post("/reporter/<service_id>/<node_id>", data = "<data>", format = "application/json")]
-fn reporter(service_id: String, node_id: String, data: Json<ReporterData>) -> Result<(), Failure> {
+#[post("/reporter/<probe_id>/<node_id>", data = "<data>", format = "application/json")]
+fn reporter(probe_id: String, node_id: String, data: Json<ReporterData>) -> Result<(), Failure> {
     match handle_report(
-        &data.probe_id, &data.node_id, &data.replica_id, data.interval, data.load.cpu, data.load.ram
+        &probe_id, &node_id, &data.replica, data.interval, data.load.cpu, data.load.ram
     ) {
         Ok(_) => Ok(()),
         Err(HandleError::InvalidLoad) => Err(Failure(Status::BadRequest)),

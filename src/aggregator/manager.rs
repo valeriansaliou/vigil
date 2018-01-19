@@ -140,9 +140,9 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
     // Bump stored values
     store.states.status = general_status.to_owned();
 
-    store.states.date = Some(
-        time::strftime("%H:%M:%S UTC%z", &time::now()).unwrap_or("".to_string())
-    );
+    if let Ok(time_string) = time_now_as_string() {
+        store.states.date = Some(time_string);
+    }
 
     if should_notify == true && bumped_replicas.len() > 0 {
         Some(BumpedStates {
@@ -152,6 +152,10 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
     } else {
         None
     }
+}
+
+fn time_now_as_string() -> Result<String, ()> {
+    time::strftime("%H:%M:%S UTC%z", &time::now()).or(Err(()))
 }
 
 pub fn run() {
@@ -164,7 +168,7 @@ pub fn run() {
         if let Some(ref bumped_states_inner) = bumped_states {
             let notification = Notification {
                 status: &bumped_states_inner.status,
-                time: SystemTime::now(),
+                time: time_now_as_string().unwrap_or("".to_string()),
                 replicas: Vec::from_iter(bumped_states_inner.replicas.iter().map(String::as_str)),
             };
 

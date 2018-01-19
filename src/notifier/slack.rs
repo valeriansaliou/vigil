@@ -53,11 +53,10 @@ impl GenericNotifier for SlackNotifier {
                 );
 
                 let status_label = format!("{:?}", notification.status);
-                let time_label = format!("{:?}", notification.time);
                 let mut nodes_label = String::new();
 
                 // Build message
-                let message_text = format!("Status changed to: *{}*", &status_label);
+                let message_text = format!("Status changed to: *{}*", status_label.as_str());
 
                 // Build paylaod
                 let mut payload = SlackPayload {
@@ -80,7 +79,7 @@ impl GenericNotifier for SlackNotifier {
 
                 attachment.fields.push(SlackPayloadAttachmentField {
                     title: "Time",
-                    value: &time_label,
+                    value: &notification.time,
                     short: true
                 });
 

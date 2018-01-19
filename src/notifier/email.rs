@@ -30,20 +30,28 @@ impl GenericNotifier for EmailNotifier {
                 // Build up the message text
                 let mut message = String::new();
 
-                message.push_str(&format!("{}\n", APP_CONF.branding.page_title));
-                message.push_str("\n--\n\n");
+                message.push_str(&format!(
+                    "Status change report from: {}\n", APP_CONF.branding.page_title
+                ));
+                message.push_str("\n--\n");
                 message.push_str(&format!("Status: {:?}\n", notification.status));
                 message.push_str(&format!("Nodes: {}\n", notification.replicas.join(", ")));
-                message.push_str(&format!("Date: {:?}\n", notification.time));
-                message.push_str(&format!("URL: {}\n", APP_CONF.branding.page_url));
+                message.push_str(&format!("Time: {}\n", &notification.time));
+                message.push_str(&format!("URL: {}", APP_CONF.branding.page_url));
+
+                message.push_str("\n--\n");
+                message.push_str("\n");
+                message.push_str("To unsubscribe, please edit your status page configuration.");
+
+                debug!("will send email notification with message: {}", &message);
 
                 // Build up the email
                 let email_message = EmailBuilder::new()
                     .to(email_config.to.as_str())
                     .from((email_config.from.as_str(), APP_CONF.branding.page_title.as_str()))
                     .subject(format!(
-                        "[{}] Status Changed ({:?})", &APP_CONF.branding.page_title,
-                        notification.status
+                        "[{}] {}", notification.status.as_str().to_uppercase(),
+                        &APP_CONF.branding.page_title
                     ))
                     .text(message)
                     .build()
