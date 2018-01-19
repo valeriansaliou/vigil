@@ -7,5 +7,6 @@
 mod context;
 mod routes;
 mod asset_file;
+mod reporter_guard;
 
 pub mod manager;

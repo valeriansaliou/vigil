@@ -8,6 +8,7 @@ use std::time::{SystemTime, Duration};
 
 use ordermap::OrderMap;
 
+use super::replica::ReplicaURL;
 use super::status::Status;
 use super::mode::Mode;
 
@@ -36,6 +37,7 @@ pub struct ServiceStatesProbeNode {
 #[derive(Serialize)]
 pub struct ServiceStatesProbeNodeReplica {
     pub status: Status,
+    pub url: Option<ReplicaURL>,
     pub load: Option<ServiceStatesProbeNodeReplicaLoad>,
     pub report: Option<ServiceStatesProbeNodeReplicaReport>,
 }

@@ -17,6 +17,8 @@ extern crate lazy_static;
 extern crate serde_derive;
 extern crate time;
 extern crate toml;
+extern crate base64;
+extern crate url;
 extern crate url_serde;
 extern crate ordermap;
 extern crate rocket;

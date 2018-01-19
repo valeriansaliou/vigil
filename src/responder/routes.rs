@@ -12,6 +12,7 @@ use rocket_contrib::{Template, Json};
 
 use super::context::{INDEX_CONFIG, IndexContext};
 use super::asset_file::AssetFile;
+use super::reporter_guard::ReporterGuard;
 use prober::manager::{STORE as PROBER_STORE};
 use prober::report::{handle as handle_report, HandleError};
 use APP_CONF;
@@ -43,12 +44,18 @@ fn index() -> Template {
 }
 
 #[post("/reporter/<probe_id>/<node_id>", data = "<data>", format = "application/json")]
-fn reporter(probe_id: String, node_id: String, data: Json<ReporterData>) -> Result<(), Failure> {
+fn reporter(
+    _auth: ReporterGuard,
+    probe_id: String,
+    node_id: String,
+    data: Json<ReporterData>
+) -> Result<(), Failure> {
     match handle_report(
         &probe_id, &node_id, &data.replica, data.interval, data.load.cpu, data.load.ram
     ) {
         Ok(_) => Ok(()),
         Err(HandleError::InvalidLoad) => Err(Failure(Status::BadRequest)),
+        Err(HandleError::WrongMode) => Err(Failure(Status::PreconditionFailed)),
         Err(HandleError::NotFound) => Err(Failure(Status::NotFound)),
     }
 }

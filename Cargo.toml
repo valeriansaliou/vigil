@@ -29,6 +29,8 @@ time = "0.1"
 serde = "1.0"
 serde_derive = "1.0"
 toml = "0.4"
+base64 = "0.6"
+url = { version = "1.6", default-features = false }
 url_serde = { version = "0.2", default-features = false }
 ordermap = { version = "0.3", features = ["serde-1"] }
 rocket = { version = "0.3", default-features = false }

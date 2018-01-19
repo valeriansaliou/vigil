@@ -32,6 +32,8 @@ pub struct ConfigServer {
 
     #[serde(default = "defaults::server_workers")]
     pub workers: u16,
+
+    pub reporter_token: String,
 }
 
 #[derive(Deserialize)]

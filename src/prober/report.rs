@@ -13,9 +13,11 @@ use super::states::{
 };
 use prober::manager::{STORE as PROBER_STORE};
 use prober::status::Status;
+use prober::mode::Mode;
 
 pub enum HandleError {
     InvalidLoad,
+    WrongMode,
     NotFound
 }
 
@@ -38,6 +40,11 @@ pub fn handle(
 
     if let Some(ref mut probe) = store.states.probes.get_mut(probe_id) {
         if let Some(ref mut node) = probe.nodes.get_mut(node_id) {
+            // Mode isnt push? Dont accept report
+            if node.mode != Mode::Push {
+                return Err(HandleError::WrongMode);
+            }
+
             // Acquire previous replica status (follow it up to avoid re-processing glitches)
             let status = if let Some(ref replica) = node.replicas.get(replica_id) {
                 replica.status.to_owned()
@@ -48,6 +55,7 @@ pub fn handle(
             // Bump stored replica
             node.replicas.insert(replica_id.to_string(), ServiceStatesProbeNodeReplica {
                 status: status,
+                url: None,
                 load: Some(ServiceStatesProbeNodeReplicaLoad {
                     cpu: load_cpu,
                     ram: load_ram,
