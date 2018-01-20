@@ -230,6 +230,7 @@ pub fn initialize_store() {
                 label: node.label.to_owned(),
                 mode: node.mode.to_owned(),
                 replicas: OrderMap::new(),
+                rabbitmq_queue: node.rabbitmq_queue.to_owned(),
             };
 
             if let Some(ref replicas) = node.replicas {

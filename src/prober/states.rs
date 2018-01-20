@@ -32,6 +32,7 @@ pub struct ServiceStatesProbeNode {
     pub label: String,
     pub mode: Mode,
     pub replicas: OrderMap<String, ServiceStatesProbeNodeReplica>,
+    pub rabbitmq_queue: Option<String>,
 }
 
 #[derive(Serialize)]

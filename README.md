@@ -115,6 +115,15 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 * `push_system_cpu_sick_above` (type: _float_, allowed: system CPU loads, default: `0.90`) — System load indice for CPU above which to consider a node in `push` mode `sick` (ie. UNIX system load)
 * `push_system_ram_sick_above` (type: _float_, allowed: system RAM loads, default: `0.90`) — System load indice for RAM above which to consider a node in `push` mode `sick` (ie. percent RAM used)
 
+**[plugins]**
+
+**[plugins.rabbitmq]**
+
+* `api_url` (type: _string_, allowed: URL, no default) — RabbitMQ API URL (ie. `http://127.0.0.1:15672`)
+* `auth_username` (type: _string_, allowed: username, no default) — RabbitMQ API authentication username
+* `auth_password` (type: _string_, allowed: password, no default) — RabbitMQ API authentication password
+* `virtualhost` (type: _string_, allowed: virtual host, no default) — RabbitMQ virtual host hosting the queues to be monitored
+
 **[notify]**
 
 **[notify.email]**
@@ -144,6 +153,7 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 * `label` (type: _string_, allowed: any string, no default) — Name of the probed service node (visible on the status page)
 * `mode` (type: _string_, allowed: `poll`, `push`, no default) — Probe mode for this node (ie. `poll` is direct HTTP or TCP poll to the URLs set in `replicas`, while `push` is for Vigil Reporter nodes)
 * `replicas` (type: _array[string]_, allowed: TCP or HTTP URLs, default: empty) — Node replica URLs to be probed (only used if `mode` is `poll`)
+* `rabbitmq_queue` (type: _string_, allowed: RabbitMQ queue names, no default) — RabbitMQ queue associated to node, which to check against for pending payloads via RabbitMQ API (this helps monitor unacked payloads accumulating in the queue)
 
 ### Run Vigil
 

@@ -18,6 +18,7 @@ pub struct Config {
     pub assets: ConfigAssets,
     pub branding: ConfigBranding,
     pub metrics: ConfigMetrics,
+    pub plugins: ConfigPlugins,
     pub notify: ConfigNotify,
     pub probe: ConfigProbe,
 }
@@ -95,6 +96,19 @@ pub struct ConfigNotify {
 }
 
 #[derive(Deserialize)]
+pub struct ConfigPlugins {
+    pub rabbitmq: Option<ConfigPluginsRabbitMQ>,
+}
+
+#[derive(Deserialize)]
+pub struct ConfigPluginsRabbitMQ {
+    pub api_url: SerdeUrl,
+    pub auth_username: String,
+    pub auth_password: String,
+    pub virtualhost: String,
+}
+
+#[derive(Deserialize)]
 pub struct ConfigNotifyEmail {
     pub to: String,
     pub from: String,
@@ -135,4 +149,5 @@ pub struct ConfigProbeServiceNode {
     pub label: String,
     pub mode: Mode,
     pub replicas: Option<Vec<String>>,
+    pub rabbitmq_queue: Option<String>,
 }
