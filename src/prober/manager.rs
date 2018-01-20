@@ -9,6 +9,7 @@ use std::sync::Arc;
 use std::thread;
 use std::net::{TcpStream, ToSocketAddrs};
 use std::time::{SystemTime, Duration};
+use time;
 
 use reqwest::{Client, RedirectPolicy};
 use reqwest::header::{Headers, UserAgent};
@@ -153,16 +154,18 @@ fn proceed_replica_probe_tcp(host: &str, port: u16) -> bool {
 }
 
 fn proceed_replica_probe_http(url: &str) -> bool {
-    debug!("prober poll will fire for http target: {}", url);
+    let url_bang = format!("{}?{}", url, time::now().to_timespec().sec);
 
-    let response = PROBE_HTTP_CLIENT.head(url).send();
+    debug!("prober poll will fire for http target: {}", &url_bang);
+
+    let response = PROBE_HTTP_CLIENT.head(&url_bang).send();
 
     if let Ok(response_inner) = response {
         let status_code = response_inner.status().as_u16();
 
         debug!(
             "prober poll result received for url: {} with status: {}",
-            url,
+            &url_bang,
             status_code
         );
 

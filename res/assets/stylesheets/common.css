@@ -110,18 +110,14 @@ a:hover {
   text-align: center;
   cursor: default;
   pointer-events: none;
-  width: 1000px;
-  margin-left: -500px;
+  width: 500px;
+  margin-left: -250px;
   margin-top: 6px;
-  visibility: hidden;
-  opacity: 0;
-  display: block;
+  display: none;
   position: absolute;
   top: 100%;
   left: 50%;
   z-index: 100;
-  transition: all 0.15s ease 0.10s;
-  transform: translateY(-4px);
 }
 
 .has-tooltip .tooltip:after {
@@ -165,11 +161,8 @@ a:hover {
 }
 
 .has-tooltip:hover .tooltip {
-  visibility: visible;
-  opacity: 1;
+  display: block;
   pointer-events: auto;
-  transition: all 0.15s ease;
-  transform: translateY(0);
 }
 
 .badge.badge-status-healthy.badge-default {

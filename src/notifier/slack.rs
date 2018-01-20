@@ -57,7 +57,9 @@ impl GenericNotifier for SlackNotifier {
                 let mut nodes_label = String::new();
 
                 // Build message
-                let message_text = format!("Status changed to: *{}*", status_label.as_str());
+                let message_text = format!(
+                    "Status changed to: *{}*.", notification.status.as_str()
+                );
 
                 // Build paylaod
                 let mut payload = SlackPayload {
@@ -72,6 +74,21 @@ impl GenericNotifier for SlackNotifier {
                 };
 
                 // Append attachment fields
+                if notification.replicas.len() > 0 {
+                    nodes_label.push_str(&notification.replicas.join(", "));
+
+                    let nodes_label_titled = format!(" Nodes: *{}*.", nodes_label);
+
+                    payload.text.push_str(&nodes_label_titled);
+                    attachment.fallback.push_str(&nodes_label_titled);
+
+                    attachment.fields.push(SlackPayloadAttachmentField {
+                        title: "Nodes",
+                        value: &nodes_label,
+                        short: false,
+                    });
+                }
+
                 attachment.fields.push(SlackPayloadAttachmentField {
                     title: "Status",
                     value: &status_label,
@@ -89,21 +106,6 @@ impl GenericNotifier for SlackNotifier {
                     value: APP_CONF.branding.page_url.as_str(),
                     short: false,
                 });
-
-                if notification.replicas.len() > 0 {
-                    nodes_label.push_str(&notification.replicas.join(", "));
-
-                    let nodes_label_titled = format!(" Nodes: *{}*.", nodes_label);
-
-                    payload.text.push_str(&nodes_label_titled);
-                    attachment.fallback.push_str(&nodes_label_titled);
-
-                    attachment.fields.push(SlackPayloadAttachmentField {
-                        title: "Nodes",
-                        value: &nodes_label,
-                        short: false,
-                    });
-                }
 
                 // Append attachment
                 payload.attachments.push(attachment);

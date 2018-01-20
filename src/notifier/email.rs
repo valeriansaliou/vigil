@@ -28,6 +28,8 @@ impl GenericNotifier for EmailNotifier {
                     notification.replicas
                 );
 
+                let nodes_label = notification.replicas.join(", ");
+
                 // Build up the message text
                 let mut message = String::new();
 
@@ -37,7 +39,7 @@ impl GenericNotifier for EmailNotifier {
                 ));
                 message.push_str("\n--\n");
                 message.push_str(&format!("Status: {:?}\n", notification.status));
-                message.push_str(&format!("Nodes: {}\n", notification.replicas.join(", ")));
+                message.push_str(&format!("Nodes: {}\n", &nodes_label));
                 message.push_str(&format!("Time: {}\n", &notification.time));
                 message.push_str(&format!("URL: {}", APP_CONF.branding.page_url.as_str()));
 
@@ -57,9 +59,7 @@ impl GenericNotifier for EmailNotifier {
                         APP_CONF.branding.page_title.as_str(),
                     ))
                     .subject(format!(
-                        "[{}] {}",
-                        notification.status.as_str().to_uppercase(),
-                        &APP_CONF.branding.page_title
+                        "{} | {}", notification.status.as_str().to_uppercase(), &nodes_label
                     ))
                     .text(message)
                     .build()
