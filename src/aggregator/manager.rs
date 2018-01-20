@@ -173,7 +173,7 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
         store.states.date = Some(time_string);
     }
 
-    if should_notify == true && bumped_replicas.len() > 0 {
+    if should_notify == true {
         Some(BumpedStates {
             status: general_status,
             replicas: bumped_replicas,
