@@ -25,7 +25,7 @@ pub fn handle(
     interval: u64,
     load_cpu: f32,
     load_ram: f32,
-) -> Result<(), HandleError> {
+) -> Result<Option<String>, HandleError> {
     debug!("report handle: {}:{}:{}", probe_id, node_id, replica_id);
 
     // Validate loads
@@ -49,6 +49,15 @@ pub fn handle(
                 Status::Healthy
             };
 
+            // Acquire previous queue load status
+            let mut load_queue = false;
+
+            if let Some(ref replica) = node.replicas.get(replica_id) {
+                if let Some(ref replica_load) = replica.load {
+                    load_queue = replica_load.queue;
+                }
+            }
+
             // Bump stored replica
             node.replicas.insert(
                 replica_id.to_string(),
@@ -58,6 +67,7 @@ pub fn handle(
                     load: Some(ServiceStatesProbeNodeReplicaLoad {
                         cpu: load_cpu,
                         ram: load_ram,
+                        queue: load_queue,
                     }),
                     report: Some(ServiceStatesProbeNodeReplicaReport {
                         time: SystemTime::now(),
@@ -66,7 +76,7 @@ pub fn handle(
                 },
             );
 
-            return Ok(());
+            return Ok(node.rabbitmq_queue.to_owned());
         }
     }
 

@@ -94,6 +94,15 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
                             }
                         }
                     }
+
+                    // Check RabbitMQ queue full marker?
+                    if replica_status == Status::Healthy {
+                        if let Some(ref replica_load) = replica.load {
+                            if replica_load.queue == true {
+                                replica_status = Status::Sick;
+                            }
+                        }
+                    }
                 } else {
                     replica_status = replica.status.to_owned();
                 }

@@ -47,6 +47,7 @@ pub struct ServiceStatesProbeNodeReplica {
 pub struct ServiceStatesProbeNodeReplicaLoad {
     pub cpu: f32,
     pub ram: f32,
+    pub queue: bool,
 }
 
 #[derive(Serialize)]

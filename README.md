@@ -123,6 +123,8 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 * `auth_username` (type: _string_, allowed: username, no default) — RabbitMQ API authentication username
 * `auth_password` (type: _string_, allowed: password, no default) — RabbitMQ API authentication password
 * `virtualhost` (type: _string_, allowed: virtual host, no default) — RabbitMQ virtual host hosting the queues to be monitored
+* `queue_ready_healthy_below` (type: _integer_, allowed: any number, no default) — Maximum number of payloads in RabbitMQ queue with status `ready` to consider node `healthy`.
+* `queue_nack_healthy_below` (type: _integer_, allowed: any number, no default) — Maximum number of payloads in RabbitMQ queue with status `nack` to consider node `healthy`.
 
 **[notify]**
 

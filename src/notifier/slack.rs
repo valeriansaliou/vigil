@@ -57,9 +57,8 @@ impl GenericNotifier for SlackNotifier {
                 let mut nodes_label = String::new();
 
                 // Build message
-                let message_text = format!(
-                    "Status changed to: *{}*.", notification.status.as_str()
-                );
+                let message_text =
+                    format!("Status changed to: *{}*.", notification.status.as_str());
 
                 // Build paylaod
                 let mut payload = SlackPayload {

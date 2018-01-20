@@ -59,7 +59,9 @@ impl GenericNotifier for EmailNotifier {
                         APP_CONF.branding.page_title.as_str(),
                     ))
                     .subject(format!(
-                        "{} | {}", notification.status.as_str().to_uppercase(), &nodes_label
+                        "{} | {}",
+                        notification.status.as_str().to_uppercase(),
+                        &nodes_label
                     ))
                     .text(message)
                     .build()

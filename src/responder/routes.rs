@@ -13,7 +13,7 @@ use rocket_contrib::{Template, Json};
 use super::context::{INDEX_CONFIG, IndexContext};
 use super::asset_file::AssetFile;
 use super::reporter_guard::ReporterGuard;
-use prober::manager::STORE as PROBER_STORE;
+use prober::manager::{STORE as PROBER_STORE, run_dispatch_plugins};
 use prober::report::{handle as handle_report, HandleError};
 use APP_CONF;
 
@@ -58,7 +58,12 @@ fn reporter(
         data.load.cpu,
         data.load.ram,
     ) {
-        Ok(_) => Ok(()),
+        Ok(forward) => {
+            // Trigger a plugins check
+            run_dispatch_plugins(&probe_id, &node_id, forward);
+
+            Ok(())
+        }
         Err(HandleError::InvalidLoad) => Err(Failure(Status::BadRequest)),
         Err(HandleError::WrongMode) => Err(Failure(Status::PreconditionFailed)),
         Err(HandleError::NotFound) => Err(Failure(Status::NotFound)),

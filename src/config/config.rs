@@ -106,6 +106,8 @@ pub struct ConfigPluginsRabbitMQ {
     pub auth_username: String,
     pub auth_password: String,
     pub virtualhost: String,
+    pub queue_ready_healthy_below: u32,
+    pub queue_nack_healthy_below: u32,
 }
 
 #[derive(Deserialize)]

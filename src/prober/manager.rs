@@ -11,10 +11,11 @@ use std::net::{TcpStream, ToSocketAddrs};
 use std::time::{SystemTime, Duration};
 use time;
 
-use reqwest::{Client, RedirectPolicy};
+use reqwest::{Client, StatusCode, RedirectPolicy};
 use reqwest::header::{Headers, UserAgent};
 use ordermap::OrderMap;
 
+use config::config::ConfigPluginsRabbitMQ;
 use prober::manager::STORE as PROBER_STORE;
 use prober::mode::Mode;
 use super::states::{ServiceStates, ServiceStatesProbe, ServiceStatesProbeNode,
@@ -42,6 +43,12 @@ lazy_static! {
         .default_headers(make_default_headers())
         .build()
         .unwrap();
+}
+
+#[derive(Deserialize)]
+struct RabbitMQAPIQueueResponse {
+    messages_ready: u32,
+    messages_unacknowledged: u32,
 }
 
 pub struct Store {
@@ -181,13 +188,76 @@ fn proceed_replica_probe_http(url: &str) -> bool {
     false
 }
 
+fn proceed_rabbitmq_queue_probe(rabbitmq: &ConfigPluginsRabbitMQ, rabbitmq_queue: &str) -> bool {
+    let url_queue = rabbitmq.api_url.join(&format!(
+        "/api/queues/{}/{}",
+        rabbitmq.virtualhost,
+        rabbitmq_queue
+    ));
+
+    if let Ok(url_queue_value) = url_queue {
+        let url_queue_string = url_queue_value.as_str();
+
+        debug!(
+            "prober poll will fire for rabbitmq queue at url: {}",
+            url_queue_string
+        );
+
+        let response = PROBE_HTTP_CLIENT
+            .get(url_queue_string)
+            .basic_auth(
+                rabbitmq.auth_username.to_owned(),
+                Some(rabbitmq.auth_password.to_owned()),
+            )
+            .send();
+
+        if let Ok(mut response_inner) = response {
+            let status = response_inner.status();
+
+            debug!(
+                "prober poll on rabbitmq queue result received for url: {} with status: {}",
+                url_queue_string,
+                status.as_u16()
+            );
+
+            // Check JSON result?
+            if status == StatusCode::Ok {
+                if let Ok(response_json) = response_inner.json::<RabbitMQAPIQueueResponse>() {
+                    // Queue full?
+                    if response_json.messages_ready >= rabbitmq.queue_ready_healthy_below ||
+                        response_json.messages_unacknowledged >= rabbitmq.queue_nack_healthy_below
+                    {
+                        info!(
+                            "got full rabbitmq queue: {} (ready: {}, unacknowledged: {})",
+                            rabbitmq_queue,
+                            response_json.messages_ready,
+                            response_json.messages_unacknowledged
+                        );
+
+                        return true;
+                    }
+                }
+            } else {
+                warn!(
+                    "rabbitmq api replied with an invalid status code: {}",
+                    status.as_u16()
+                );
+            }
+        } else {
+            warn!("rabbitmq api request failed");
+        }
+    }
+
+    false
+}
+
 fn dispatch_polls() {
     // Probe hosts
     for probe_replica in map_poll_replicas() {
         let replica_status = proceed_replica_probe_with_retry(&probe_replica.3);
 
         debug!(
-            "probe result: {}:{}:{} => {:?}",
+            "replica probe result: {}:{}:{} => {:?}",
             &probe_replica.0,
             &probe_replica.1,
             &probe_replica.2,
@@ -206,6 +276,54 @@ fn dispatch_polls() {
                 }
             }
         }
+    }
+}
+
+fn dispatch_plugins_rabbitmq(probe_id: String, node_id: String, queue: Option<String>) {
+    // RabbitMQ plugin enabled?
+    if let Some(ref rabbitmq) = APP_CONF.plugins.rabbitmq {
+        // Any queue for node?
+        if let Some(ref queue_value) = queue {
+            let rabbitmq_queue_loaded = proceed_rabbitmq_queue_probe(rabbitmq, queue_value);
+
+            debug!(
+                "rabbitmq queue probe result: {}:{} [{}] => {:?}",
+                &probe_id,
+                &node_id,
+                queue_value,
+                rabbitmq_queue_loaded
+            );
+
+            // Update replica status? (write-lock the store)
+            if rabbitmq_queue_loaded == true {
+                {
+                    let mut store = STORE.write().unwrap();
+
+                    if let Some(ref mut probe) = store.states.probes.get_mut(&probe_id) {
+                        if let Some(ref mut node) = probe.nodes.get_mut(&node_id) {
+                            for (_, replica) in node.replicas.iter_mut() {
+                                // Only alter healthy replicas
+                                if let Some(ref mut replica_load) = replica.load {
+                                    replica_load.queue = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+pub fn run_dispatch_plugins(probe_id: &str, node_id: &str, queue: Option<String>) {
+    // Check target RabbitMQ queue?
+    if APP_CONF.plugins.rabbitmq.is_some() {
+        let self_probe_id = probe_id.to_owned();
+        let self_node_id = node_id.to_owned();
+
+        thread::spawn(move || {
+            dispatch_plugins_rabbitmq(self_probe_id, self_node_id, queue)
+        });
     }
 }
 
