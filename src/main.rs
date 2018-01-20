@@ -24,6 +24,7 @@ extern crate ordermap;
 extern crate rocket;
 extern crate rocket_contrib;
 extern crate native_tls;
+extern crate openssl_probe;
 extern crate reqwest;
 extern crate lettre;
 extern crate lettre_email;
@@ -139,6 +140,10 @@ fn ensure_states() {
 }
 
 fn main() {
+    // Ensure OpenSSL root chain is found on current environment
+    openssl_probe::init_ssl_cert_env_vars();
+
+    // Initialize shared logger
     let _logger = ConfigLogger::init(
         LogLevelFilter::from_str(&APP_CONF.server.log_level).expect("invalid log level"),
     );

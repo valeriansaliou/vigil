@@ -661,6 +661,11 @@ dependencies = [
 ]
 
 [[package]]
+name = "openssl-probe"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
 name = "openssl-sys"
 version = "0.9.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1342,6 +1347,7 @@ dependencies = [
  "lettre_email 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.3.9 (registry+https://github.com/rust-lang/crates.io-index)",
  "native-tls 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "openssl-probe 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "ordermap 0.3.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "reqwest 0.8.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "rocket 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1483,6 +1489,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum num-traits 0.1.41 (registry+https://github.com/rust-lang/crates.io-index)" = "cacfcab5eb48250ee7d0c7896b51a2c5eec99c1feea5f32025635f5ae4b00070"
 "checksum num_cpus 1.8.0 (registry+https://github.com/rust-lang/crates.io-index)" = "c51a3322e4bca9d212ad9a158a02abc6934d005490c054a2778df73a70aa0a30"
 "checksum openssl 0.9.23 (registry+https://github.com/rust-lang/crates.io-index)" = "169a4b9160baf9b9b1ab975418c673686638995ba921683a7f1e01470dcb8854"
+"checksum openssl-probe 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)" = "77af24da69f9d9341038eba93a073b1fdaaa1b788221b00a69bce9e762cb32de"
 "checksum openssl-sys 0.9.24 (registry+https://github.com/rust-lang/crates.io-index)" = "14ba54ac7d5a4eabd1d5f2c1fdeb7e7c14debfa669d94b983d01b465e767ba9e"
 "checksum ordermap 0.2.13 (registry+https://github.com/rust-lang/crates.io-index)" = "b81cf3b8cb96aa0e73bbedfcdc9708d09fec2854ba8d474be4e6f666d7379e8b"
 "checksum ordermap 0.3.5 (registry+https://github.com/rust-lang/crates.io-index)" = "a86ed3f5f244b372d6b1a00b72ef7f8876d0bc6a78a4c9985c53614041512063"
