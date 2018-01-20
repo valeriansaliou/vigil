@@ -13,8 +13,11 @@ We consider here the packaging flow of Vigil version `1.0.0`, for target archite
     1. See [messense/rust-musl-cross](https://github.com/messense/rust-musl-cross)
     2. Install the proper Docker alias for `i686-musl`, which is `alias rust-musl-i686='docker run --rm -it -v "$(pwd)":/home/rust/src messense/rust-musl-cross:i686-musl'`
     3. Enter the Docker container with `rust-musl-i686`
-    4. Setup the latest Rust `nightly` toolchain with `rustup install nightly`
-    5. Compile with `cargo build --release`
+    4. Setup the latest Rust `nightly` toolchain with `rustup install nightly` _(in the container)_
+    5. Make Rust `nightly` the default with `rustup default nightly` _(in the container)_
+    6. Add the proper `musl` target with `rustup target add i686-unknown-linux-musl` _(in the container)_
+    7. Compile with `cargo build --target=i686-unknown-linux-musl --release` _(in the container)_
+    8. Stop the Docker container with `exit` (the compiled target binary is stored on your host system)
 
 3. **How to package built binary and release it on GitHub:**
     1. `mkdir vigil`
