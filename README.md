@@ -51,7 +51,7 @@ It is recommended to configure Vigil or Vigil Reporter to send frequent probe ch
 
 The best way to install Vigil is to pull the latest release from the [Vigil releases](https://github.com/valeriansaliou/vigil/releases) page.
 
-Make sure to pick the correct server architecture (either Intel 32 bits, Intel 64 bits, or ARM).
+Make sure to pick the correct server architecture (eg. Intel 32 bits).
 
 **Install from Cargo:**
 
