@@ -294,18 +294,16 @@ fn dispatch_plugins_rabbitmq(probe_id: String, node_id: String, queue: Option<St
                 rabbitmq_queue_loaded
             );
 
-            // Update replica status? (write-lock the store)
-            if rabbitmq_queue_loaded == true {
-                {
-                    let mut store = STORE.write().unwrap();
+            // Update replica status (write-lock the store)
+            {
+                let mut store = STORE.write().unwrap();
 
-                    if let Some(ref mut probe) = store.states.probes.get_mut(&probe_id) {
-                        if let Some(ref mut node) = probe.nodes.get_mut(&node_id) {
-                            for (_, replica) in node.replicas.iter_mut() {
-                                // Only alter healthy replicas
-                                if let Some(ref mut replica_load) = replica.load {
-                                    replica_load.queue = true;
-                                }
+                if let Some(ref mut probe) = store.states.probes.get_mut(&probe_id) {
+                    if let Some(ref mut node) = probe.nodes.get_mut(&node_id) {
+                        for (_, replica) in node.replicas.iter_mut() {
+                            // Only alter healthy replicas
+                            if let Some(ref mut replica_load) = replica.load {
+                                replica_load.queue = rabbitmq_queue_loaded;
                             }
                         }
                     }

@@ -121,7 +121,7 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
                 );
 
                 // Append bumped replica path?
-                if replica.status != replica_status {
+                if replica_status == Status::Dead {
                     bumped_replicas.push(format!("{}:{}:{}", probe_id, node_id, replica_id));
                 }
 
