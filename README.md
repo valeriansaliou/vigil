@@ -216,7 +216,7 @@ Where:
 
 **Request data:**
 
-Adjust the request data to your replica context:
+Adjust the request data to your replica context and send it as `HTTP POST`:
 
 ```json
 {
