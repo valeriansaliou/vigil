@@ -190,12 +190,52 @@ Vigil has 3 status variants, either `healthy` (no issue ongoing), `sick` (servic
 
 Vigil Reporter is used to actively submit health information to Vigil from your apps. Apps are best monitored via application probes, which are able to report detailed system information such as CPU and RAM load. This lets Vigil show if an application host system is under high load.
 
-**📦 Vigil Reporter Libraries:**
+### Vigil Reporter Libraries
 
 * **NodeJS**: **[node-vigil-reporter](https://www.npmjs.com/package/vigil-reporter)**
 * **Rust**: **[rs-vigil-reporter](https://crates.io/crates/vigil-reporter)**
 
 👉 Cannot find the library for your programming language? Build your own and be referenced here! ([contact me](https://valeriansaliou.name/))
+
+### Manual reporting
+
+In case you need to manually report node metrics to the Vigil endpoint, use the following HTTP configuration (adjust it to yours):
+
+**Endpoint URL:**
+
+`https://status.example.com/reporter/<probe_id>/<node_id>/`
+
+Where:
+
+* `node_id`: The parent node of the reporting replica
+* `probe_id`: The parent probe of the node
+
+**Request headers:**
+
+* Add an `Authorization` header with a `Basic` authentication where the password is your configured `reporter_token`.
+
+**Request data:**
+
+Adjust the request data to your replica context:
+
+```json
+{
+  "replica": "<replica_id>",
+  "interval": 30,
+
+  "load": {
+    "cpu": 0.30,
+    "ram": 0.80
+  }
+}
+```
+
+Where:
+
+* `replica`: The replica unique identifier (eg. the server LAN IP)
+* `interval`: The push interval (in seconds)
+* `load.cpu`: The general CPU load, from `0.00` to `1.00` (can be more than `1.00` if the CPU is overloaded)
+* `load.ram`: The general RAM load, from `0.00` to `1.00`
 
 ## :fire: Report A Vulnerability
 
