@@ -157,6 +157,7 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 * `label` (type: _string_, allowed: any string, no default) — Name of the probed service node (visible on the status page)
 * `mode` (type: _string_, allowed: `poll`, `push`, no default) — Probe mode for this node (ie. `poll` is direct HTTP or TCP poll to the URLs set in `replicas`, while `push` is for Vigil Reporter nodes)
 * `replicas` (type: _array[string]_, allowed: TCP or HTTP URLs, default: empty) — Node replica URLs to be probed (only used if `mode` is `poll`)
+* `http_body_healthy_match` (type: _string_, allowed: regular expressions, no default) — HTTP response body for which to report node replica as `healthy` (if the body does not match, the replica will be reported as `dead`, even if the status code check passes; the check uses a `GET` rather than the usual `HEAD` if this option is set)
 * `rabbitmq_queue` (type: _string_, allowed: RabbitMQ queue names, no default) — RabbitMQ queue associated to node, which to check against for pending payloads via RabbitMQ API (this helps monitor unacked payloads accumulating in the queue)
 
 ### Run Vigil

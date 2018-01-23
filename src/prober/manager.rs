@@ -16,6 +16,7 @@ use reqwest::header::{Headers, UserAgent};
 use ordermap::OrderMap;
 
 use config::config::ConfigPluginsRabbitMQ;
+use config::regex::Regex;
 use prober::manager::STORE as PROBER_STORE;
 use prober::mode::Mode;
 use super::states::{ServiceStates, ServiceStatesProbe, ServiceStatesProbeNode,
@@ -65,7 +66,7 @@ fn make_default_headers() -> Headers {
     headers
 }
 
-fn map_poll_replicas() -> Vec<(String, String, String, ReplicaURL)> {
+fn map_poll_replicas() -> Vec<(String, String, String, ReplicaURL, Option<Regex>)> {
     let mut replica_list = Vec::new();
 
     // Acquire states
@@ -86,6 +87,7 @@ fn map_poll_replicas() -> Vec<(String, String, String, ReplicaURL)> {
                             node_id.to_owned(),
                             replica_id.to_owned(),
                             replica_url.to_owned(),
+                            node.http_body_healthy_match.to_owned(),
                         ));
                     }
                 }
@@ -96,7 +98,10 @@ fn map_poll_replicas() -> Vec<(String, String, String, ReplicaURL)> {
     replica_list
 }
 
-fn proceed_replica_probe_with_retry(replica_url: &ReplicaURL) -> Status {
+fn proceed_replica_probe_with_retry(
+    replica_url: &ReplicaURL,
+    body_match: &Option<Regex>,
+) -> Status {
     let mut status = Status::Dead;
     let mut retry_count = 0;
 
@@ -111,19 +116,19 @@ fn proceed_replica_probe_with_retry(replica_url: &ReplicaURL) -> Status {
 
         thread::sleep(Duration::from_millis(PROBE_HOLD_MILLISECONDS));
 
-        status = proceed_replica_probe(replica_url);
+        status = proceed_replica_probe(replica_url, body_match);
     }
 
     status
 }
 
-fn proceed_replica_probe(replica_url: &ReplicaURL) -> Status {
+fn proceed_replica_probe(replica_url: &ReplicaURL, body_match: &Option<Regex>) -> Status {
     let start_time = SystemTime::now();
 
     let is_up = match replica_url {
         &ReplicaURL::TCP(ref host, port) => proceed_replica_probe_tcp(host, port),
-        &ReplicaURL::HTTP(ref url) => proceed_replica_probe_http(url),
-        &ReplicaURL::HTTPS(ref url) => proceed_replica_probe_http(url),
+        &ReplicaURL::HTTP(ref url) => proceed_replica_probe_http(url, body_match),
+        &ReplicaURL::HTTPS(ref url) => proceed_replica_probe_http(url, body_match),
     };
 
     if is_up == true {
@@ -160,14 +165,18 @@ fn proceed_replica_probe_tcp(host: &str, port: u16) -> bool {
     false
 }
 
-fn proceed_replica_probe_http(url: &str) -> bool {
+fn proceed_replica_probe_http(url: &str, body_match: &Option<Regex>) -> bool {
     let url_bang = format!("{}?{}", url, time::now().to_timespec().sec);
 
     debug!("prober poll will fire for http target: {}", &url_bang);
 
-    let response = PROBE_HTTP_CLIENT.head(&url_bang).send();
+    let response = if body_match.is_some() {
+        PROBE_HTTP_CLIENT.get(&url_bang).send()
+    } else {
+        PROBE_HTTP_CLIENT.head(&url_bang).send()
+    };
 
-    if let Ok(response_inner) = response {
+    if let Ok(mut response_inner) = response {
         let status_code = response_inner.status().as_u16();
 
         debug!(
@@ -180,6 +189,22 @@ fn proceed_replica_probe_http(url: &str) -> bool {
         if status_code >= APP_CONF.metrics.poll_http_status_healthy_above &&
             status_code < APP_CONF.metrics.poll_http_status_healthy_below
         {
+            // Check response body for match? (if configured)
+            if let &Some(ref body_match_regex) = body_match {
+                if let Ok(text) = response_inner.text() {
+                    debug!(
+                        "checking prober poll result response text for url: {} for any match: {}",
+                        &url_bang,
+                        &text
+                    );
+
+                    // Doesnt match? Consider as DOWN.
+                    if body_match_regex.is_match(&text) == false {
+                        return false;
+                    }
+                }
+            }
+
             return true;
         }
     }
@@ -254,7 +279,7 @@ fn proceed_rabbitmq_queue_probe(rabbitmq: &ConfigPluginsRabbitMQ, rabbitmq_queue
 fn dispatch_polls() {
     // Probe hosts
     for probe_replica in map_poll_replicas() {
-        let replica_status = proceed_replica_probe_with_retry(&probe_replica.3);
+        let replica_status = proceed_replica_probe_with_retry(&probe_replica.3, &probe_replica.4);
 
         debug!(
             "replica probe result: {}:{}:{} => {:?}",
@@ -346,6 +371,7 @@ pub fn initialize_store() {
                 label: node.label.to_owned(),
                 mode: node.mode.to_owned(),
                 replicas: OrderMap::new(),
+                http_body_healthy_match: node.http_body_healthy_match.to_owned(),
                 rabbitmq_queue: node.rabbitmq_queue.to_owned(),
             };
 

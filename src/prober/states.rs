@@ -11,6 +11,7 @@ use ordermap::OrderMap;
 use super::replica::ReplicaURL;
 use super::status::Status;
 use super::mode::Mode;
+use config::regex::Regex;
 
 #[derive(Serialize)]
 pub struct ServiceStates {
@@ -32,6 +33,7 @@ pub struct ServiceStatesProbeNode {
     pub label: String,
     pub mode: Mode,
     pub replicas: OrderMap<String, ServiceStatesProbeNodeReplica>,
+    pub http_body_healthy_match: Option<Regex>,
     pub rabbitmq_queue: Option<String>,
 }
 

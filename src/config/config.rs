@@ -10,6 +10,7 @@ use std::path::PathBuf;
 use url_serde::SerdeUrl;
 
 use super::defaults;
+use super::regex::Regex;
 use prober::mode::Mode;
 
 #[derive(Deserialize)]
@@ -151,5 +152,6 @@ pub struct ConfigProbeServiceNode {
     pub label: String,
     pub mode: Mode,
     pub replicas: Option<Vec<String>>,
+    pub http_body_healthy_match: Option<Regex>,
     pub rabbitmq_queue: Option<String>,
 }
