@@ -73,7 +73,7 @@ cargo build --release
 
 You can find the built binaries in the `./target/release` directory.
 
-Make sure you install the `libssl-dev` (ie. OpenSSL headers) before you compile Vigil. SSL dependencies are required for the HTTPS probes and email notifications.
+_Install the `libssl-dev` (ie. OpenSSL headers) before you compile Vigil. SSL dependencies are required for the HTTPS probes and email notifications._
 
 ### Configuration
 
