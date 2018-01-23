@@ -203,7 +203,7 @@ In case you need to manually report node metrics to the Vigil endpoint, use the 
 
 **Endpoint URL:**
 
-`https://status.example.com/reporter/<probe_id>/<node_id>/`
+`HTTP POST https://status.example.com/reporter/<probe_id>/<node_id>/`
 
 Where:
 
