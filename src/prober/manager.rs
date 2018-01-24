@@ -202,11 +202,18 @@ fn proceed_replica_probe_http(url: &str, body_match: &Option<Regex>) -> bool {
                     if body_match_regex.is_match(&text) == false {
                         return false;
                     }
+                } else {
+                    debug!("could not unpack response text for url: {}", &url_bang);
+
+                    // Consider as DOWN (the response text could not be checked)
+                    return false;
                 }
             }
 
             return true;
         }
+    } else {
+        debug!("prober poll result was not received for url: {}", &url_bang);
     }
 
     // Consider as DOWN.
