@@ -10,6 +10,7 @@ use reqwest::{Client, StatusCode};
 
 use super::generic::{DISPATCH_TIMEOUT_SECONDS, Notification, GenericNotifier};
 use prober::status::Status;
+use config::config::ConfigNotify;
 use APP_CONF;
 
 lazy_static! {
@@ -44,9 +45,9 @@ struct SlackPayloadAttachmentField<'a> {
 }
 
 impl GenericNotifier for SlackNotifier {
-    fn dispatch(notification: &Notification) -> Result<(), bool> {
-        if Self::is_enabled() == true {
-            if let Some(ref slack) = APP_CONF.notify.slack {
+    fn dispatch(notify: &ConfigNotify, notification: &Notification) -> Result<(), bool> {
+        if Self::is_enabled(notify) == true {
+            if let Some(ref slack) = notify.slack {
                 debug!(
                     "dispatch slack notification for status: {:?} and replicas: {:?}",
                     notification.status,
@@ -128,8 +129,8 @@ impl GenericNotifier for SlackNotifier {
         Err(false)
     }
 
-    fn is_enabled() -> bool {
-        APP_CONF.notify.slack.is_some()
+    fn is_enabled(notify: &ConfigNotify) -> bool {
+        notify.slack.is_some()
     }
 }
 

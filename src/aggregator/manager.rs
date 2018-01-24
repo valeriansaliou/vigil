@@ -201,18 +201,20 @@ pub fn run() {
                 replicas: Vec::from_iter(bumped_states_inner.replicas.iter().map(String::as_str)),
             };
 
-            for result in [
-                ("email", EmailNotifier::dispatch(&notification)),
-                ("slack", SlackNotifier::dispatch(&notification)),
-            ].iter()
-            {
-                if result.1.is_ok() == true {
-                    debug!("dispatched notification to provider: {}", result.0);
-                } else {
-                    if let Err(true) = result.1 {
-                        error!("failed dispatching notification to provider: {}", result.0);
+            if let Some(ref notify) = APP_CONF.notify {
+                for result in [
+                    ("email", EmailNotifier::dispatch(notify, &notification)),
+                    ("slack", SlackNotifier::dispatch(notify, &notification)),
+                ].iter()
+                {
+                    if result.1.is_ok() == true {
+                        debug!("dispatched notification to provider: {}", result.0);
                     } else {
-                        debug!("did not dispatch notification to provider: {}", result.0);
+                        if let Err(true) = result.1 {
+                            error!("failed dispatching notification to provider: {}", result.0);
+                        } else {
+                            debug!("did not dispatch notification to provider: {}", result.0);
+                        }
                     }
                 }
             }

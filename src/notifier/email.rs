@@ -14,14 +14,15 @@ use lettre::EmailTransport;
 use lettre_email::EmailBuilder;
 
 use super::generic::{DISPATCH_TIMEOUT_SECONDS, Notification, GenericNotifier};
+use config::config::ConfigNotify;
 use APP_CONF;
 
 pub struct EmailNotifier;
 
 impl GenericNotifier for EmailNotifier {
-    fn dispatch(notification: &Notification) -> Result<(), bool> {
-        if Self::is_enabled() == true {
-            if let Some(ref email_config) = APP_CONF.notify.email {
+    fn dispatch(notify: &ConfigNotify, notification: &Notification) -> Result<(), bool> {
+        if Self::is_enabled(notify) == true {
+            if let Some(ref email_config) = notify.email {
                 debug!(
                     "dispatch email notification for status: {:?} and replicas: {:?}",
                     notification.status,
@@ -83,8 +84,8 @@ impl GenericNotifier for EmailNotifier {
         Err(false)
     }
 
-    fn is_enabled() -> bool {
-        APP_CONF.notify.email.is_some()
+    fn is_enabled(notify: &ConfigNotify) -> bool {
+        notify.email.is_some()
     }
 }
 

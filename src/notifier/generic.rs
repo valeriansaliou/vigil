@@ -5,6 +5,7 @@
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
 use prober::status::Status;
+use config::config::ConfigNotify;
 
 pub const DISPATCH_TIMEOUT_SECONDS: u64 = 10;
 
@@ -15,6 +16,6 @@ pub struct Notification<'a> {
 }
 
 pub trait GenericNotifier {
-    fn dispatch(notification: &Notification) -> Result<(), bool>;
-    fn is_enabled() -> bool;
+    fn dispatch(notify: &ConfigNotify, notification: &Notification) -> Result<(), bool>;
+    fn is_enabled(notify: &ConfigNotify) -> bool;
 }

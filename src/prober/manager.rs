@@ -313,29 +313,31 @@ fn dispatch_polls() {
 
 fn dispatch_plugins_rabbitmq(probe_id: String, node_id: String, queue: Option<String>) {
     // RabbitMQ plugin enabled?
-    if let Some(ref rabbitmq) = APP_CONF.plugins.rabbitmq {
-        // Any queue for node?
-        if let Some(ref queue_value) = queue {
-            let rabbitmq_queue_loaded = proceed_rabbitmq_queue_probe(rabbitmq, queue_value);
+    if let Some(ref plugins) = APP_CONF.plugins {
+        if let Some(ref rabbitmq) = plugins.rabbitmq {
+            // Any queue for node?
+            if let Some(ref queue_value) = queue {
+                let rabbitmq_queue_loaded = proceed_rabbitmq_queue_probe(rabbitmq, queue_value);
 
-            debug!(
-                "rabbitmq queue probe result: {}:{} [{}] => {:?}",
-                &probe_id,
-                &node_id,
-                queue_value,
-                rabbitmq_queue_loaded
-            );
+                debug!(
+                    "rabbitmq queue probe result: {}:{} [{}] => {:?}",
+                    &probe_id,
+                    &node_id,
+                    queue_value,
+                    rabbitmq_queue_loaded
+                );
 
-            // Update replica status (write-lock the store)
-            {
-                let mut store = STORE.write().unwrap();
+                // Update replica status (write-lock the store)
+                {
+                    let mut store = STORE.write().unwrap();
 
-                if let Some(ref mut probe) = store.states.probes.get_mut(&probe_id) {
-                    if let Some(ref mut node) = probe.nodes.get_mut(&node_id) {
-                        for (_, replica) in node.replicas.iter_mut() {
-                            // Only alter healthy replicas
-                            if let Some(ref mut replica_load) = replica.load {
-                                replica_load.queue = rabbitmq_queue_loaded;
+                    if let Some(ref mut probe) = store.states.probes.get_mut(&probe_id) {
+                        if let Some(ref mut node) = probe.nodes.get_mut(&node_id) {
+                            for (_, replica) in node.replicas.iter_mut() {
+                                // Only alter healthy replicas
+                                if let Some(ref mut replica_load) = replica.load {
+                                    replica_load.queue = rabbitmq_queue_loaded;
+                                }
                             }
                         }
                     }
@@ -347,13 +349,15 @@ fn dispatch_plugins_rabbitmq(probe_id: String, node_id: String, queue: Option<St
 
 pub fn run_dispatch_plugins(probe_id: &str, node_id: &str, queue: Option<String>) {
     // Check target RabbitMQ queue?
-    if APP_CONF.plugins.rabbitmq.is_some() {
-        let self_probe_id = probe_id.to_owned();
-        let self_node_id = node_id.to_owned();
+    if let Some(ref plugins) = APP_CONF.plugins {
+        if plugins.rabbitmq.is_some() {
+            let self_probe_id = probe_id.to_owned();
+            let self_node_id = node_id.to_owned();
 
-        thread::spawn(move || {
-            dispatch_plugins_rabbitmq(self_probe_id, self_node_id, queue)
-        });
+            thread::spawn(move || {
+                dispatch_plugins_rabbitmq(self_probe_id, self_node_id, queue)
+            });
+        }
     }
 }
 

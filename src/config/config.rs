@@ -19,8 +19,8 @@ pub struct Config {
     pub assets: ConfigAssets,
     pub branding: ConfigBranding,
     pub metrics: ConfigMetrics,
-    pub plugins: ConfigPlugins,
-    pub notify: ConfigNotify,
+    pub plugins: Option<ConfigPlugins>,
+    pub notify: Option<ConfigNotify>,
     pub probe: ConfigProbe,
 }
 
