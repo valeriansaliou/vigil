@@ -5,7 +5,7 @@
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
 #![feature(plugin)]
-#![plugin(interpolate_idents, rocket_codegen)]
+#![plugin(rocket_codegen)]
 
 #[macro_use]
 extern crate log;

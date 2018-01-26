@@ -24,7 +24,6 @@ doc = false
 log = "0.3"
 clap = { version = "2.29", default-features = false }
 lazy_static = "1.0"
-interpolate_idents = "0.2"
 time = "0.1"
 serde = "1.0"
 serde_derive = "1.0"
