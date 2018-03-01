@@ -18,14 +18,10 @@ It is useful in microservices contexts to monitor both apps and backends. If a n
 <table>
 <tr>
 <td align="center"><a href="https://crisp.chat/"><img src="https://valeriansaliou.github.io/vigil/images/crisp-icon.png" height="64" /></a></td>
-</tr>
-<tr>
-<td align="center">Crisp</td>
-</tr>
-<tr>
 <td align="center"><a href="https://enrichdata.com/"><img src="https://valeriansaliou.github.io/vigil/images/enrich-icon.png" height="64" /></a></td>
 </tr>
 <tr>
+<td align="center">Crisp</td>
 <td align="center">Enrich</td>
 </tr>
 </table>
