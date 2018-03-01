@@ -9,7 +9,7 @@ Vigil is an open-source Status Page you can host on your infrastructure, used to
 
 It is useful in microservices contexts to monitor both apps and backends. If a node goes down in your infrastructure, you receive a status change notification in a Slack channel.
 
-**👉 See a live demo of Vigil on [Crisp Status Page](https://status.crisp.chat).**
+**👉 See a live demo of Vigil on [Crisp Status Page](https://status.crisp.chat) and [Enrich Status Page](https://status.enrichdata.com).**
 
 ![Vigil](https://valeriansaliou.github.io/vigil/images/vigil.png)
 
