@@ -22,6 +22,12 @@ It is useful in microservices contexts to monitor both apps and backends. If a n
 <tr>
 <td align="center">Crisp</td>
 </tr>
+<tr>
+<td align="center"><a href="https://enrichdata.com/"><img src="https://valeriansaliou.github.io/vigil/images/enrich-icon.png" height="64" /></a></td>
+</tr>
+<tr>
+<td align="center">Enrich</td>
+</tr>
 </table>
 
 _👋 You use Vigil and you want to be listed there? [Contact me](https://valeriansaliou.name/)._
