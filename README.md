@@ -198,6 +198,7 @@ Vigil Reporter is used to actively submit health information to Vigil from your 
 ### Vigil Reporter Libraries
 
 * **NodeJS**: **[node-vigil-reporter](https://www.npmjs.com/package/vigil-reporter)**
+* **Golang**: **[go-vigil-reporter](https://github.com/valeriansaliou/go-vigil-reporter)**
 * **Rust**: **[rs-vigil-reporter](https://crates.io/crates/vigil-reporter)**
 
 👉 Cannot find the library for your programming language? Build your own and be referenced here! ([contact me](https://valeriansaliou.name/))
