@@ -65,7 +65,7 @@ cargo install vigil-server
 
 Ensure that your `$PATH` is properly configured to source the Crates binaries, and then run Vigil using the `vigil` command.
 
-**Install from sources:**
+**Install from source:**
 
 The last option is to pull the source code from Git and compile Vigil via `cargo`:
 
