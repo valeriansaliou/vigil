@@ -87,10 +87,10 @@ First, pull the `valeriansaliou/vigil` image:
 docker pull valeriansaliou/vigil
 ```
 
-Then, seed it a configuration file and run it:
+Then, seed it a configuration file and run it (replace `/path/to/your/vigil/config.cfg` with the path to your configuration file):
 
 ```bash
-docker run valeriansaliou/vigil -v /path/to/your/vigil/config.cfg:/etc/vigil.cfg
+docker run -v /path/to/your/vigil/config.cfg:/etc/vigil.cfg valeriansaliou/vigil
 ```
 
 In the configuration file, ensure that:
