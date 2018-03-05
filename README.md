@@ -77,6 +77,27 @@ You can find the built binaries in the `./target/release` directory.
 
 _Install the `libssl-dev` (ie. OpenSSL headers) before you compile Vigil. SSL dependencies are required for the HTTPS probes and email notifications._
 
+**Install from Docker Hub:**
+
+You might find it convenient to run Vigil via Docker. You can find the pre-built Vigil image on Docker Hub as [valeriansaliou/vigil](https://hub.docker.com/r/valeriansaliou/vigil/).
+
+First, pull the `valeriansaliou/vigil` image:
+
+```bash
+docker pull valeriansaliou/vigil
+```
+
+Then, seed it a configuration file and run it:
+
+```bash
+docker run valeriansaliou/vigil -v /path/to/your/vigil/config.cfg:/etc/vigil.cfg
+```
+
+In the configuration file, ensure that:
+
+* `inet` is set to `0.0.0.0:8080` (this lets Vigil be reached from outside the container)
+* `assets.path` is set to `./res/assets/` (this refers to an internal path in the container, as the assets are contained there)
+
 ### Configuration
 
 Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/config.cfg) configuration file and adjust it to your own environment.
