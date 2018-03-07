@@ -95,7 +95,7 @@ docker run -p 8080:8080 -v /path/to/your/vigil/config.cfg:/etc/vigil.cfg valeria
 
 In the configuration file, ensure that:
 
-* `inet` is set to `0.0.0.0:8080` (this lets Vigil be reached from outside the container)
+* `server.inet` is set to `0.0.0.0:8080` (this lets Vigil be reached from outside the container)
 * `assets.path` is set to `./res/assets/` (this refers to an internal path in the container, as the assets are contained there)
 
 Vigil will be reachable from `http://localhost:8080`.
