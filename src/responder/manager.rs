@@ -47,10 +47,12 @@ pub fn run() {
             routes::index,
             routes::reporter,
             routes::robots,
+            routes::status_text,
             routes::badge,
             routes::assets_fonts,
             routes::assets_images,
             routes::assets_stylesheets,
+            routes::assets_javascripts,
         ],
         )
         .attach(Template::fairing())

@@ -75,6 +75,11 @@ fn robots() -> Option<AssetFile> {
     AssetFile::open(APP_CONF.assets.path.join("./public/robots.txt")).ok()
 }
 
+#[get("/status/text")]
+fn status_text() -> &'static str {
+    &PROBER_STORE.read().unwrap().states.status.as_str()
+}
+
 #[get("/badge/<kind>")]
 fn badge(kind: String) -> Option<NamedFile> {
     // Notice acquire lock in a block to release it ASAP (ie. before OS access to file)
@@ -102,4 +107,9 @@ fn assets_images(file: PathBuf) -> Option<AssetFile> {
 #[get("/assets/stylesheets/<file..>")]
 fn assets_stylesheets(file: PathBuf) -> Option<AssetFile> {
     AssetFile::open(APP_CONF.assets.path.join("./stylesheets").join(file)).ok()
+}
+
+#[get("/assets/javascripts/<file..>")]
+fn assets_javascripts(file: PathBuf) -> Option<AssetFile> {
+    AssetFile::open(APP_CONF.assets.path.join("./javascripts").join(file)).ok()
 }

@@ -17,6 +17,12 @@
     <link rel="stylesheet" href="/assets/stylesheets/common.css?v={{ config.runtime_version | escape }}" type="text/css" />
     <link rel="stylesheet" href="/assets/stylesheets/index.css?v={{ config.runtime_version | escape }}" type="text/css" />
 
+    <script src="/assets/javascripts/index.js?v={{ config.runtime_version | escape }}" type="text/javascript"></script>
+
+    <script type="text/javascript">
+      window.STATUS_GENERAL = "{{ states.status | escape }}";
+    </script>
+
     {% if config.custom_html %}
       {{ config.custom_html | safe }}
     {% endif %}
