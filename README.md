@@ -222,8 +222,8 @@ When a monitored backend or app goes down in your infrastructure, Vigil can let 
 
 You can also get nice realtime `down` and `up` alerts on your eg. iPhone and Apple Watch:
 
-![Vigil down alert on iPhone](https://valeriansaliou.github.io/vigil/images/alert-slack-iphone.png =320x)
-![Vigil down alert on Apple Watch](https://valeriansaliou.github.io/vigil/images/alert-slack-watch.jpg =240x)
+![Vigil down alert on iPhone](https://valeriansaliou.github.io/vigil/images/alert-slack-iphone.png){: width=320px }
+![Vigil down alert on Apple Watch](https://valeriansaliou.github.io/vigil/images/alert-slack-watch.jpg){: width=240px }
 
 ## How can I integrate Vigil Reporter in my code?
 
