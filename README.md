@@ -214,6 +214,12 @@ Vigil has 3 status variants, either `healthy` (no issue ongoing), `sick` (servic
 
 ![Status Dead](https://valeriansaliou.github.io/vigil/images/status-dead.png)
 
+## What Slack alerts look like?
+
+When a monitored backend or app goes down in your infrastructure, Vigil can let you know by Slack (or Email):
+
+![Vigil alert in Slack](https://valeriansaliou.github.io/vigil/images/alert-slack.png)
+
 ## How can I integrate Vigil Reporter in my code?
 
 Vigil Reporter is used to actively submit health information to Vigil from your apps. Apps are best monitored via application probes, which are able to report detailed system information such as CPU and RAM load. This lets Vigil show if an application host system is under high load.
