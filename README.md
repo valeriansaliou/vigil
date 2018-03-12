@@ -220,6 +220,11 @@ When a monitored backend or app goes down in your infrastructure, Vigil can let 
 
 ![Vigil alert in Slack](https://valeriansaliou.github.io/vigil/images/alert-slack.png)
 
+You can also get nice realtime `down` and `up` alerts on your eg. iPhone and Apple Watch:
+
+![Vigil down alert on iPhone](https://valeriansaliou.github.io/vigil/images/alert-slack-iphone.png)
+![Vigil down alert on Apple Watch](https://valeriansaliou.github.io/vigil/images/alert-slack-watch.jpg)
+
 ## How can I integrate Vigil Reporter in my code?
 
 Vigil Reporter is used to actively submit health information to Vigil from your apps. Apps are best monitored via application probes, which are able to report detailed system information such as CPU and RAM load. This lets Vigil show if an application host system is under high load.
