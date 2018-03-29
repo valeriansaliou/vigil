@@ -13,7 +13,7 @@ use time;
 
 use reqwest::{Client, StatusCode, RedirectPolicy};
 use reqwest::header::{Headers, UserAgent};
-use ordermap::OrderMap;
+use indexmap::IndexMap;
 
 use config::config::ConfigPluginsRabbitMQ;
 use config::regex::Regex;
@@ -32,7 +32,7 @@ lazy_static! {
         states: ServiceStates {
             status: Status::Healthy,
             date: None,
-            probes: OrderMap::new(),
+            probes: IndexMap::new(),
         }
     }));
 
@@ -369,7 +369,7 @@ pub fn initialize_store() {
         let mut probe = ServiceStatesProbe {
             status: Status::Healthy,
             label: service.label.to_owned(),
-            nodes: OrderMap::new(),
+            nodes: IndexMap::new(),
         };
 
         debug!("prober store: got service {}", service.id);
@@ -381,7 +381,7 @@ pub fn initialize_store() {
                 status: Status::Healthy,
                 label: node.label.to_owned(),
                 mode: node.mode.to_owned(),
-                replicas: OrderMap::new(),
+                replicas: IndexMap::new(),
                 http_body_healthy_match: node.http_body_healthy_match.to_owned(),
                 rabbitmq_queue: node.rabbitmq_queue.to_owned(),
             };
