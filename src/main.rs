@@ -146,9 +146,9 @@ fn main() {
     openssl_probe::init_ssl_cert_env_vars();
 
     // Initialize shared logger
-    let _logger = ConfigLogger::init(
-        LevelFilter::from_str(&APP_CONF.server.log_level).expect("invalid log level"),
-    );
+    let _logger = ConfigLogger::init(LevelFilter::from_str(&APP_CONF.server.log_level).expect(
+        "invalid log level",
+    ));
 
     info!("starting up");
 
