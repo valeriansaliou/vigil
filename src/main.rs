@@ -43,7 +43,7 @@ use std::str::FromStr;
 use std::time::Duration;
 
 use clap::{App, Arg};
-use log::LogLevelFilter;
+use log::LevelFilter;
 
 use config::config::Config;
 use config::logger::ConfigLogger;
@@ -147,7 +147,7 @@ fn main() {
 
     // Initialize shared logger
     let _logger = ConfigLogger::init(
-        LogLevelFilter::from_str(&APP_CONF.server.log_level).expect("invalid log level"),
+        LevelFilter::from_str(&APP_CONF.server.log_level).expect("invalid log level"),
     );
 
     info!("starting up");
