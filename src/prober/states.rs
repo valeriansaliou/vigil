@@ -6,7 +6,7 @@
 
 use std::time::{SystemTime, Duration};
 
-use ordermap::OrderMap;
+use indexmap::IndexMap;
 
 use super::replica::ReplicaURL;
 use super::status::Status;
@@ -17,14 +17,14 @@ use config::regex::Regex;
 pub struct ServiceStates {
     pub status: Status,
     pub date: Option<String>,
-    pub probes: OrderMap<String, ServiceStatesProbe>,
+    pub probes: IndexMap<String, ServiceStatesProbe>,
 }
 
 #[derive(Serialize)]
 pub struct ServiceStatesProbe {
     pub status: Status,
     pub label: String,
-    pub nodes: OrderMap<String, ServiceStatesProbeNode>,
+    pub nodes: IndexMap<String, ServiceStatesProbeNode>,
 }
 
 #[derive(Serialize)]
@@ -32,7 +32,7 @@ pub struct ServiceStatesProbeNode {
     pub status: Status,
     pub label: String,
     pub mode: Mode,
-    pub replicas: OrderMap<String, ServiceStatesProbeNodeReplica>,
+    pub replicas: IndexMap<String, ServiceStatesProbeNodeReplica>,
     pub http_body_healthy_match: Option<Regex>,
     pub rabbitmq_queue: Option<String>,
 }

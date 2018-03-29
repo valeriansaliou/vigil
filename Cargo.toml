@@ -21,18 +21,18 @@ path = "src/main.rs"
 doc = false
 
 [dependencies]
-log = "0.3"
+log = "0.4"
 clap = { version = "2.29", default-features = false }
 lazy_static = "1.0"
 time = "0.1"
 serde = "1.0"
 serde_derive = "1.0"
 toml = "0.4"
-base64 = "0.6"
+base64 = "0.9"
 regex = "0.2"
 url = { version = "1.6", default-features = false }
 url_serde = { version = "0.2", default-features = false }
-ordermap = { version = "0.3", features = ["serde-1"] }
+indexmap = { version = "1.0", features = ["serde-1"] }
 rocket = { version = "0.3", default-features = false }
 rocket_codegen = "0.3"
 rocket_contrib = { version = "0.3", features = ["tera_templates"] }

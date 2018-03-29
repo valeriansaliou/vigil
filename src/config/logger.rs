@@ -5,27 +5,27 @@
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
 use log;
-use log::{LogRecord, LogLevel, LogMetadata, LogLevelFilter, SetLoggerError};
+use log::{Record, Level, Metadata, LevelFilter, SetLoggerError};
 
 pub struct ConfigLogger;
 
 impl log::Log for ConfigLogger {
-    fn enabled(&self, metadata: &LogMetadata) -> bool {
-        metadata.level() <= LogLevel::Debug
+    fn enabled(&self, metadata: &Metadata) -> bool {
+        metadata.level() <= Level::Debug
     }
 
-    fn log(&self, record: &LogRecord) {
+    fn log(&self, record: &Record) {
         if self.enabled(record.metadata()) {
             println!("({}) - {}", record.level(), record.args());
         }
     }
+
+    fn flush(&self) {}
 }
 
 impl ConfigLogger {
-    pub fn init(level: LogLevelFilter) -> Result<(), SetLoggerError> {
-        log::set_logger(|max_log_level| {
-            max_log_level.set(level);
-            Box::new(ConfigLogger)
-        })
+    pub fn init(level: LevelFilter) -> Result<(), SetLoggerError> {
+        log::set_max_level(level);
+        log::set_boxed_logger(Box::new(ConfigLogger))
     }
 }
