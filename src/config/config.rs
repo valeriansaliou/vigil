@@ -93,6 +93,7 @@ pub struct ConfigMetrics {
 #[derive(Deserialize)]
 pub struct ConfigNotify {
     pub email: Option<ConfigNotifyEmail>,
+    pub twilio: Option<ConfigNotifyTwilio>,
     pub slack: Option<ConfigNotifySlack>,
 }
 
@@ -127,6 +128,14 @@ pub struct ConfigNotifyEmail {
 
     #[serde(default = "defaults::notify_email_smtp_encrypt")]
     pub smtp_encrypt: bool,
+}
+
+#[derive(Deserialize)]
+pub struct ConfigNotifyTwilio {
+    pub to: String,
+    pub from: String,
+    pub account_sid: String,
+    pub auth_token: String,
 }
 
 #[derive(Deserialize)]

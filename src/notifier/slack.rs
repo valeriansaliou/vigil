@@ -6,7 +6,7 @@
 
 use std::time::Duration;
 
-use reqwest::{Client, StatusCode};
+use reqwest::Client;
 
 use super::generic::{DISPATCH_TIMEOUT_SECONDS, Notification, GenericNotifier};
 use prober::status::Status;
@@ -109,7 +109,7 @@ impl GenericNotifier for SlackNotifier {
                 .send();
 
             if let Ok(response_inner) = response {
-                if response_inner.status() == StatusCode::Ok {
+                if response_inner.status().is_success() == true {
                     return Ok(());
                 }
             }

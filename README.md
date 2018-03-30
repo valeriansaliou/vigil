@@ -167,6 +167,13 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 * `smtp_password` (type: _string_, allowed: any string, no default) — SMTP password to use for authentication (if any)
 * `smtp_encrypt` (type: _boolean_, allowed: `true`, `false`, default: `true`) — Whether to encrypt SMTP connection with `STARTTLS` or not
 
+**[notify.twilio]**
+
+* `to` (type: _string_, allowed: phone number, no default) — Phone number to which to send text messages
+* `from` (type: _string_, allowed: phone number, no default) — Phone number from which to send text messages (this number must be available for use in your Twilio account)
+* `account_sid` (type: _string_, allowed: any string, no default) — Twilio account identifier (ie. `Sid`)
+* `auth_token` (type: _string_, allowed: any string, no default) — Twilio authentication token (ie. `AuthToken`)
+
 **[notify.slack]**
 
 * `hook_url` (type: _string_, allowed: URL, no default) — Slack hook URL (ie. `https://hooks.slack.com/[..]`)

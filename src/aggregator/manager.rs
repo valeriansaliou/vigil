@@ -14,6 +14,7 @@ use prober::mode::Mode;
 use prober::manager::STORE as PROBER_STORE;
 use notifier::generic::Notification;
 use notifier::email::EmailNotifier;
+use notifier::twilio::TwilioNotifier;
 use notifier::slack::SlackNotifier;
 use APP_CONF;
 
@@ -203,6 +204,7 @@ pub fn run() {
 
             if let Some(ref notify) = APP_CONF.notify {
                 Notification::dispatch::<EmailNotifier>(notify, &notification).ok();
+                Notification::dispatch::<TwilioNotifier>(notify, &notification).ok();
                 Notification::dispatch::<SlackNotifier>(notify, &notification).ok();
             }
         }
