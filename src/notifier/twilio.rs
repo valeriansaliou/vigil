@@ -30,15 +30,11 @@ impl GenericNotifier for TwilioNotifier {
             // Build up the message text
             let mut message = String::new();
 
-            message.push_str(&format!(
-                "{}: Status changed:\n",
-                APP_CONF.branding.page_title
-            ));
+            message.push_str(&format!("{}\n", APP_CONF.branding.page_title));
             message.push_str("\n");
             message.push_str(&format!("Status: {:?}\n", notification.status));
             message.push_str(&format!("Nodes: {}\n", &notification.replicas.join(", ")));
             message.push_str(&format!("Time: {}\n", &notification.time));
-            message.push_str(&format!("URL: {}", APP_CONF.branding.page_url.as_str()));
 
             debug!("will send Twilio notification with message: {}", &message);
 
