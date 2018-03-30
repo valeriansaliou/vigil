@@ -202,27 +202,8 @@ pub fn run() {
             };
 
             if let Some(ref notify) = APP_CONF.notify {
-                for result in [
-                    (
-                        "email",
-                        Notification::dispatch::<EmailNotifier>(notify, &notification),
-                    ),
-                    (
-                        "slack",
-                        Notification::dispatch::<SlackNotifier>(notify, &notification),
-                    ),
-                ].iter()
-                {
-                    if result.1.is_ok() == true {
-                        debug!("dispatched notification to provider: {}", result.0);
-                    } else {
-                        if let Err(true) = result.1 {
-                            error!("failed dispatching notification to provider: {}", result.0);
-                        } else {
-                            debug!("did not dispatch notification to provider: {}", result.0);
-                        }
-                    }
-                }
+                Notification::dispatch::<EmailNotifier>(notify, &notification).ok();
+                Notification::dispatch::<SlackNotifier>(notify, &notification).ok();
             }
         }
 

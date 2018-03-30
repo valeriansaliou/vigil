@@ -53,12 +53,18 @@ impl<'a> Notification<'a> {
 
                 // Attempt notification dispatch
                 if N::attempt(notify, notification).is_ok() == true {
+                    debug!("dispatched notification to provider: {}", N::name());
+
                     return Ok(());
                 }
             }
 
+            error!("failed dispatching notification to provider: {}", N::name());
+
             return Err(true);
         }
+
+        debug!("did not dispatch notification to provider: {}", N::name());
 
         Err(false)
     }
