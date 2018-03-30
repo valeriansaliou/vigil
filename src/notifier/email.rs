@@ -20,65 +20,57 @@ use APP_CONF;
 pub struct EmailNotifier;
 
 impl GenericNotifier for EmailNotifier {
-    fn dispatch(notify: &ConfigNotify, notification: &Notification) -> Result<(), bool> {
-        if Self::is_enabled(notify) == true {
-            if let Some(ref email_config) = notify.email {
-                debug!(
-                    "dispatch email notification for status: {:?} and replicas: {:?}",
-                    notification.status,
-                    notification.replicas
-                );
+    fn attempt(notify: &ConfigNotify, notification: &Notification) -> Result<(), bool> {
+        if let Some(ref email_config) = notify.email {
+            let nodes_label = notification.replicas.join(", ");
 
-                let nodes_label = notification.replicas.join(", ");
+            // Build up the message text
+            let mut message = String::new();
 
-                // Build up the message text
-                let mut message = String::new();
+            message.push_str(&format!(
+                "Status change report from: {}\n",
+                APP_CONF.branding.page_title
+            ));
+            message.push_str("\n--\n");
+            message.push_str(&format!("Status: {:?}\n", notification.status));
+            message.push_str(&format!("Nodes: {}\n", &nodes_label));
+            message.push_str(&format!("Time: {}\n", &notification.time));
+            message.push_str(&format!("URL: {}", APP_CONF.branding.page_url.as_str()));
 
-                message.push_str(&format!(
-                    "Status change report from: {}\n",
-                    APP_CONF.branding.page_title
-                ));
-                message.push_str("\n--\n");
-                message.push_str(&format!("Status: {:?}\n", notification.status));
-                message.push_str(&format!("Nodes: {}\n", &nodes_label));
-                message.push_str(&format!("Time: {}\n", &notification.time));
-                message.push_str(&format!("URL: {}", APP_CONF.branding.page_url.as_str()));
+            message.push_str("\n--\n");
+            message.push_str("\n");
+            message.push_str(
+                "To unsubscribe, please edit your status page configuration.",
+            );
 
-                message.push_str("\n--\n");
-                message.push_str("\n");
-                message.push_str(
-                    "To unsubscribe, please edit your status page configuration.",
-                );
+            debug!("will send email notification with message: {}", &message);
 
-                debug!("will send email notification with message: {}", &message);
+            // Build up the email
+            let email_message = EmailBuilder::new()
+                .to(email_config.to.as_str())
+                .from((
+                    email_config.from.as_str(),
+                    APP_CONF.branding.page_title.as_str(),
+                ))
+                .subject(format!(
+                    "{} | {}",
+                    notification.status.as_str().to_uppercase(),
+                    &nodes_label
+                ))
+                .text(message)
+                .build()
+                .or(Err(true))?;
 
-                // Build up the email
-                let email_message = EmailBuilder::new()
-                    .to(email_config.to.as_str())
-                    .from((
-                        email_config.from.as_str(),
-                        APP_CONF.branding.page_title.as_str(),
-                    ))
-                    .subject(format!(
-                        "{} | {}",
-                        notification.status.as_str().to_uppercase(),
-                        &nodes_label
-                    ))
-                    .text(message)
-                    .build()
-                    .or(Err(true))?;
-
-                // Deliver the message
-                return acquire_transport(
-                    &email_config.smtp_host,
-                    email_config.smtp_port,
-                    email_config.smtp_username.to_owned(),
-                    email_config.smtp_password.to_owned(),
-                    email_config.smtp_encrypt,
-                ).map(|mut transport| transport.send(&email_message))
-                    .and(Ok(()))
-                    .or(Err(true));
-            }
+            // Deliver the message
+            return acquire_transport(
+                &email_config.smtp_host,
+                email_config.smtp_port,
+                email_config.smtp_username.to_owned(),
+                email_config.smtp_password.to_owned(),
+                email_config.smtp_encrypt,
+            ).map(|mut transport| transport.send(&email_message))
+                .and(Ok(()))
+                .or(Err(true));
         }
 
         Err(false)
@@ -86,6 +78,10 @@ impl GenericNotifier for EmailNotifier {
 
     fn is_enabled(notify: &ConfigNotify) -> bool {
         notify.email.is_some()
+    }
+
+    fn name() -> &'static str {
+        "email"
     }
 }
 

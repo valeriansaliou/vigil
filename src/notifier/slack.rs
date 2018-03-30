@@ -45,85 +45,76 @@ struct SlackPayloadAttachmentField<'a> {
 }
 
 impl GenericNotifier for SlackNotifier {
-    fn dispatch(notify: &ConfigNotify, notification: &Notification) -> Result<(), bool> {
-        if Self::is_enabled(notify) == true {
-            if let Some(ref slack) = notify.slack {
-                debug!(
-                    "dispatch slack notification for status: {:?} and replicas: {:?}",
-                    notification.status,
-                    notification.replicas
-                );
+    fn attempt(notify: &ConfigNotify, notification: &Notification) -> Result<(), bool> {
+        if let Some(ref slack) = notify.slack {
+            let status_label = format!("{:?}", notification.status);
+            let mut nodes_label = String::new();
 
-                let status_label = format!("{:?}", notification.status);
-                let mut nodes_label = String::new();
+            // Build message
+            let message_text = format!("Status changed to: *{}*.", notification.status.as_str());
 
-                // Build message
-                let message_text =
-                    format!("Status changed to: *{}*.", notification.status.as_str());
+            // Build paylaod
+            let mut payload = SlackPayload {
+                text: format!("<!channel> {}", &message_text),
+                attachments: Vec::new(),
+            };
 
-                // Build paylaod
-                let mut payload = SlackPayload {
-                    text: format!("<!channel> {}", &message_text),
-                    attachments: Vec::new(),
-                };
+            let mut attachment = SlackPayloadAttachment {
+                fallback: message_text,
+                color: status_to_color(&notification.status),
+                fields: Vec::new(),
+            };
 
-                let mut attachment = SlackPayloadAttachment {
-                    fallback: message_text,
-                    color: status_to_color(&notification.status),
-                    fields: Vec::new(),
-                };
+            // Append attachment fields
+            if notification.replicas.len() > 0 {
+                nodes_label.push_str(&notification.replicas.join(", "));
 
-                // Append attachment fields
-                if notification.replicas.len() > 0 {
-                    nodes_label.push_str(&notification.replicas.join(", "));
+                let nodes_label_titled = format!(" Nodes: *{}*.", nodes_label);
 
-                    let nodes_label_titled = format!(" Nodes: *{}*.", nodes_label);
-
-                    payload.text.push_str(&nodes_label_titled);
-                    attachment.fallback.push_str(&nodes_label_titled);
-
-                    attachment.fields.push(SlackPayloadAttachmentField {
-                        title: "Nodes",
-                        value: &nodes_label,
-                        short: false,
-                    });
-                }
+                payload.text.push_str(&nodes_label_titled);
+                attachment.fallback.push_str(&nodes_label_titled);
 
                 attachment.fields.push(SlackPayloadAttachmentField {
-                    title: "Status",
-                    value: &status_label,
-                    short: true,
-                });
-
-                attachment.fields.push(SlackPayloadAttachmentField {
-                    title: "Time",
-                    value: &notification.time,
-                    short: true,
-                });
-
-                attachment.fields.push(SlackPayloadAttachmentField {
-                    title: "Monitor Page",
-                    value: APP_CONF.branding.page_url.as_str(),
+                    title: "Nodes",
+                    value: &nodes_label,
                     short: false,
                 });
-
-                // Append attachment
-                payload.attachments.push(attachment);
-
-                // Submit payload to Slack
-                let response = SLACK_HTTP_CLIENT
-                    .post(slack.hook_url.as_str())
-                    .json(&payload)
-                    .send();
-
-                if let Ok(response_inner) = response {
-                    if response_inner.status() == StatusCode::Ok {
-                        return Ok(());
-                    }
-                }
-
-                return Err(true);
             }
+
+            attachment.fields.push(SlackPayloadAttachmentField {
+                title: "Status",
+                value: &status_label,
+                short: true,
+            });
+
+            attachment.fields.push(SlackPayloadAttachmentField {
+                title: "Time",
+                value: &notification.time,
+                short: true,
+            });
+
+            attachment.fields.push(SlackPayloadAttachmentField {
+                title: "Monitor Page",
+                value: APP_CONF.branding.page_url.as_str(),
+                short: false,
+            });
+
+            // Append attachment
+            payload.attachments.push(attachment);
+
+            // Submit payload to Slack
+            let response = SLACK_HTTP_CLIENT
+                .post(slack.hook_url.as_str())
+                .json(&payload)
+                .send();
+
+            if let Ok(response_inner) = response {
+                if response_inner.status() == StatusCode::Ok {
+                    return Ok(());
+                }
+            }
+
+            return Err(true);
         }
 
         Err(false)
@@ -131,6 +122,10 @@ impl GenericNotifier for SlackNotifier {
 
     fn is_enabled(notify: &ConfigNotify) -> bool {
         notify.slack.is_some()
+    }
+
+    fn name() -> &'static str {
+        "slack"
     }
 }
 

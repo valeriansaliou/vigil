@@ -12,7 +12,7 @@ use time;
 use prober::status::Status;
 use prober::mode::Mode;
 use prober::manager::STORE as PROBER_STORE;
-use notifier::generic::{Notification, GenericNotifier};
+use notifier::generic::Notification;
 use notifier::email::EmailNotifier;
 use notifier::slack::SlackNotifier;
 use APP_CONF;
@@ -203,8 +203,14 @@ pub fn run() {
 
             if let Some(ref notify) = APP_CONF.notify {
                 for result in [
-                    ("email", EmailNotifier::dispatch(notify, &notification)),
-                    ("slack", SlackNotifier::dispatch(notify, &notification)),
+                    (
+                        "email",
+                        Notification::dispatch::<EmailNotifier>(notify, &notification),
+                    ),
+                    (
+                        "slack",
+                        Notification::dispatch::<SlackNotifier>(notify, &notification),
+                    ),
                 ].iter()
                 {
                     if result.1.is_ok() == true {
