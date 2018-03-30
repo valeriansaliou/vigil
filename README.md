@@ -223,17 +223,18 @@ Vigil has 3 status variants, either `healthy` (no issue ongoing), `sick` (servic
 
 ![Status Dead](https://valeriansaliou.github.io/vigil/images/status-dead.png)
 
-## What Slack alerts look like?
+## What do alerts look like?
 
-When a monitored backend or app goes down in your infrastructure, Vigil can let you know by Slack (or Email):
+When a monitored backend or app goes down in your infrastructure, Vigil can let you know by Slack, Twilio (SMS) and Email:
 
 ![Vigil alert in Slack](https://valeriansaliou.github.io/vigil/images/alert-slack.png)
 
 You can also get nice realtime `down` and `up` alerts on your eg. iPhone and Apple Watch:
 
 <p align="center">
-  <img src="https://valeriansaliou.github.io/vigil/images/alert-slack-iphone.png" height="400" alt="Vigil down alert on iPhone" />
-  <img src="https://valeriansaliou.github.io/vigil/images/alert-slack-watch.jpg" height="400" alt="Vigil up alert on Apple Watch" />
+  <img src="https://valeriansaliou.github.io/vigil/images/alert-slack-iphone.png" height="400" alt="Vigil down alert on iPhone (Slack)" />
+  <img src="https://valeriansaliou.github.io/vigil/images/alert-slack-watch.jpg" height="400" alt="Vigil up alert on Apple Watch (Slack)" />
+  <img src="https://valeriansaliou.github.io/vigil/images/alert-twilio-iphone.png" height="400" alt="Vigil alerts on iPhone (Twilio SMS)" />
 <p>
 
 ## How can I integrate Vigil Reporter in my code?
