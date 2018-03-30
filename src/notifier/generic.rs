@@ -39,7 +39,7 @@ impl<'a> Notification<'a> {
                 notification.replicas
             );
 
-            for try_index in 1..DISPATCH_TRY_ATTEMPT_TIMES {
+            for try_index in 1..(DISPATCH_TRY_ATTEMPT_TIMES + 1) {
                 debug!(
                     "dispatch {} notification attempt: #{}",
                     N::name(),
