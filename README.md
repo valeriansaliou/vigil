@@ -7,7 +7,7 @@ Vigil
 
 Vigil is an open-source Status Page you can host on your infrastructure, used to monitor all your servers and apps, and visible to your users (on a domain of your choice, eg. `status.example.com`).
 
-It is useful in microservices contexts to monitor both apps and backends. If a node goes down in your infrastructure, you receive a status change notification in a Slack channel (or: Email or Twilio SMS).
+It is useful in microservices contexts to monitor both apps and backends. If a node goes down in your infrastructure, you receive a status change notification in a Slack channel, Email, Twilio SMS or/and XMPP.
 
 **👉 See a live demo of Vigil on [Crisp Status Page](https://status.crisp.chat) and [Enrich Status Page](https://status.enrichdata.com).**
 
@@ -33,7 +33,7 @@ _👋 You use Vigil and you want to be listed there? [Contact me](https://valeri
 ## Features
 
 * **Monitors automatically your infrastructure services**
-* **Notifies you when a service gets down** or gets back up (via a configured channel, eg. Slack or Email)
+* **Notifies you when a service gets down** or gets back up (via a configured channel: Slack, Email, Twilio SMS or/and XMPP)
 * **Generates a status page**, that you can host on your domain for your public users (eg. `https://status.example.com`)
 
 ## How does it work?
@@ -233,7 +233,7 @@ Vigil has 3 status variants, either `healthy` (no issue ongoing), `sick` (servic
 
 ## What do alerts look like?
 
-When a monitored backend or app goes down in your infrastructure, Vigil can let you know by Slack, Twilio (SMS) and Email:
+When a monitored backend or app goes down in your infrastructure, Vigil can let you know by Slack, Twilio SMS, Email and XMPP:
 
 ![Vigil alert in Slack](https://valeriansaliou.github.io/vigil/images/alert-slack.png)
 
