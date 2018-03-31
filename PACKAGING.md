@@ -3,7 +3,7 @@ Packaging
 
 This file contains quick reminders and notes on how to package Vigil.
 
-We consider here the packaging flow of Vigil version `1.0.0`, for target architecture `i686` and distribution `debian8` (the steps are alike for `x86_64`):
+We consider here the packaging flow of Vigil version `1.0.0`, for target architecture `i686` and distribution `debian9` (the steps are alike for `x86_64`):
 
 1. **How to bump Vigil version before a release:**
     1. Bump version in `Cargo.toml` to `1.0.0`
@@ -21,7 +21,7 @@ We consider here the packaging flow of Vigil version `1.0.0`, for target archite
     2. `mv target/release/vigil vigil/`
     3. `strip vigil/vigil`
     4. `cp -r config.cfg res vigil/`
-    5. `tar -czvf v1.0.0-i686-debian8.tar.gz vigil`
+    5. `tar -czvf v1.0.0-i686-debian9.tar.gz vigil`
     6. `rm -r vigil/`
     7. Publish the archive on the [releases](https://github.com/valeriansaliou/vigil/releases) page on GitHub
 
