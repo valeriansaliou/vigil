@@ -8,3 +8,4 @@ pub mod generic;
 pub mod email;
 pub mod twilio;
 pub mod slack;
+pub mod xmpp;

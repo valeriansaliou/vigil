@@ -74,3 +74,7 @@ pub fn notify_email_smtp_port() -> u16 {
 pub fn notify_email_smtp_encrypt() -> bool {
     true
 }
+
+pub fn notify_xmpp_xmpp_encrypt() -> bool {
+    true
+}

@@ -30,6 +30,7 @@ extern crate openssl_probe;
 extern crate reqwest;
 extern crate lettre;
 extern crate lettre_email;
+extern crate libstrophe;
 
 mod config;
 mod aggregator;

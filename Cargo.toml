@@ -41,6 +41,7 @@ openssl-probe = "0.1"
 reqwest = "0.8"
 lettre = { version = "0.7", features = ["smtp-transport"] }
 lettre_email = "0.7"
+libstrophe = "0.8"
 
 [profile.dev]
 opt-level = 0

@@ -77,7 +77,7 @@ cargo build --release
 
 You can find the built binaries in the `./target/release` directory.
 
-_Install the `libssl-dev` (ie. OpenSSL headers) before you compile Vigil. SSL dependencies are required for the HTTPS probes and email notifications._
+_Install `libssl-dev` (ie. OpenSSL headers) and `libstrophe-dev` (ie. XMPP library headers; only if you need the XMPP notifier) before you compile Vigil. SSL dependencies are required for the HTTPS probes and email notifications._
 
 **Install from Docker Hub:**
 
@@ -177,6 +177,14 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 **[notify.slack]**
 
 * `hook_url` (type: _string_, allowed: URL, no default) — Slack hook URL (ie. `https://hooks.slack.com/[..]`)
+
+**[notify.xmpp]**
+
+**Notice: the XMPP notifier requires `libstrophe` (`libstrophe-dev` package on Debian) to be available when compiling Vigil, with the feature `notifier-xmpp` enabled upon Cargo build.**
+
+* `to` (type: _string_, allowed: Jabber ID, no default) — Jabber ID (JID) to which to send messages
+* `from` (type: _string_, allowed: Jabber ID, no default) — Jabber ID (JID) from which to send messages
+* `xmpp_password` (type: _string_, allowed: any string, no default) — XMPP account password to use for authentication
 
 **[probe]**
 

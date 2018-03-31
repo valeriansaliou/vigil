@@ -16,6 +16,7 @@ use notifier::generic::Notification;
 use notifier::email::EmailNotifier;
 use notifier::twilio::TwilioNotifier;
 use notifier::slack::SlackNotifier;
+use notifier::xmpp::XMPPNotifier;
 use APP_CONF;
 
 const AGGREGATE_INTERVAL_SECONDS: u64 = 10;
@@ -206,6 +207,7 @@ pub fn run() {
                 Notification::dispatch::<EmailNotifier>(notify, &notification).ok();
                 Notification::dispatch::<TwilioNotifier>(notify, &notification).ok();
                 Notification::dispatch::<SlackNotifier>(notify, &notification).ok();
+                Notification::dispatch::<XMPPNotifier>(notify, &notification).ok();
             }
         }
 

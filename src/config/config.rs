@@ -95,6 +95,7 @@ pub struct ConfigNotify {
     pub email: Option<ConfigNotifyEmail>,
     pub twilio: Option<ConfigNotifyTwilio>,
     pub slack: Option<ConfigNotifySlack>,
+    pub xmpp: Option<ConfigNotifyXMPP>,
 }
 
 #[derive(Deserialize)]
@@ -141,6 +142,16 @@ pub struct ConfigNotifyTwilio {
 #[derive(Deserialize)]
 pub struct ConfigNotifySlack {
     pub hook_url: SerdeUrl,
+}
+
+#[derive(Deserialize)]
+pub struct ConfigNotifyXMPP {
+    pub to: String,
+    pub from: String,
+    pub xmpp_password: String,
+
+    #[serde(default = "defaults::notify_xmpp_xmpp_encrypt")]
+    pub xmpp_encrypt: bool,
 }
 
 #[derive(Deserialize)]
