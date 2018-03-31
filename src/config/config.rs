@@ -149,9 +149,6 @@ pub struct ConfigNotifyXMPP {
     pub to: String,
     pub from: String,
     pub xmpp_password: String,
-
-    #[serde(default = "defaults::notify_xmpp_xmpp_encrypt")]
-    pub xmpp_encrypt: bool,
 }
 
 #[derive(Deserialize)]

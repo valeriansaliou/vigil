@@ -5,47 +5,77 @@
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
 use std::time::Duration;
+use std::sync::RwLock;
+use time;
 
-use libstrophe::{self, Connection, ConnectionEvent, ConnectionFlags, Context, Stanza};
+use libstrophe::{Connection, ConnectionEvent, Context, Stanza};
 use libstrophe::error::StreamError;
 
 use super::generic::{DISPATCH_TIMEOUT_SECONDS, Notification, GenericNotifier};
 use config::config::ConfigNotify;
+use APP_CONF;
 
 pub struct XMPPNotifier;
 
 impl GenericNotifier for XMPPNotifier {
     fn attempt(notify: &ConfigNotify, notification: &Notification) -> Result<(), bool> {
         if let Some(ref xmpp) = notify.xmpp {
-            let mut is_sent = false;
+            let is_sent = RwLock::new(false);
+
+            // Build up the message text
+            let mut message = String::new();
+
+            message.push_str(&format!("{}\n", APP_CONF.branding.page_title));
+            message.push_str("\n");
+            message.push_str(&format!("Status: {:?}\n", notification.status));
+            message.push_str(&format!("Nodes: {}\n", &notification.replicas.join(", ")));
+            message.push_str(&format!("Time: {}\n", &notification.time));
+            message.push_str(&format!("URL: {}", APP_CONF.branding.page_url.as_str()));
+
+            debug!("will send XMPP notification with message: {}", &message);
 
             // Configure connection handler
-            let handler = move |connection: &mut Connection,
-                                event: ConnectionEvent,
-                                _error: i32,
-                                _stream_error: Option<&StreamError>| {
-                // TODO
-                error!("==> XMPP: event");
+            let fn_handle = |connection: &mut Connection,
+                             event: ConnectionEvent,
+                             _error: i32,
+                             _stream_error: Option<&StreamError>| {
+                let context = connection.context();
 
                 match event {
                     ConnectionEvent::XMPP_CONN_CONNECT => {
-                        // TODO
-                        error!("==> XMPP: connect");
+                        debug!("connected to XMPP account: {}", &xmpp.from);
 
                         // Send status message
-                        // Stanza::new_message(context, Some(type), None, Some(to))
+                        let mut message_stanza =
+                            Stanza::new_message(
+                                &context,
+                                Some("chat"),
+                                Some(&format!("vigil-{}", time::now().to_timespec().sec)),
+                                Some(&xmpp.to),
+                            );
 
-                        is_sent = true;
+                        if message_stanza.set_body(&message).is_ok() == true {
+                            connection.send(&message_stanza);
+
+                            {
+                                let mut is_sent_value = is_sent.write().unwrap();
+
+                                *is_sent_value = true;
+                            }
+                        }
 
                         // Disconnect immediately
                         connection.disconnect();
                     }
                     ConnectionEvent::XMPP_CONN_DISCONNECT |
                     ConnectionEvent::XMPP_CONN_FAIL => {
-                        // TODO
-                        error!("==> XMPP: disconnect or fail");
+                        debug!(
+                            "disconnected from XMPP account: {} ({:?})",
+                            &xmpp.from,
+                            event
+                        );
 
-                        connection.context().stop();
+                        context.stop();
                     }
                     _ => {}
                 }
@@ -63,23 +93,12 @@ impl GenericNotifier for XMPPNotifier {
                 Duration::from_secs(DISPATCH_TIMEOUT_SECONDS / 2),
             );
 
-            let mut flags = ConnectionFlags::empty();
-
-            flags.set(ConnectionFlags::DISABLE_TLS, false);
-            flags.set(ConnectionFlags::MANDATORY_TLS, xmpp.xmpp_encrypt);
-            flags.set(ConnectionFlags::LEGACY_SSL, false);
-
-            connection.set_flags(flags).ok();
-
             // Connect to XMPP server
-            if connection.connect_client(None, None, &handler).is_ok() == true {
+            if connection.connect_client(None, None, &fn_handle).is_ok() == true {
                 // Enter context
                 context.run();
 
-                // Left context
-                libstrophe::shutdown();
-
-                if is_sent == true {
+                if *is_sent.read().unwrap() == true {
                     return Ok(());
                 }
             }
