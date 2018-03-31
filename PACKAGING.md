@@ -9,10 +9,12 @@ We consider here the packaging flow of Vigil version `1.0.0`, for target archite
     1. Bump version in `Cargo.toml` to `1.0.0`
     2. Execute `cargo update` to bump `Cargo.lock`
 
-2. **How to build Vigil for Linux via Docker:**
-    1. `apt-get install -y build-essential pkg-config libssl-dev libstrophe-dev`
+2. **How to build Vigil for Linux on Debian:**
+    1. `apt-get install -y git build-essential pkg-config libssl-dev libstrophe-dev`
     2. `curl https://sh.rustup.rs -sSf | sh` (install the `nightly` toolchain)
-    3. `cargo build --all-features`
+    3. `git clone https://github.com/valeriansaliou/vigil.git`
+    4. `cd vigil/`
+    5. `cargo build --all-features`
 
 3. **How to package built binary and release it on GitHub:**
     1. `mkdir vigil`
