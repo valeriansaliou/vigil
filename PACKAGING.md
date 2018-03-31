@@ -3,29 +3,25 @@ Packaging
 
 This file contains quick reminders and notes on how to package Vigil.
 
-We consider here the packaging flow of Vigil version `1.0.0`, for target architecture `i686` (the steps are alike for `x86_64`):
+We consider here the packaging flow of Vigil version `1.0.0`, for target architecture `i686` and distribution `debian8` (the steps are alike for `x86_64`):
 
 1. **How to bump Vigil version before a release:**
     1. Bump version in `Cargo.toml` to `1.0.0`
     2. Execute `cargo update` to bump `Cargo.lock`
 
 2. **How to build Vigil for Linux via Docker:**
-    1. See [messense/rust-musl-cross](https://github.com/messense/rust-musl-cross)
-    2. Install the proper Docker alias for `i686-musl`, which is `alias rust-musl-i686='docker run --rm -it -v "$(pwd)":/home/rust/src messense/rust-musl-cross:i686-musl'`
-    3. Enter the Docker container with `rust-musl-i686`
-    4. Setup the latest Rust `nightly` toolchain with `rustup install nightly` _(in the container)_
-    5. Make Rust `nightly` the default with `rustup default nightly` _(in the container)_
-    6. Add the proper `musl` target with `rustup target add i686-unknown-linux-musl` _(in the container)_
-    7. Compile with `cargo build --target=i686-unknown-linux-musl --release` _(in the container)_
-    8. Stop the Docker container with `exit` (the compiled target binary is stored on your host system)
+    1. `apt-get install -y build-essential pkg-config libssl-dev libstrophe-dev`
+    2. `curl https://sh.rustup.rs -sSf | sh` (install the `nightly` toolchain)
+    3. `cargo build --all-features`
 
 3. **How to package built binary and release it on GitHub:**
     1. `mkdir vigil`
-    2. `mv target/i686-unknown-linux-musl/release/vigil vigil/`
-    3. `cp -r config.cfg res vigil/`
-    4. `tar -czvf v1.0.0-i686.tar.gz vigil`
-    5. `rm -r vigil/`
-    6. Publish the archive on the [releases](https://github.com/valeriansaliou/vigil/releases) page on GitHub
+    2. `mv target/release/vigil vigil/`
+    3. `strip vigil/vigil`
+    4. `cp -r config.cfg res vigil/`
+    5. `tar -czvf v1.0.0-i686-debian8.tar.gz vigil`
+    6. `rm -r vigil/`
+    7. Publish the archive on the [releases](https://github.com/valeriansaliou/vigil/releases) page on GitHub
 
 4. **How to update other repositories:**
     1. Publish package on Crates: `cargo publish`
