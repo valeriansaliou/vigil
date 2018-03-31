@@ -13,11 +13,19 @@ use prober::status::Status;
 use prober::mode::Mode;
 use prober::manager::STORE as PROBER_STORE;
 use notifier::generic::Notification;
-use notifier::email::EmailNotifier;
-use notifier::twilio::TwilioNotifier;
-use notifier::slack::SlackNotifier;
-use notifier::xmpp::XMPPNotifier;
 use APP_CONF;
+
+#[cfg(feature = "notifier-email")]
+use notifier::email::EmailNotifier;
+
+#[cfg(feature = "notifier-twilio")]
+use notifier::twilio::TwilioNotifier;
+
+#[cfg(feature = "notifier-slack")]
+use notifier::slack::SlackNotifier;
+
+#[cfg(feature = "notifier-xmpp")]
+use notifier::xmpp::XMPPNotifier;
 
 const AGGREGATE_INTERVAL_SECONDS: u64 = 10;
 
@@ -204,9 +212,16 @@ pub fn run() {
             };
 
             if let Some(ref notify) = APP_CONF.notify {
+                #[cfg(feature = "notifier-email")]
                 Notification::dispatch::<EmailNotifier>(notify, &notification).ok();
+
+                #[cfg(feature = "notifier-twilio")]
                 Notification::dispatch::<TwilioNotifier>(notify, &notification).ok();
+
+                #[cfg(feature = "notifier-slack")]
                 Notification::dispatch::<SlackNotifier>(notify, &notification).ok();
+
+                #[cfg(feature = "notifier-xmpp")]
                 Notification::dispatch::<XMPPNotifier>(notify, &notification).ok();
             }
         }

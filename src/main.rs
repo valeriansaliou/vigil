@@ -28,8 +28,12 @@ extern crate regex;
 extern crate native_tls;
 extern crate openssl_probe;
 extern crate reqwest;
+
+#[cfg(feature = "notifier-email")]
 extern crate lettre;
 extern crate lettre_email;
+
+#[cfg(feature = "notifier-xmpp")]
 extern crate libstrophe;
 
 mod config;

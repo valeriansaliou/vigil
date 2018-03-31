@@ -39,9 +39,16 @@ rocket_contrib = { version = "0.3", features = ["tera_templates"] }
 native-tls = "0.1"
 openssl-probe = "0.1"
 reqwest = "0.8"
-lettre = { version = "0.7", features = ["smtp-transport"] }
-lettre_email = "0.7"
-libstrophe = "0.8"
+lettre = { version = "0.7", features = ["smtp-transport"], optional = true }
+lettre_email = { version = "0.7", optional = true }
+libstrophe = { version = "0.8", default-features = false, optional = true }
+
+[features]
+default = ["notifier-email", "notifier-twilio", "notifier-slack"]
+notifier-email = ["lettre", "lettre_email"]
+notifier-twilio = []
+notifier-slack = []
+notifier-xmpp = ["libstrophe"]
 
 [profile.dev]
 opt-level = 0
