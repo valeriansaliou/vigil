@@ -14,7 +14,7 @@ We consider here the packaging flow of Vigil version `1.0.0`, for target archite
     2. `curl https://sh.rustup.rs -sSf | sh` (install the `nightly` toolchain)
     3. `git clone https://github.com/valeriansaliou/vigil.git`
     4. `cd vigil/`
-    5. `cargo build --all-features`
+    5. `cargo build --all-features --release`
 
 3. **How to package built binary and release it on GitHub:**
     1. `mkdir vigil`
