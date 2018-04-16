@@ -39,8 +39,8 @@ rocket_contrib = { version = "0.3", features = ["tera_templates"] }
 native-tls = "0.1"
 openssl-probe = "0.1"
 reqwest = "0.8"
-lettre = { version = "0.7", features = ["smtp-transport"], optional = true }
-lettre_email = { version = "0.7", optional = true }
+lettre = { version = "0.8", features = ["smtp-transport"], optional = true }
+lettre_email = { version = "0.8", optional = true }
 libstrophe = { version = "0.8", default-features = false, optional = true }
 
 [features]
