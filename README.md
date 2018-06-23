@@ -9,7 +9,7 @@ Vigil is an open-source Status Page you can host on your infrastructure, used to
 
 It is useful in microservices contexts to monitor both apps and backends. If a node goes down in your infrastructure, you receive a status change notification in a Slack channel, Email, Twilio SMS or/and XMPP.
 
-**👉 See a live demo of Vigil on [Crisp Status Page](https://status.crisp.chat) and [Enrich Status Page](https://status.enrichdata.com).**
+**👉 See a live demo of Vigil on [Crisp Status Page](https://status.crisp.chat).**
 
 **:newspaper: The Vigil project was announced in [a post on my personal journal](https://journal.valeriansaliou.name/announcing-vigil-how-we-monitor-crisp-at-scale/).**
 
@@ -20,11 +20,9 @@ It is useful in microservices contexts to monitor both apps and backends. If a n
 <table>
 <tr>
 <td align="center"><a href="https://crisp.chat/"><img src="https://valeriansaliou.github.io/vigil/images/crisp-icon.png" height="64" /></a></td>
-<td align="center"><a href="https://enrichdata.com/"><img src="https://valeriansaliou.github.io/vigil/images/enrich-icon.png" height="64" /></a></td>
 </tr>
 <tr>
 <td align="center">Crisp</td>
-<td align="center">Enrich</td>
 </tr>
 </table>
 
