@@ -45,6 +45,12 @@ Vigil monitors all your infrastructure services. You first need to configure tar
 
 It is recommended to configure Vigil or Vigil Reporter to send frequent probe checks, as to ensure you are quickly notified when a service gets down (thus to reduce unexpected downtime on your services).
 
+## Hosted alternative to Vigil
+
+Vigil needs to be hosted on your own systems, and maintained on your end. If you do not feel like managing yet another service, [you may use Crisp Status instead](https://crisp.chat/en/status/). Crisp status is a direct port of Vigil to the Crisp customer support platform. Crisp Status hosts your status page on Crisp systems, and is able to do what Vigil does (and even more!).
+
+As an example of a status page running Crisp Status, check out [Enrich Status Page](https://status.enrichdata.com/en/).
+
 ## How to use it?
 
 ### Installation
