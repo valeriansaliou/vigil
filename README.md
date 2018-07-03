@@ -47,7 +47,9 @@ It is recommended to configure Vigil or Vigil Reporter to send frequent probe ch
 
 ## Hosted alternative to Vigil
 
-Vigil needs to be hosted on your own systems, and maintained on your end. If you do not feel like managing yet another service, [you may use Crisp Status instead](https://crisp.chat/en/status/). Crisp status is a direct port of Vigil to the Crisp customer support platform. Crisp Status hosts your status page on Crisp systems, and is able to do what Vigil does (and even more!).
+Vigil needs to be hosted on your own systems, and maintained on your end. If you do not feel like managing yet another service, [you may use Crisp Status instead](https://crisp.chat/en/status/). Crisp status is a direct port of Vigil to the Crisp customer support platform.
+
+Crisp Status hosts your status page on Crisp systems, and is able to do what Vigil does (and even more!). Crisp Status is integrated to other Crisp products (eg. Crisp Chatbox & Crisp Helpdesk). It warns your users over chatbox and helpdesk if your status page reports as `dead` for an extended period of time.
 
 As an example of a status page running Crisp Status, check out [Enrich Status Page](https://status.enrichdata.com/en/).
 
