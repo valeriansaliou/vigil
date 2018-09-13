@@ -279,6 +279,7 @@ Where:
 **Request headers:**
 
 * Add an `Authorization` header with a `Basic` authentication where the password is your configured `reporter_token`.
+* Set the `Content-Type` to `application/json; charset=utf-8`, and ensure you submit the request data as UTF-8.
 
 **Request data:**
 
