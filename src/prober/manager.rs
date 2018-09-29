@@ -10,6 +10,7 @@ use std::thread;
 use std::net::{TcpStream, ToSocketAddrs};
 use std::time::{SystemTime, Duration};
 use time;
+use url::Url;
 
 use reqwest::{Client, StatusCode, RedirectPolicy};
 use reqwest::header::{Headers, UserAgent};
@@ -166,7 +167,17 @@ fn proceed_replica_probe_tcp(host: &str, port: u16) -> bool {
 }
 
 fn proceed_replica_probe_http(url: &str, body_match: &Option<Regex>) -> bool {
-    let url_bang = format!("{}?{}", url, time::now().to_timespec().sec);
+
+    // Append timestamp to url to cachebreak
+    let cache_break_param = time::now().to_timespec().sec;
+
+    let mut _url = Url::parse(&url).unwrap();
+
+    let query_params = format!("{}&{}", _url.query().unwrap_or(""), cache_break_param);
+
+    _url.set_query(Some(&query_params));
+
+    let url_bang = format!("{}", _url);
 
     debug!("prober poll will fire for http target: {}", &url_bang);
 
