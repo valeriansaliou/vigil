@@ -166,7 +166,16 @@ fn proceed_replica_probe_tcp(host: &str, port: u16) -> bool {
 }
 
 fn proceed_replica_probe_http(url: &str, body_match: &Option<Regex>) -> bool {
-    let url_bang = format!("{}?{}", url, time::now().to_timespec().sec);
+    // Acquire query string separator (if the URL already contains a query string, use append mode)
+    let query_separator = if url.contains("?") { "&" } else { "?" };
+
+    // Generate URL with cache buster, to bypass any upstream cache (eg. CDN cache layer)
+    let url_bang = format!(
+        "{}{}{}",
+        url,
+        query_separator,
+        time::now().to_timespec().sec
+    );
 
     debug!("prober poll will fire for http target: {}", &url_bang);
 

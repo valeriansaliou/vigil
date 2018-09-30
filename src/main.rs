@@ -134,8 +134,7 @@ fn make_app_args() -> AppArgs {
 
 fn ensure_states() {
     // Ensure all statics are valid (a `deref` is enough to lazily initialize them)
-    APP_ARGS.deref();
-    APP_CONF.deref();
+    let (_, _) = (APP_ARGS.deref(), APP_CONF.deref());
 
     // Ensure assets path exists
     assert_eq!(
