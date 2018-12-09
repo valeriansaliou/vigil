@@ -31,6 +31,7 @@ extern crate reqwest;
 
 #[cfg(feature = "notifier-email")]
 extern crate lettre;
+#[cfg(feature = "notifier-email")]
 extern crate lettre_email;
 
 #[cfg(feature = "notifier-xmpp")]
