@@ -32,6 +32,7 @@ const AGGREGATE_INTERVAL_SECONDS: u64 = 10;
 struct BumpedStates {
     status: Status,
     replicas: Vec<String>,
+    changed: bool,
 }
 
 fn check_child_status(parent_status: &Status, child_status: &Status) -> Option<Status> {
@@ -167,14 +168,47 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
         probe.status = probe_status;
     }
 
+    // Check if general status has changed
+    let has_changed = store.states.status != general_status;
+
     // Check if should dispatch notification later (only if critical)
     // Allow for cases:
     //   - healthy >> dead
     //   - sick    >> dead
     //   - dead    >> sick
     //   - dead    >> healthy
-    let should_notify = (store.states.status != Status::Dead && general_status == Status::Dead) ||
+    let mut should_notify = (store.states.status != Status::Dead &&
+                                 general_status == Status::Dead) ||
         (store.states.status == Status::Dead && general_status != Status::Dead);
+
+    // Check if should re-notify? (in case status did not change; only if dead)
+    // Notice: this is used to send periodic reminders of downtime (ie. 'still down' messages)
+    if has_changed == false && should_notify == false && general_status == Status::Dead {
+        debug!("status unchanged, but may need to re-notify; checking");
+
+        if let Some(ref notify) = APP_CONF.notify {
+            match (store.notified, notify.reminder_interval) {
+                (Some(last_notified), Some(reminder_interval)) => {
+                    if let Ok(duration_since_notified) =
+                        SystemTime::now().duration_since(last_notified)
+                    {
+                        // Duration since last notified exceeds reminder interval, should re-notify
+                        if duration_since_notified >= Duration::from_secs(reminder_interval) {
+                            info!("should re-notify about unchanged status");
+
+                            should_notify = true
+                        } else {
+                            debug!(
+                                "should not re-notify about unchanged status (interval: {})",
+                                reminder_interval
+                            );
+                        }
+                    }
+                }
+                _ => {}
+            }
+        }
+    }
 
     // Bump stored values
     store.states.status = general_status.to_owned();
@@ -184,9 +218,12 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
     }
 
     if should_notify == true {
+        store.notified = Some(SystemTime::now());
+
         Some(BumpedStates {
             status: general_status,
             replicas: bumped_replicas,
+            changed: has_changed,
         })
     } else {
         None
@@ -209,6 +246,7 @@ pub fn run() {
                 status: &bumped_states_inner.status,
                 time: time_now_as_string().unwrap_or("".to_string()),
                 replicas: Vec::from_iter(bumped_states_inner.replicas.iter().map(String::as_str)),
+                changed: bumped_states_inner.changed,
             };
 
             if let Some(ref notify) = APP_CONF.notify {

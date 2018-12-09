@@ -25,6 +25,10 @@ impl GenericNotifier for XMPPNotifier {
             // Build up the message text
             let mut message = String::new();
 
+            if notification.changed == false {
+                message.push_str("Reminder for: ");
+            }
+
             message.push_str(&format!("{}\n", APP_CONF.branding.page_title));
             message.push_str("\n");
             message.push_str(&format!("Status: {:?}\n", notification.status));

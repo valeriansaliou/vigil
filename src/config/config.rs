@@ -92,6 +92,7 @@ pub struct ConfigMetrics {
 
 #[derive(Deserialize)]
 pub struct ConfigNotify {
+    pub reminder_interval: Option<u64>,
     pub email: Option<ConfigNotifyEmail>,
     pub twilio: Option<ConfigNotifyTwilio>,
     pub slack: Option<ConfigNotifySlack>,

@@ -167,6 +167,8 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 
 **[notify]**
 
+* `reminder_interval` (type: _integer_, allowed: seconds, no default) — Interval at which downtime reminder notifications should be sent (if any)
+
 **[notify.email]**
 
 * `to` (type: _string_, allowed: email address, no default) — Email address to which to send emails

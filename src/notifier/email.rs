@@ -27,10 +27,18 @@ impl GenericNotifier for EmailNotifier {
             // Build up the message text
             let mut message = String::new();
 
-            message.push_str(&format!(
-                "Status change report from: {}\n",
-                APP_CONF.branding.page_title
-            ));
+            if notification.changed == true {
+                message.push_str(&format!(
+                    "Status change report from: {}\n",
+                    APP_CONF.branding.page_title
+                ));
+            } else {
+                message.push_str(&format!(
+                    "Status unchanged reminder from: {}\n",
+                    APP_CONF.branding.page_title
+                ));
+            }
+
             message.push_str("\n--\n");
             message.push_str(&format!("Status: {:?}\n", notification.status));
             message.push_str(&format!("Nodes: {}\n", &nodes_label));

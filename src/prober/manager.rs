@@ -33,7 +33,8 @@ lazy_static! {
             status: Status::Healthy,
             date: None,
             probes: IndexMap::new(),
-        }
+        },
+        notified: None,
     }));
 
     static ref PROBE_HTTP_CLIENT: Client = Client::builder()
@@ -54,6 +55,7 @@ struct RabbitMQAPIQueueResponse {
 
 pub struct Store {
     pub states: ServiceStates,
+    pub notified: Option<SystemTime>,
 }
 
 fn make_default_headers() -> Headers {
