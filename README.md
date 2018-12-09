@@ -93,16 +93,18 @@ _Install `libssl-dev` (ie. OpenSSL headers) and `libstrophe-dev` (ie. XMPP libra
 
 You might find it convenient to run Vigil via Docker. You can find the pre-built Vigil image on Docker Hub as [valeriansaliou/vigil](https://hub.docker.com/r/valeriansaliou/vigil/).
 
+> Pre-built Docker version may not be the latest version of Vigil available.
+
 First, pull the `valeriansaliou/vigil` image:
 
 ```bash
-docker pull valeriansaliou/vigil:v1.5.0
+docker pull valeriansaliou/vigil:v1.4.0
 ```
 
 Then, seed it a configuration file and run it (replace `/path/to/your/vigil/config.cfg` with the path to your configuration file):
 
 ```bash
-docker run -p 8080:8080 -v /path/to/your/vigil/config.cfg:/etc/vigil.cfg valeriansaliou/vigil:v1.5.0
+docker run -p 8080:8080 -v /path/to/your/vigil/config.cfg:/etc/vigil.cfg valeriansaliou/vigil:v1.4.0
 ```
 
 In the configuration file, ensure that:
