@@ -59,6 +59,8 @@ As an example of a status page running Crisp Status, check out [Enrich Status Pa
 
 ### Installation
 
+> Ensure that you build Vigil using Rust `nightly-2018-08-24` (use the `nightly` toolchain). Some Vigil dependencies will not compile with later versions of the compiler.
+
 **Install from releases:**
 
 The best way to install Vigil is to pull the latest release from the [Vigil releases](https://github.com/valeriansaliou/vigil/releases) page.
