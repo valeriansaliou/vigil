@@ -4,8 +4,7 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
-#![feature(plugin)]
-#![plugin(rocket_codegen)]
+#![feature(proc_macro_hygiene, decl_macro)]
 
 #[macro_use]
 extern crate log;
@@ -15,6 +14,8 @@ extern crate clap;
 extern crate lazy_static;
 #[macro_use]
 extern crate serde_derive;
+#[macro_use]
+extern crate rocket;
 extern crate time;
 extern crate toml;
 extern crate base64;
@@ -22,7 +23,6 @@ extern crate url;
 extern crate serde;
 extern crate url_serde;
 extern crate indexmap;
-extern crate rocket;
 extern crate rocket_contrib;
 extern crate regex;
 extern crate native_tls;

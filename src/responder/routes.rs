@@ -7,8 +7,9 @@
 use std::path::PathBuf;
 
 use rocket::http::Status;
-use rocket::response::{NamedFile, Failure};
-use rocket_contrib::{Template, Json};
+use rocket::response::NamedFile;
+use rocket_contrib::json::Json;
+use rocket_contrib::templates::Template;
 
 use super::context::{INDEX_CONFIG, IndexContext};
 use super::asset_file::AssetFile;
@@ -31,7 +32,7 @@ pub struct ReporterDataLoad {
 }
 
 #[get("/")]
-fn index() -> Template {
+pub fn index() -> Template {
     // Notice acquire lock in a block to release it ASAP (ie. before template renders)
     let context = {
         IndexContext {
@@ -44,12 +45,12 @@ fn index() -> Template {
 }
 
 #[post("/reporter/<probe_id>/<node_id>", data = "<data>", format = "application/json")]
-fn reporter(
+pub fn reporter(
     _auth: ReporterGuard,
     probe_id: String,
     node_id: String,
     data: Json<ReporterData>,
-) -> Result<(), Failure> {
+) -> Result<(), Status> {
     match handle_report(
         &probe_id,
         &node_id,
@@ -64,24 +65,24 @@ fn reporter(
 
             Ok(())
         }
-        Err(HandleError::InvalidLoad) => Err(Failure(Status::BadRequest)),
-        Err(HandleError::WrongMode) => Err(Failure(Status::PreconditionFailed)),
-        Err(HandleError::NotFound) => Err(Failure(Status::NotFound)),
+        Err(HandleError::InvalidLoad) => Err(Status::BadRequest),
+        Err(HandleError::WrongMode) => Err(Status::PreconditionFailed),
+        Err(HandleError::NotFound) => Err(Status::NotFound),
     }
 }
 
 #[get("/robots.txt")]
-fn robots() -> Option<AssetFile> {
+pub fn robots() -> Option<AssetFile> {
     AssetFile::open(APP_CONF.assets.path.join("./public/robots.txt")).ok()
 }
 
 #[get("/status/text")]
-fn status_text() -> &'static str {
+pub fn status_text() -> &'static str {
     &PROBER_STORE.read().unwrap().states.status.as_str()
 }
 
 #[get("/badge/<kind>")]
-fn badge(kind: String) -> Option<NamedFile> {
+pub fn badge(kind: String) -> Option<NamedFile> {
     // Notice acquire lock in a block to release it ASAP (ie. before OS access to file)
     let status = {
         &PROBER_STORE.read().unwrap().states.status.as_str()
@@ -95,21 +96,21 @@ fn badge(kind: String) -> Option<NamedFile> {
 }
 
 #[get("/assets/fonts/<file..>")]
-fn assets_fonts(file: PathBuf) -> Option<AssetFile> {
+pub fn assets_fonts(file: PathBuf) -> Option<AssetFile> {
     AssetFile::open(APP_CONF.assets.path.join("./fonts").join(file)).ok()
 }
 
 #[get("/assets/images/<file..>")]
-fn assets_images(file: PathBuf) -> Option<AssetFile> {
+pub fn assets_images(file: PathBuf) -> Option<AssetFile> {
     AssetFile::open(APP_CONF.assets.path.join("./images").join(file)).ok()
 }
 
 #[get("/assets/stylesheets/<file..>")]
-fn assets_stylesheets(file: PathBuf) -> Option<AssetFile> {
+pub fn assets_stylesheets(file: PathBuf) -> Option<AssetFile> {
     AssetFile::open(APP_CONF.assets.path.join("./stylesheets").join(file)).ok()
 }
 
 #[get("/assets/javascripts/<file..>")]
-fn assets_javascripts(file: PathBuf) -> Option<AssetFile> {
+pub fn assets_javascripts(file: PathBuf) -> Option<AssetFile> {
     AssetFile::open(APP_CONF.assets.path.join("./javascripts").join(file)).ok()
 }

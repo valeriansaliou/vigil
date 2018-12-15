@@ -8,7 +8,7 @@ use std::collections::HashMap;
 
 use rocket;
 use rocket::config::{Config, Environment};
-use rocket_contrib::Template;
+use rocket_contrib::templates::Template;
 
 use super::routes;
 
@@ -40,7 +40,7 @@ pub fn run() {
     config.set_extras(extras);
 
     // Build and run Rocket instance
-    rocket::custom(config, false)
+    rocket::custom(config)
         .mount(
             "/",
             routes![
