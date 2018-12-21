@@ -12,7 +12,7 @@ use std::time::{SystemTime, Duration};
 use time;
 
 use reqwest::{Client, StatusCode, RedirectPolicy};
-use reqwest::header::{Headers, UserAgent};
+use reqwest::header::{HeaderMap, USER_AGENT};
 use indexmap::IndexMap;
 
 use config::config::ConfigPluginsRabbitMQ;
@@ -41,7 +41,6 @@ lazy_static! {
         .timeout(Duration::from_secs(APP_CONF.metrics.poll_delay_dead))
         .gzip(false)
         .redirect(RedirectPolicy::none())
-        .enable_hostname_verification()
         .default_headers(make_default_headers())
         .build()
         .unwrap();
@@ -58,12 +57,15 @@ pub struct Store {
     pub notified: Option<SystemTime>,
 }
 
-fn make_default_headers() -> Headers {
-    let mut headers = Headers::new();
+fn make_default_headers() -> HeaderMap {
+    let mut headers = HeaderMap::new();
 
-    headers.set(UserAgent::new(
-        format!("vigil (+{})", APP_CONF.branding.page_url.as_str()),
-    ));
+    headers.insert(
+        USER_AGENT,
+        format!("vigil (+{})", APP_CONF.branding.page_url.as_str())
+            .parse()
+            .unwrap(),
+    );
 
     headers
 }
@@ -264,7 +266,7 @@ fn proceed_rabbitmq_queue_probe(rabbitmq: &ConfigPluginsRabbitMQ, rabbitmq_queue
             );
 
             // Check JSON result?
-            if status == StatusCode::Ok {
+            if status == StatusCode::OK {
                 if let Ok(response_json) = response_inner.json::<RabbitMQAPIQueueResponse>() {
                     // Queue full?
                     if response_json.messages_ready >= rabbitmq.queue_ready_healthy_below ||

@@ -17,7 +17,6 @@ lazy_static! {
     static ref TWILIO_HTTP_CLIENT: Client = Client::builder()
         .timeout(Duration::from_secs(DISPATCH_TIMEOUT_SECONDS))
         .gzip(true)
-        .enable_hostname_verification()
         .build()
         .unwrap();
 }
