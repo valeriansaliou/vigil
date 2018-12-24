@@ -39,12 +39,11 @@ impl GenericNotifier for XMPPNotifier {
             debug!("will send XMPP notification with message: {}", &message);
 
             // Configure connection handler
-            let fn_handle = |connection: &mut Connection,
+            let fn_handle = |context: &Context,
+                             connection: &mut Connection,
                              event: ConnectionEvent,
                              _error: i32,
                              _stream_error: Option<&StreamError>| {
-                let context = connection.context();
-
                 match event {
                     ConnectionEvent::XMPP_CONN_CONNECT => {
                         debug!("connected to XMPP account: {}", &xmpp.from);
@@ -87,7 +86,7 @@ impl GenericNotifier for XMPPNotifier {
 
             // Configure XMPP connection
             let context = Context::new_with_default_logger();
-            let mut connection = Connection::new(context.clone());
+            let mut connection = Connection::new(context);
 
             connection.set_jid(&xmpp.from);
             connection.set_pass(&xmpp.xmpp_password);
@@ -98,9 +97,9 @@ impl GenericNotifier for XMPPNotifier {
             );
 
             // Connect to XMPP server
-            if connection.connect_client(None, None, &fn_handle).is_ok() == true {
+            if let Ok(connection_context) = connection.connect_client(None, None, &fn_handle) {
                 // Enter context
-                context.run();
+                connection_context.run();
 
                 if *is_sent.read().unwrap() == true {
                     return Ok(());
