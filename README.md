@@ -59,7 +59,7 @@ As an example of a status page running Crisp Status, check out [Enrich Status Pa
 
 ### Installation
 
-> Ensure that you build Vigil using Rust `nightly-2018-12-14` (use the `nightly` toolchain). Some Vigil dependencies will not compile with later versions of the compiler.
+> Ensure that you build Vigil using Rust `nightly-2019-01-17` (use the `nightly` toolchain). Some Vigil dependencies may not compile with later versions of the compiler.
 
 **Install from releases:**
 
