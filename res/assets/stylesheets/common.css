@@ -140,24 +140,52 @@ a:hover {
   text-align: center;
   text-shadow: none;
   text-transform: initial;
-  padding: 6px 20px 7px;
   display: inline-block;
   left: 50%;
   border-radius: 1px;
 }
 
-.has-tooltip .tooltip .tooltip-value .tooltip-main,
-.has-tooltip .tooltip .tooltip-value .tooltip-label {
+.has-tooltip .tooltip .tooltip-value .tooltip-value-text {
+  padding: 6px 20px 7px;
   display: block;
 }
 
-.has-tooltip .tooltip .tooltip-value .tooltip-main {
+.has-tooltip .tooltip .tooltip-value .tooltip-value-text .tooltip-main,
+.has-tooltip .tooltip .tooltip-value .tooltip-value-text .tooltip-label {
+  display: block;
+}
+
+.has-tooltip .tooltip .tooltip-value .tooltip-value-text .tooltip-main {
   color: #ffffff;
 }
 
-.has-tooltip .tooltip .tooltip-value .tooltip-label {
+.has-tooltip .tooltip .tooltip-value .tooltip-value-text .tooltip-label {
   color: rgba(255, 255, 255, 0.75);
   margin-top: 1px;
+}
+
+.has-tooltip .tooltip .tooltip-value .tooltip-value-details {
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 7px 20px 9px;
+  display: block;
+}
+
+.has-tooltip .tooltip .tooltip-value .tooltip-value-details .tooltip-detail:after {
+  content: "";
+  background-color: rgba(255, 255, 255, 0.4);
+  vertical-align: sub;
+  width: 1px;
+  height: 13px;
+  margin: 0 8px;
+  display: inline-block;
+}
+
+.has-tooltip .tooltip .tooltip-value .tooltip-value-details .tooltip-detail:last-child:after {
+  display: none;
+}
+
+.has-tooltip .tooltip .tooltip-value .tooltip-value-details .tooltip-detail-label {
+  text-decoration: underline;
 }
 
 .has-tooltip:hover .tooltip {

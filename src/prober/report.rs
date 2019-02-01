@@ -6,7 +6,8 @@
 
 use std::time::{SystemTime, Duration};
 
-use super::states::{ServiceStatesProbeNodeReplica, ServiceStatesProbeNodeReplicaLoad,
+use super::states::{ServiceStatesProbeNodeReplica, ServiceStatesProbeNodeReplicaMetrics,
+                    ServiceStatesProbeNodeReplicaMetricsSystem, ServiceStatesProbeNodeReplicaLoad,
                     ServiceStatesProbeNodeReplicaReport};
 use prober::manager::STORE as PROBER_STORE;
 use prober::status::Status;
@@ -42,21 +43,28 @@ pub fn handle(
                 return Err(HandleError::WrongMode);
             }
 
-            // Acquire previous replica status (follow it up to avoid re-processing glitches)
-            let status = if let Some(ref replica) = node.replicas.get(replica_id) {
-                replica.status.to_owned()
-            } else {
-                Status::Healthy
-            };
+            // Acquire previous replica status + previous queue load status (follow-up values)
+            let (mut status, mut metrics, mut load_queue);
 
-            // Acquire previous queue load status
-            let mut load_queue = false;
+            load_queue = false;
 
             if let Some(ref replica) = node.replicas.get(replica_id) {
+                status = replica.status.to_owned();
+                metrics = replica.metrics.to_owned();
+
                 if let Some(ref replica_load) = replica.load {
                     load_queue = replica_load.queue;
                 }
+            } else {
+                status = Status::Healthy;
+                metrics = ServiceStatesProbeNodeReplicaMetrics::default();
             }
+
+            // Assign new system metrics
+            metrics.system = Some(ServiceStatesProbeNodeReplicaMetricsSystem {
+                cpu: (load_cpu * 100.0).round() as u16,
+                ram: (load_ram * 100.0).round() as u16,
+            });
 
             // Bump stored replica
             node.replicas.insert(
@@ -64,6 +72,7 @@ pub fn handle(
                 ServiceStatesProbeNodeReplica {
                     status: status,
                     url: None,
+                    metrics: metrics,
                     load: Some(ServiceStatesProbeNodeReplicaLoad {
                         cpu: load_cpu,
                         ram: load_ram,

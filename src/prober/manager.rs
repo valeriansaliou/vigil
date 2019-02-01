@@ -20,7 +20,8 @@ use config::regex::Regex;
 use prober::manager::STORE as PROBER_STORE;
 use prober::mode::Mode;
 use super::states::{ServiceStates, ServiceStatesProbe, ServiceStatesProbeNode,
-                    ServiceStatesProbeNodeReplica};
+                    ServiceStatesProbeNodeReplica, ServiceStatesProbeNodeReplicaMetrics,
+                    ServiceStatesProbeNodeReplicaMetricsRabbitMQ};
 use super::replica::ReplicaURL;
 use super::status::Status;
 use APP_CONF;
@@ -105,9 +106,8 @@ fn map_poll_replicas() -> Vec<(String, String, String, ReplicaURL, Option<Regex>
 fn proceed_replica_probe_with_retry(
     replica_url: &ReplicaURL,
     body_match: &Option<Regex>,
-) -> Status {
-    let mut status = Status::Dead;
-    let mut retry_count = 0;
+) -> (Status, Option<Duration>) {
+    let (mut status, mut latency, mut retry_count) = (Status::Dead, None, 0);
 
     while retry_count < APP_CONF.metrics.poll_retry && status == Status::Dead {
         retry_count += 1;
@@ -120,13 +120,19 @@ fn proceed_replica_probe_with_retry(
 
         thread::sleep(Duration::from_millis(PROBE_HOLD_MILLISECONDS));
 
-        status = proceed_replica_probe(replica_url, body_match);
+        let probe_results = proceed_replica_probe(replica_url, body_match);
+
+        status = probe_results.0;
+        latency = Some(probe_results.1);
     }
 
-    status
+    (status, latency)
 }
 
-fn proceed_replica_probe(replica_url: &ReplicaURL, body_match: &Option<Regex>) -> Status {
+fn proceed_replica_probe(
+    replica_url: &ReplicaURL,
+    body_match: &Option<Regex>,
+) -> (Status, Duration) {
     let start_time = SystemTime::now();
 
     let is_up = match replica_url {
@@ -135,17 +141,19 @@ fn proceed_replica_probe(replica_url: &ReplicaURL, body_match: &Option<Regex>) -
         &ReplicaURL::HTTPS(ref url) => proceed_replica_probe_http(url, body_match),
     };
 
+    let duration_latency = SystemTime::now().duration_since(start_time).unwrap_or(
+        Duration::from_secs(0),
+    );
+
     if is_up == true {
         // Probe reports as sick?
-        if let Ok(duration_since) = SystemTime::now().duration_since(start_time) {
-            if duration_since >= Duration::from_secs(APP_CONF.metrics.poll_delay_sick) {
-                return Status::Sick;
-            }
+        if duration_latency >= Duration::from_secs(APP_CONF.metrics.poll_delay_sick) {
+            return (Status::Sick, duration_latency);
         }
 
-        Status::Healthy
+        (Status::Healthy, duration_latency)
     } else {
-        Status::Dead
+        (Status::Dead, duration_latency)
     }
 }
 
@@ -233,7 +241,10 @@ fn proceed_replica_probe_http(url: &str, body_match: &Option<Regex>) -> bool {
     false
 }
 
-fn proceed_rabbitmq_queue_probe(rabbitmq: &ConfigPluginsRabbitMQ, rabbitmq_queue: &str) -> bool {
+fn proceed_rabbitmq_queue_probe(
+    rabbitmq: &ConfigPluginsRabbitMQ,
+    rabbitmq_queue: &str,
+) -> (bool, Option<(u32, u32)>) {
     let url_queue = rabbitmq.api_url.join(&format!(
         "/api/queues/{}/{}",
         rabbitmq.virtualhost,
@@ -268,6 +279,11 @@ fn proceed_rabbitmq_queue_probe(rabbitmq: &ConfigPluginsRabbitMQ, rabbitmq_queue
             // Check JSON result?
             if status == StatusCode::OK {
                 if let Ok(response_json) = response_inner.json::<RabbitMQAPIQueueResponse>() {
+                    let queue_counts = Some((
+                        response_json.messages_ready,
+                        response_json.messages_unacknowledged,
+                    ));
+
                     // Queue full?
                     if response_json.messages_ready >= rabbitmq.queue_ready_healthy_below ||
                         response_json.messages_unacknowledged >= rabbitmq.queue_nack_healthy_below
@@ -279,8 +295,10 @@ fn proceed_rabbitmq_queue_probe(rabbitmq: &ConfigPluginsRabbitMQ, rabbitmq_queue
                             response_json.messages_unacknowledged
                         );
 
-                        return true;
+                        return (true, queue_counts);
                     }
+
+                    return (false, queue_counts);
                 }
             } else {
                 warn!(
@@ -293,13 +311,14 @@ fn proceed_rabbitmq_queue_probe(rabbitmq: &ConfigPluginsRabbitMQ, rabbitmq_queue
         }
     }
 
-    false
+    (false, None)
 }
 
 fn dispatch_polls() {
     // Probe hosts
     for probe_replica in map_poll_replicas() {
-        let replica_status = proceed_replica_probe_with_retry(&probe_replica.3, &probe_replica.4);
+        let (replica_status, replica_latency) =
+            proceed_replica_probe_with_retry(&probe_replica.3, &probe_replica.4);
 
         debug!(
             "replica probe result: {}:{}:{} => {:?}",
@@ -317,6 +336,9 @@ fn dispatch_polls() {
                 if let Some(ref mut node) = probe.nodes.get_mut(&probe_replica.1) {
                     if let Some(ref mut replica) = node.replicas.get_mut(&probe_replica.2) {
                         replica.status = replica_status;
+
+                        replica.metrics.latency =
+                            replica_latency.map(|duration| duration.as_millis() as u64);
                     }
                 }
             }
@@ -331,12 +353,12 @@ fn dispatch_plugins_rabbitmq(probe_id: String, node_id: String, queue: Option<St
             // Any queue for node?
             if let Some(ref queue_value) = queue {
                 // Check if RabbitMQ queue is loaded
-                let mut rabbitmq_queue_loaded = proceed_rabbitmq_queue_probe(rabbitmq, queue_value);
+                let mut rabbitmq_queue_load = proceed_rabbitmq_queue_probe(rabbitmq, queue_value);
 
                 // Check once again? (the queue can be seen as loaded from check #1, but if we \
                 //   check again a few milliseconds later, it will actually be empty; so not loaded)
                 // Notice: this prevents false-positive 'sick' statuses.
-                if rabbitmq_queue_loaded == true {
+                if rabbitmq_queue_load.0 == true {
                     if let Some(retry_delay) = rabbitmq.queue_loaded_retry_delay {
                         debug!(
                             "rabbitmq queue is loaded, checking once again in {}ms: {}:{} [{}]",
@@ -349,7 +371,7 @@ fn dispatch_plugins_rabbitmq(probe_id: String, node_id: String, queue: Option<St
                         thread::sleep(Duration::from_millis(retry_delay));
 
                         // Check again if RabbitMQ queue is loaded
-                        rabbitmq_queue_loaded = proceed_rabbitmq_queue_probe(rabbitmq, queue_value);
+                        rabbitmq_queue_load = proceed_rabbitmq_queue_probe(rabbitmq, queue_value);
                     }
                 }
 
@@ -358,7 +380,7 @@ fn dispatch_plugins_rabbitmq(probe_id: String, node_id: String, queue: Option<St
                     &probe_id,
                     &node_id,
                     queue_value,
-                    rabbitmq_queue_loaded
+                    rabbitmq_queue_load.0
                 );
 
                 // Update replica status (write-lock the store)
@@ -368,9 +390,19 @@ fn dispatch_plugins_rabbitmq(probe_id: String, node_id: String, queue: Option<St
                     if let Some(ref mut probe) = store.states.probes.get_mut(&probe_id) {
                         if let Some(ref mut node) = probe.nodes.get_mut(&node_id) {
                             for (_, replica) in node.replicas.iter_mut() {
-                                // Only alter healthy replicas
                                 if let Some(ref mut replica_load) = replica.load {
-                                    replica_load.queue = rabbitmq_queue_loaded;
+                                    replica_load.queue = rabbitmq_queue_load.0;
+                                }
+
+                                // Store RabbitMQ metrics
+                                if let Some((queue_ready, queue_nack)) = rabbitmq_queue_load.1 {
+                                    replica.metrics.rabbitmq =
+                                        Some(ServiceStatesProbeNodeReplicaMetricsRabbitMQ {
+                                            queue_ready: queue_ready,
+                                            queue_nack: queue_nack,
+                                        });
+                                } else {
+                                    replica.metrics.rabbitmq = None
                                 }
                             }
                         }
@@ -440,6 +472,7 @@ pub fn initialize_store() {
                         ServiceStatesProbeNodeReplica {
                             status: Status::Healthy,
                             url: Some(replica_url),
+                            metrics: ServiceStatesProbeNodeReplicaMetrics::default(),
                             load: None,
                             report: None,
                         },

@@ -41,8 +41,28 @@ pub struct ServiceStatesProbeNode {
 pub struct ServiceStatesProbeNodeReplica {
     pub status: Status,
     pub url: Option<ReplicaURL>,
+    pub metrics: ServiceStatesProbeNodeReplicaMetrics,
     pub load: Option<ServiceStatesProbeNodeReplicaLoad>,
     pub report: Option<ServiceStatesProbeNodeReplicaReport>,
+}
+
+#[derive(Serialize, Clone, Default)]
+pub struct ServiceStatesProbeNodeReplicaMetrics {
+    pub latency: Option<u64>,
+    pub system: Option<ServiceStatesProbeNodeReplicaMetricsSystem>,
+    pub rabbitmq: Option<ServiceStatesProbeNodeReplicaMetricsRabbitMQ>,
+}
+
+#[derive(Serialize, Clone)]
+pub struct ServiceStatesProbeNodeReplicaMetricsSystem {
+    pub cpu: u16,
+    pub ram: u16,
+}
+
+#[derive(Serialize, Clone, Default)]
+pub struct ServiceStatesProbeNodeReplicaMetricsRabbitMQ {
+    pub queue_ready: u32,
+    pub queue_nack: u32,
 }
 
 #[derive(Serialize)]

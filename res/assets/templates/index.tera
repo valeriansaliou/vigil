@@ -132,23 +132,51 @@
 
                       <span class="tooltip">
                         <span class="tooltip-value">
-                          <span class="tooltip-main font-sans-semibold">
-                            {% if replica.status == "dead" %}
-                              This replica reports as dead.
-                            {% elif replica.status == "sick" %}
-                              This replica reports as sick.
-                            {% else %}
-                              This replica reports as healthy.
-                            {% endif %}
+                          <span class="tooltip-value-text">
+                            <span class="tooltip-main font-sans-semibold">
+                              {% if replica.status == "dead" %}
+                                This replica reports as dead.
+                              {% elif replica.status == "sick" %}
+                                This replica reports as sick.
+                              {% else %}
+                                This replica reports as healthy.
+                              {% endif %}
+                            </span>
+
+                            <span class="tooltip-label font-sans-light">
+                              {% if node.mode == "push" %}
+                                Checked via a push probe (Reporter).
+                              {% else %}
+                                Checked via a poll probe (HTTP or TCP).
+                              {% endif %}
+                            </span>
                           </span>
 
-                          <span class="tooltip-label font-sans-light">
-                            {% if node.mode == "push" %}
-                              Checked via a push probe (Reporter).
-                            {% else %}
-                              Checked via a poll probe (HTTP or TCP).
-                            {% endif %}
-                          </span>
+                          {% if replica.metrics.system or replica.metrics.latency or replica.metrics.rabbitmq %}
+                            <span class="tooltip-value-details">
+                              {% if replica.metrics.system %}
+                                <span class="tooltip-detail font-sans-regular">
+                                  <span class="tooltip-detail-label font-sans-semibold">CPU</span>: {{ replica.metrics.system.cpu }}%
+                                </span>
+
+                                <span class="tooltip-detail font-sans-regular">
+                                  <span class="tooltip-detail-label font-sans-semibold">RAM</span>: {{ replica.metrics.system.ram }}%
+                                </span>
+                              {% endif %}
+
+                              {% if replica.metrics.latency %}
+                                <span class="tooltip-detail font-sans-regular">
+                                  <span class="tooltip-detail-label font-sans-semibold">Latency</span>: {{ replica.metrics.latency }}ms
+                                </span>
+                              {% endif %}
+
+                              {% if replica.metrics.rabbitmq %}
+                                <span class="tooltip-detail font-sans-regular">
+                                  <span class="tooltip-detail-label font-sans-semibold">Queue</span>: {{ replica.metrics.rabbitmq.queue_ready }}R {{ replica.metrics.rabbitmq.queue_nack }}N
+                                </span>
+                              {% endif %}
+                            </span>
+                          {% endif %}
                         </span>
                       </span>
                     </span>
