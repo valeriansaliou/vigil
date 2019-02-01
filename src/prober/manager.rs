@@ -330,7 +330,28 @@ fn dispatch_plugins_rabbitmq(probe_id: String, node_id: String, queue: Option<St
         if let Some(ref rabbitmq) = plugins.rabbitmq {
             // Any queue for node?
             if let Some(ref queue_value) = queue {
-                let rabbitmq_queue_loaded = proceed_rabbitmq_queue_probe(rabbitmq, queue_value);
+                // Check if RabbitMQ queue is loaded
+                let mut rabbitmq_queue_loaded = proceed_rabbitmq_queue_probe(rabbitmq, queue_value);
+
+                // Check once again? (the queue can be seen as loaded from check #1, but if we \
+                //   check again a few milliseconds later, it will actually be empty; so not loaded)
+                // Notice: this prevents false-positive 'sick' statuses.
+                if rabbitmq_queue_loaded == true {
+                    if let Some(retry_delay) = rabbitmq.queue_loaded_retry_delay {
+                        debug!(
+                            "rabbitmq queue is loaded, checking once again in {}ms: {}:{} [{}]",
+                            retry_delay,
+                            &probe_id,
+                            &node_id,
+                            queue_value
+                        );
+
+                        thread::sleep(Duration::from_millis(retry_delay));
+
+                        // Check again if RabbitMQ queue is loaded
+                        rabbitmq_queue_loaded = proceed_rabbitmq_queue_probe(rabbitmq, queue_value);
+                    }
+                }
 
                 debug!(
                     "rabbitmq queue probe result: {}:{} [{}] => {:?}",
