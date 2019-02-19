@@ -7,7 +7,7 @@
 mod replica;
 
 pub mod manager;
-pub mod states;
 pub mod mode;
-pub mod status;
 pub mod report;
+pub mod states;
+pub mod status;

@@ -4,16 +4,16 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
-use std::time::Duration;
 use std::sync::RwLock;
+use std::time::Duration;
 use time;
 
-use libstrophe::{Connection, ConnectionEvent, Context, Stanza};
 use libstrophe::error::StreamError;
+use libstrophe::{Connection, ConnectionEvent, Context, Stanza};
 
-use super::generic::{DISPATCH_TIMEOUT_SECONDS, Notification, GenericNotifier};
-use config::config::ConfigNotify;
+use super::generic::{GenericNotifier, Notification, DISPATCH_TIMEOUT_SECONDS};
 use crate::APP_CONF;
+use config::config::ConfigNotify;
 
 pub struct XMPPNotifier;
 
@@ -49,13 +49,12 @@ impl GenericNotifier for XMPPNotifier {
                         debug!("connected to XMPP account: {}", &xmpp.from);
 
                         // Send status message
-                        let mut message_stanza =
-                            Stanza::new_message(
-                                &context,
-                                Some("chat"),
-                                Some(&format!("vigil-{}", time::now().to_timespec().sec)),
-                                Some(&xmpp.to),
-                            );
+                        let mut message_stanza = Stanza::new_message(
+                            &context,
+                            Some("chat"),
+                            Some(&format!("vigil-{}", time::now().to_timespec().sec)),
+                            Some(&xmpp.to),
+                        );
 
                         if message_stanza.set_body(&message).is_ok() == true {
                             connection.send(&message_stanza);
@@ -70,12 +69,10 @@ impl GenericNotifier for XMPPNotifier {
                         // Disconnect immediately
                         connection.disconnect();
                     }
-                    ConnectionEvent::XMPP_CONN_DISCONNECT |
-                    ConnectionEvent::XMPP_CONN_FAIL => {
+                    ConnectionEvent::XMPP_CONN_DISCONNECT | ConnectionEvent::XMPP_CONN_FAIL => {
                         debug!(
                             "disconnected from XMPP account: {} ({:?})",
-                            &xmpp.from,
-                            event
+                            &xmpp.from, event
                         );
 
                         context.stop();

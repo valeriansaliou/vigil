@@ -4,26 +4,27 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
-use std::sync::RwLock;
-use std::sync::Arc;
-use std::thread;
 use std::net::{TcpStream, ToSocketAddrs};
-use std::time::{SystemTime, Duration};
+use std::sync::Arc;
+use std::sync::RwLock;
+use std::thread;
+use std::time::{Duration, SystemTime};
 use time;
 
-use reqwest::{Client, StatusCode, RedirectPolicy};
-use reqwest::header::{HeaderMap, USER_AGENT};
 use indexmap::IndexMap;
+use reqwest::header::{HeaderMap, USER_AGENT};
+use reqwest::{Client, RedirectPolicy, StatusCode};
 
+use super::replica::ReplicaURL;
+use super::states::{
+    ServiceStates, ServiceStatesProbe, ServiceStatesProbeNode, ServiceStatesProbeNodeReplica,
+    ServiceStatesProbeNodeReplicaMetrics, ServiceStatesProbeNodeReplicaMetricsRabbitMQ,
+};
+use super::status::Status;
 use crate::config::config::ConfigPluginsRabbitMQ;
 use crate::config::regex::Regex;
 use crate::prober::manager::STORE as PROBER_STORE;
 use crate::prober::mode::Mode;
-use super::states::{ServiceStates, ServiceStatesProbe, ServiceStatesProbeNode,
-                    ServiceStatesProbeNodeReplica, ServiceStatesProbeNodeReplicaMetrics,
-                    ServiceStatesProbeNodeReplicaMetricsRabbitMQ};
-use super::replica::ReplicaURL;
-use super::status::Status;
 use crate::APP_CONF;
 
 const PROBE_HOLD_MILLISECONDS: u64 = 250;
@@ -37,7 +38,6 @@ lazy_static! {
         },
         notified: None,
     }));
-
     static ref PROBE_HTTP_CLIENT: Client = Client::builder()
         .timeout(Duration::from_secs(APP_CONF.metrics.poll_delay_dead))
         .gzip(false)
@@ -114,8 +114,7 @@ fn proceed_replica_probe_with_retry(
 
         debug!(
             "will probe replica: {:?} with retry count: {}",
-            replica_url,
-            retry_count
+            replica_url, retry_count
         );
 
         thread::sleep(Duration::from_millis(PROBE_HOLD_MILLISECONDS));
@@ -141,9 +140,9 @@ fn proceed_replica_probe(
         &ReplicaURL::HTTPS(ref url) => proceed_replica_probe_http(url, body_match),
     };
 
-    let duration_latency = SystemTime::now().duration_since(start_time).unwrap_or(
-        Duration::from_secs(0),
-    );
+    let duration_latency = SystemTime::now()
+        .duration_since(start_time)
+        .unwrap_or(Duration::from_secs(0));
 
     if is_up == true {
         // Probe reports as sick?
@@ -202,21 +201,19 @@ fn proceed_replica_probe_http(url: &str, body_match: &Option<Regex>) -> bool {
 
         debug!(
             "prober poll result received for url: {} with status: {}",
-            &url_bang,
-            status_code
+            &url_bang, status_code
         );
 
         // Consider as UP?
-        if status_code >= APP_CONF.metrics.poll_http_status_healthy_above &&
-            status_code < APP_CONF.metrics.poll_http_status_healthy_below
+        if status_code >= APP_CONF.metrics.poll_http_status_healthy_above
+            && status_code < APP_CONF.metrics.poll_http_status_healthy_below
         {
             // Check response body for match? (if configured)
             if let &Some(ref body_match_regex) = body_match {
                 if let Ok(text) = response_inner.text() {
                     debug!(
                         "checking prober poll result response text for url: {} for any match: {}",
-                        &url_bang,
-                        &text
+                        &url_bang, &text
                     );
 
                     // Doesnt match? Consider as DOWN.
@@ -247,8 +244,7 @@ fn proceed_rabbitmq_queue_probe(
 ) -> (bool, Option<(u32, u32)>) {
     let url_queue = rabbitmq.api_url.join(&format!(
         "/api/queues/{}/{}",
-        rabbitmq.virtualhost,
-        rabbitmq_queue
+        rabbitmq.virtualhost, rabbitmq_queue
     ));
 
     if let Ok(url_queue_value) = url_queue {
@@ -285,8 +281,9 @@ fn proceed_rabbitmq_queue_probe(
                     ));
 
                     // Queue full?
-                    if response_json.messages_ready >= rabbitmq.queue_ready_healthy_below ||
-                        response_json.messages_unacknowledged >= rabbitmq.queue_nack_healthy_below
+                    if response_json.messages_ready >= rabbitmq.queue_ready_healthy_below
+                        || response_json.messages_unacknowledged
+                            >= rabbitmq.queue_nack_healthy_below
                     {
                         info!(
                             "got full rabbitmq queue: {} (ready: {}, unacknowledged: {})",
@@ -322,10 +319,7 @@ fn dispatch_polls() {
 
         debug!(
             "replica probe result: {}:{}:{} => {:?}",
-            &probe_replica.0,
-            &probe_replica.1,
-            &probe_replica.2,
-            replica_status
+            &probe_replica.0, &probe_replica.1, &probe_replica.2, replica_status
         );
 
         // Update replica status (write-lock the store)
@@ -362,10 +356,7 @@ fn dispatch_plugins_rabbitmq(probe_id: String, node_id: String, queue: Option<St
                     if let Some(retry_delay) = rabbitmq.queue_loaded_retry_delay {
                         debug!(
                             "rabbitmq queue is loaded, checking once again in {}ms: {}:{} [{}]",
-                            retry_delay,
-                            &probe_id,
-                            &node_id,
-                            queue_value
+                            retry_delay, &probe_id, &node_id, queue_value
                         );
 
                         thread::sleep(Duration::from_millis(retry_delay));
@@ -377,10 +368,7 @@ fn dispatch_plugins_rabbitmq(probe_id: String, node_id: String, queue: Option<St
 
                 debug!(
                     "rabbitmq queue probe result: {}:{} [{}] => {:?}",
-                    &probe_id,
-                    &node_id,
-                    queue_value,
-                    rabbitmq_queue_load.0
+                    &probe_id, &node_id, queue_value, rabbitmq_queue_load.0
                 );
 
                 // Update replica status (write-lock the store)
@@ -420,9 +408,7 @@ pub fn run_dispatch_plugins(probe_id: &str, node_id: &str, queue: Option<String>
             let self_probe_id = probe_id.to_owned();
             let self_node_id = node_id.to_owned();
 
-            thread::spawn(move || {
-                dispatch_plugins_rabbitmq(self_probe_id, self_node_id, queue)
-            });
+            thread::spawn(move || dispatch_plugins_rabbitmq(self_probe_id, self_node_id, queue));
         }
     }
 }
@@ -460,9 +446,7 @@ pub fn initialize_store() {
                 for replica in replicas {
                     debug!(
                         "prober store: got replica {}:{}:{}",
-                        service.id,
-                        node.id,
-                        replica
+                        service.id, node.id, replica
                     );
 
                     let replica_url = ReplicaURL::parse_from(replica).expect("invalid replica url");

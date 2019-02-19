@@ -4,15 +4,15 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
-use std::thread;
-use std::time::{SystemTime, Duration};
 use std::iter::FromIterator;
+use std::thread;
+use std::time::{Duration, SystemTime};
 use time;
 
-use crate::prober::status::Status;
-use crate::prober::mode::Mode;
-use crate::prober::manager::STORE as PROBER_STORE;
 use crate::notifier::generic::Notification;
+use crate::prober::manager::STORE as PROBER_STORE;
+use crate::prober::mode::Mode;
+use crate::prober::status::Status;
 use crate::APP_CONF;
 
 #[cfg(feature = "notifier-email")]
@@ -72,15 +72,13 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
                         if let Ok(duration_since_report) =
                             SystemTime::now().duration_since(replica_report.time)
                         {
-                            if duration_since_report >=
-                                (replica_report.interval +
-                                     Duration::from_secs(APP_CONF.metrics.push_delay_dead))
+                            if duration_since_report
+                                >= (replica_report.interval
+                                    + Duration::from_secs(APP_CONF.metrics.push_delay_dead))
                             {
                                 debug!(
                                     "replica: {}:{}:{} is dead because it didnt report in a while",
-                                    probe_id,
-                                    node_id,
-                                    replica_id
+                                    probe_id, node_id, replica_id
                                 );
 
                                 replica_status = Status::Dead;
@@ -91,14 +89,12 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
                     // Compare system load indices and compute a new status?
                     if replica_status == Status::Healthy {
                         if let Some(ref replica_load) = replica.load {
-                            if (replica_load.cpu > APP_CONF.metrics.push_system_cpu_sick_above) ||
-                                (replica_load.ram > APP_CONF.metrics.push_system_ram_sick_above)
+                            if (replica_load.cpu > APP_CONF.metrics.push_system_cpu_sick_above)
+                                || (replica_load.ram > APP_CONF.metrics.push_system_ram_sick_above)
                             {
                                 debug!(
                                     "replica: {}:{}:{} is sick because it is overloaded",
-                                    probe_id,
-                                    node_id,
-                                    replica_id
+                                    probe_id, node_id, replica_id
                                 );
 
                                 replica_status = Status::Sick;
@@ -125,10 +121,7 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
 
                 debug!(
                     "aggregated status for replica: {}:{}:{} => {:?}",
-                    probe_id,
-                    node_id,
-                    replica_id,
-                    replica_status
+                    probe_id, node_id, replica_id, replica_status
                 );
 
                 // Append bumped replica path?
@@ -146,9 +139,7 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
 
             debug!(
                 "aggregated status for node: {}:{} => {:?}",
-                probe_id,
-                node_id,
-                node_status
+                probe_id, node_id, node_status
             );
 
             node.status = node_status;
@@ -161,8 +152,7 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
 
         debug!(
             "aggregated status for probe: {} => {:?}",
-            probe_id,
-            probe_status
+            probe_id, probe_status
         );
 
         probe.status = probe_status;
@@ -177,9 +167,8 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
     //   - sick    >> dead
     //   - dead    >> sick
     //   - dead    >> healthy
-    let mut should_notify = (store.states.status != Status::Dead &&
-                                 general_status == Status::Dead) ||
-        (store.states.status == Status::Dead && general_status != Status::Dead);
+    let mut should_notify = (store.states.status != Status::Dead && general_status == Status::Dead)
+        || (store.states.status == Status::Dead && general_status != Status::Dead);
 
     // Check if should re-notify? (in case status did not change; only if dead)
     // Notice: this is used to send periodic reminders of downtime (ie. 'still down' messages)

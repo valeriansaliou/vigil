@@ -4,11 +4,11 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
-use base64;
-use rocket::Outcome;
-use rocket::http::Status;
-use rocket::request::{self, Request, FromRequest};
 use crate::APP_CONF;
+use base64;
+use rocket::http::Status;
+use rocket::request::{self, FromRequest, Request};
+use rocket::Outcome;
 
 pub struct ReporterGuard;
 

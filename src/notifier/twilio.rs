@@ -4,12 +4,12 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
-use std::time::Duration;
 use std::collections::HashMap;
+use std::time::Duration;
 
 use reqwest::Client;
 
-use super::generic::{DISPATCH_TIMEOUT_SECONDS, Notification, GenericNotifier};
+use super::generic::{GenericNotifier, Notification, DISPATCH_TIMEOUT_SECONDS};
 use crate::config::config::ConfigNotify;
 use crate::APP_CONF;
 

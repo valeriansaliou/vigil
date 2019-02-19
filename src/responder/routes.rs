@@ -11,10 +11,10 @@ use rocket::response::NamedFile;
 use rocket_contrib::json::Json;
 use rocket_contrib::templates::Template;
 
-use super::context::{INDEX_CONFIG, IndexContext};
 use super::asset_file::AssetFile;
+use super::context::{IndexContext, INDEX_CONFIG};
 use super::reporter_guard::ReporterGuard;
-use crate::prober::manager::{STORE as PROBER_STORE, run_dispatch_plugins};
+use crate::prober::manager::{run_dispatch_plugins, STORE as PROBER_STORE};
 use crate::prober::report::{handle as handle_report, HandleError};
 use crate::APP_CONF;
 
@@ -44,7 +44,11 @@ pub fn index() -> Template {
     Template::render("index", &context)
 }
 
-#[post("/reporter/<probe_id>/<node_id>", data = "<data>", format = "application/json")]
+#[post(
+    "/reporter/<probe_id>/<node_id>",
+    data = "<data>",
+    format = "application/json"
+)]
 pub fn reporter(
     _auth: ReporterGuard,
     probe_id: String,
@@ -84,15 +88,15 @@ pub fn status_text() -> &'static str {
 #[get("/badge/<kind>")]
 pub fn badge(kind: String) -> Option<NamedFile> {
     // Notice acquire lock in a block to release it ASAP (ie. before OS access to file)
-    let status = {
-        &PROBER_STORE.read().unwrap().states.status.as_str()
-    };
+    let status = { &PROBER_STORE.read().unwrap().states.status.as_str() };
 
-    NamedFile::open(APP_CONF.assets.path.join(format!(
-        "./images/badges/{}-{}-default.svg",
-        kind,
-        status
-    ))).ok()
+    NamedFile::open(
+        APP_CONF
+            .assets
+            .path
+            .join(format!("./images/badges/{}-{}-default.svg", kind, status)),
+    )
+    .ok()
 }
 
 #[get("/assets/fonts/<file..>")]

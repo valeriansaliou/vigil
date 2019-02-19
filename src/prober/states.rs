@@ -4,13 +4,13 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
-use std::time::{SystemTime, Duration};
+use std::time::{Duration, SystemTime};
 
 use indexmap::IndexMap;
 
+use super::mode::Mode;
 use super::replica::ReplicaURL;
 use super::status::Status;
-use super::mode::Mode;
 use crate::config::regex::Regex;
 
 #[derive(Serialize)]

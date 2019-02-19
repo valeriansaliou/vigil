@@ -6,14 +6,16 @@
 
 use std::time::Duration;
 
-use native_tls::TlsConnector;
-use lettre::smtp::{ClientSecurity, SmtpTransportBuilder, SmtpTransport, ConnectionReuseParameters};
 use lettre::smtp::authentication::Credentials;
 use lettre::smtp::client::net::ClientTlsParameters;
+use lettre::smtp::{
+    ClientSecurity, ConnectionReuseParameters, SmtpTransport, SmtpTransportBuilder,
+};
 use lettre::EmailTransport;
 use lettre_email::EmailBuilder;
+use native_tls::TlsConnector;
 
-use super::generic::{DISPATCH_TIMEOUT_SECONDS, Notification, GenericNotifier};
+use super::generic::{GenericNotifier, Notification, DISPATCH_TIMEOUT_SECONDS};
 use crate::config::config::ConfigNotify;
 use crate::APP_CONF;
 
@@ -47,9 +49,7 @@ impl GenericNotifier for EmailNotifier {
 
             message.push_str("\n--\n");
             message.push_str("\n");
-            message.push_str(
-                "To unsubscribe, please edit your status page configuration.",
-            );
+            message.push_str("To unsubscribe, please edit your status page configuration.");
 
             debug!("will send email notification with message: {}", &message);
 
@@ -76,9 +76,10 @@ impl GenericNotifier for EmailNotifier {
                 email_config.smtp_username.to_owned(),
                 email_config.smtp_password.to_owned(),
                 email_config.smtp_encrypt,
-            ).map(|mut transport| transport.send(&email_message))
-                .and(Ok(()))
-                .or(Err(true));
+            )
+            .map(|mut transport| transport.send(&email_message))
+            .and(Ok(()))
+            .or(Err(true));
         }
 
         Err(false)
@@ -129,10 +130,8 @@ fn acquire_transport(
 
             match (smtp_username, smtp_password) {
                 (Some(smtp_username_value), Some(smtp_password_value)) => {
-                    transport_builder = transport_builder.credentials(Credentials::new(
-                        smtp_username_value,
-                        smtp_password_value,
-                    ));
+                    transport_builder = transport_builder
+                        .credentials(Credentials::new(smtp_username_value, smtp_password_value));
                 }
                 _ => {}
             }

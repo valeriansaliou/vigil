@@ -5,15 +5,15 @@
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
 use std::fs::File;
-use std::path::{Path, PathBuf};
 use std::io;
 use std::ops::{Deref, DerefMut};
+use std::path::{Path, PathBuf};
 use time::{self, Duration};
 
+use rocket::http::hyper::header::{CacheControl, CacheDirective, Expires, HttpDate};
+use rocket::http::ContentType;
 use rocket::request::Request;
 use rocket::response::{self, Responder};
-use rocket::http::ContentType;
-use rocket::http::hyper::header::{CacheControl, CacheDirective, Expires, HttpDate};
 
 const ASSETS_EXPIRE_SECONDS: u32 = 10800;
 
@@ -60,8 +60,7 @@ impl<'r> Responder<'r> for AssetFile {
         ]));
 
         response.set_header(Expires(HttpDate(
-            time::now() +
-                Duration::seconds(ASSETS_EXPIRE_SECONDS as i64),
+            time::now() + Duration::seconds(ASSETS_EXPIRE_SECONDS as i64),
         )));
 
         // Set content type header?

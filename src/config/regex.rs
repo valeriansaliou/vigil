@@ -8,8 +8,8 @@ use std::fmt;
 use std::ops::Deref;
 
 use regex;
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde::de::{Error, Visitor};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 #[derive(Clone, Debug)]
 pub struct Regex(regex::Regex);
@@ -37,9 +37,9 @@ impl<'de> Deserialize<'de> for Regex {
             }
 
             fn visit_str<E: Error>(self, value: &str) -> Result<Regex, E> {
-                regex::Regex::new(value).map(Regex).map_err(|err| {
-                    E::custom(err.to_string())
-                })
+                regex::Regex::new(value)
+                    .map(Regex)
+                    .map_err(|err| E::custom(err.to_string()))
             }
         }
 

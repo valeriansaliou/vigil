@@ -16,18 +16,18 @@ extern crate lazy_static;
 extern crate serde_derive;
 #[macro_use]
 extern crate rocket;
-extern crate time;
-extern crate toml;
 extern crate base64;
-extern crate url;
-extern crate serde;
-extern crate url_serde;
 extern crate indexmap;
-extern crate rocket_contrib;
-extern crate regex;
 extern crate native_tls;
 extern crate openssl_probe;
+extern crate regex;
 extern crate reqwest;
+extern crate rocket_contrib;
+extern crate serde;
+extern crate time;
+extern crate toml;
+extern crate url;
+extern crate url_serde;
 
 #[cfg(feature = "notifier-email")]
 extern crate lettre;
@@ -37,25 +37,25 @@ extern crate lettre_email;
 #[cfg(feature = "notifier-xmpp")]
 extern crate libstrophe;
 
-mod config;
 mod aggregator;
+mod config;
+mod notifier;
 mod prober;
 mod responder;
-mod notifier;
 
-use std::thread;
 use std::ops::Deref;
 use std::str::FromStr;
+use std::thread;
 use std::time::Duration;
 
 use clap::{App, Arg};
 use log::LevelFilter;
 
+use crate::aggregator::manager::run as run_aggregator;
 use crate::config::config::Config;
 use crate::config::logger::ConfigLogger;
 use crate::config::reader::ConfigReader;
-use crate::prober::manager::{run as run_prober, initialize_store as initialize_store_prober};
-use crate::aggregator::manager::run as run_aggregator;
+use crate::prober::manager::{initialize_store as initialize_store_prober, run as run_prober};
 use crate::responder::manager::run as run_responder;
 
 struct AppArgs {
@@ -67,7 +67,7 @@ pub static THREAD_NAME_AGGREGATOR: &'static str = "vigil-aggregator";
 pub static THREAD_NAME_RESPONDER: &'static str = "vigil-responder";
 
 macro_rules! gen_spawn_managed {
-    ($name:expr, $method:ident, $thread_name:ident, $managed_fn:ident) => (
+    ($name:expr, $method:ident, $thread_name:ident, $managed_fn:ident) => {
         fn $method() {
             debug!("spawn managed thread: {}", $name);
 
@@ -92,7 +92,7 @@ macro_rules! gen_spawn_managed {
                 $method();
             }
         }
-    )
+    };
 }
 
 lazy_static! {
@@ -130,7 +130,9 @@ fn make_app_args() -> AppArgs {
         .get_matches();
 
     // Generate owned app arguments
-    AppArgs { config: String::from(matches.value_of("config").expect("invalid config value")) }
+    AppArgs {
+        config: String::from(matches.value_of("config").expect("invalid config value")),
+    }
 }
 
 fn ensure_states() {
@@ -151,9 +153,9 @@ fn main() {
     openssl_probe::init_ssl_cert_env_vars();
 
     // Initialize shared logger
-    let _logger = ConfigLogger::init(LevelFilter::from_str(&APP_CONF.server.log_level).expect(
-        "invalid log level",
-    ));
+    let _logger = ConfigLogger::init(
+        LevelFilter::from_str(&APP_CONF.server.log_level).expect("invalid log level"),
+    );
 
     info!("starting up");
 

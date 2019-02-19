@@ -20,9 +20,8 @@ impl ConfigReader {
         let mut file = File::open(&APP_ARGS.config).expect("cannot find config file");
         let mut conf = String::new();
 
-        file.read_to_string(&mut conf).expect(
-            "cannot read config file",
-        );
+        file.read_to_string(&mut conf)
+            .expect("cannot read config file");
 
         debug!("read config file: {}", &APP_ARGS.config);
 

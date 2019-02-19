@@ -4,14 +4,16 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
-use std::time::{SystemTime, Duration};
+use std::time::{Duration, SystemTime};
 
-use super::states::{ServiceStatesProbeNodeReplica, ServiceStatesProbeNodeReplicaMetrics,
-                    ServiceStatesProbeNodeReplicaMetricsSystem, ServiceStatesProbeNodeReplicaLoad,
-                    ServiceStatesProbeNodeReplicaReport};
+use super::states::{
+    ServiceStatesProbeNodeReplica, ServiceStatesProbeNodeReplicaLoad,
+    ServiceStatesProbeNodeReplicaMetrics, ServiceStatesProbeNodeReplicaMetricsSystem,
+    ServiceStatesProbeNodeReplicaReport,
+};
 use crate::prober::manager::STORE as PROBER_STORE;
-use crate::prober::status::Status;
 use crate::prober::mode::Mode;
+use crate::prober::status::Status;
 
 pub enum HandleError {
     InvalidLoad,
@@ -44,7 +46,7 @@ pub fn handle(
             }
 
             // Acquire previous replica status + previous queue load status (follow-up values)
-            let (mut status, mut metrics, mut load_queue);
+            let (status, mut metrics, mut load_queue);
 
             load_queue = false;
 
@@ -91,9 +93,7 @@ pub fn handle(
 
     warn!(
         "report could not be stored: {}:{}:{}",
-        probe_id,
-        node_id,
-        replica_id
+        probe_id, node_id, replica_id
     );
 
     Err(HandleError::NotFound)
