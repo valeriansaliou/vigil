@@ -16,7 +16,7 @@ use super::asset_file::AssetFile;
 use super::reporter_guard::ReporterGuard;
 use prober::manager::{STORE as PROBER_STORE, run_dispatch_plugins};
 use prober::report::{handle as handle_report, HandleError};
-use APP_CONF;
+use crate::APP_CONF;
 
 #[derive(Deserialize)]
 pub struct ReporterData {

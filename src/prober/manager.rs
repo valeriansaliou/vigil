@@ -24,7 +24,7 @@ use super::states::{ServiceStates, ServiceStatesProbe, ServiceStatesProbeNode,
                     ServiceStatesProbeNodeReplicaMetricsRabbitMQ};
 use super::replica::ReplicaURL;
 use super::status::Status;
-use APP_CONF;
+use crate::APP_CONF;
 
 const PROBE_HOLD_MILLISECONDS: u64 = 250;
 

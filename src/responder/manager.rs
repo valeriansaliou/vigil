@@ -12,7 +12,7 @@ use rocket_contrib::templates::Template;
 
 use super::routes;
 
-use APP_CONF;
+use crate::APP_CONF;
 
 pub fn run() {
     // Build Rocket configuration

@@ -13,7 +13,7 @@ use libstrophe::error::StreamError;
 
 use super::generic::{DISPATCH_TIMEOUT_SECONDS, Notification, GenericNotifier};
 use config::config::ConfigNotify;
-use APP_CONF;
+use crate::APP_CONF;
 
 pub struct XMPPNotifier;
 

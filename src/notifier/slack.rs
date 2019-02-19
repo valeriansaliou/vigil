@@ -11,7 +11,7 @@ use reqwest::Client;
 use super::generic::{DISPATCH_TIMEOUT_SECONDS, Notification, GenericNotifier};
 use prober::status::Status;
 use config::config::ConfigNotify;
-use APP_CONF;
+use crate::APP_CONF;
 
 lazy_static! {
     static ref SLACK_HTTP_CLIENT: Client = Client::builder()

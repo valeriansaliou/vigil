@@ -13,7 +13,7 @@ use prober::status::Status;
 use prober::mode::Mode;
 use prober::manager::STORE as PROBER_STORE;
 use notifier::generic::Notification;
-use APP_CONF;
+use crate::APP_CONF;
 
 #[cfg(feature = "notifier-email")]
 use notifier::email::EmailNotifier;

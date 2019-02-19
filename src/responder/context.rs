@@ -7,7 +7,7 @@
 use url_serde::SerdeUrl;
 
 use prober::states::ServiceStates;
-use APP_CONF;
+use crate::APP_CONF;
 
 const LOGO_EXTENSION_SPLIT_SPAN: usize = 4;
 

@@ -9,7 +9,7 @@ use std::io::Read;
 use toml;
 
 use super::config::*;
-use APP_ARGS;
+use crate::APP_ARGS;
 
 pub struct ConfigReader;
 
