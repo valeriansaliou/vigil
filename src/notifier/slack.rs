@@ -9,8 +9,8 @@ use std::time::Duration;
 use reqwest::Client;
 
 use super::generic::{DISPATCH_TIMEOUT_SECONDS, Notification, GenericNotifier};
-use prober::status::Status;
-use config::config::ConfigNotify;
+use crate::prober::status::Status;
+use crate::config::config::ConfigNotify;
 use crate::APP_CONF;
 
 lazy_static! {

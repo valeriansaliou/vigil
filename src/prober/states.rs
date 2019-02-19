@@ -11,7 +11,7 @@ use indexmap::IndexMap;
 use super::replica::ReplicaURL;
 use super::status::Status;
 use super::mode::Mode;
-use config::regex::Regex;
+use crate::config::regex::Regex;
 
 #[derive(Serialize)]
 pub struct ServiceStates {

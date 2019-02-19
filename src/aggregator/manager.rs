@@ -9,20 +9,20 @@ use std::time::{SystemTime, Duration};
 use std::iter::FromIterator;
 use time;
 
-use prober::status::Status;
-use prober::mode::Mode;
-use prober::manager::STORE as PROBER_STORE;
-use notifier::generic::Notification;
+use crate::prober::status::Status;
+use crate::prober::mode::Mode;
+use crate::prober::manager::STORE as PROBER_STORE;
+use crate::notifier::generic::Notification;
 use crate::APP_CONF;
 
 #[cfg(feature = "notifier-email")]
-use notifier::email::EmailNotifier;
+use crate::notifier::email::EmailNotifier;
 
 #[cfg(feature = "notifier-twilio")]
-use notifier::twilio::TwilioNotifier;
+use crate::notifier::twilio::TwilioNotifier;
 
 #[cfg(feature = "notifier-slack")]
-use notifier::slack::SlackNotifier;
+use crate::notifier::slack::SlackNotifier;
 
 #[cfg(feature = "notifier-xmpp")]
 use notifier::xmpp::XMPPNotifier;

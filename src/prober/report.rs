@@ -9,9 +9,9 @@ use std::time::{SystemTime, Duration};
 use super::states::{ServiceStatesProbeNodeReplica, ServiceStatesProbeNodeReplicaMetrics,
                     ServiceStatesProbeNodeReplicaMetricsSystem, ServiceStatesProbeNodeReplicaLoad,
                     ServiceStatesProbeNodeReplicaReport};
-use prober::manager::STORE as PROBER_STORE;
-use prober::status::Status;
-use prober::mode::Mode;
+use crate::prober::manager::STORE as PROBER_STORE;
+use crate::prober::status::Status;
+use crate::prober::mode::Mode;
 
 pub enum HandleError {
     InvalidLoad,

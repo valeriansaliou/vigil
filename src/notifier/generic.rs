@@ -7,8 +7,8 @@
 use std::thread;
 use std::time::Duration;
 
-use prober::status::Status;
-use config::config::ConfigNotify;
+use crate::prober::status::Status;
+use crate::config::config::ConfigNotify;
 
 const DISPATCH_TRY_WAIT_SECONDS: u64 = 2;
 const DISPATCH_TRY_ATTEMPT_TIMES: u8 = 3;

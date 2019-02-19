@@ -10,7 +10,7 @@ use std::collections::HashMap;
 use reqwest::Client;
 
 use super::generic::{DISPATCH_TIMEOUT_SECONDS, Notification, GenericNotifier};
-use config::config::ConfigNotify;
+use crate::config::config::ConfigNotify;
 use crate::APP_CONF;
 
 lazy_static! {

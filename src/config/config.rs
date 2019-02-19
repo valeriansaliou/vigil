@@ -11,7 +11,7 @@ use url_serde::SerdeUrl;
 
 use super::defaults;
 use super::regex::Regex;
-use prober::mode::Mode;
+use crate::prober::mode::Mode;
 
 #[derive(Deserialize)]
 pub struct Config {

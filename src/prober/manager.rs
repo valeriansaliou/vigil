@@ -15,10 +15,10 @@ use reqwest::{Client, StatusCode, RedirectPolicy};
 use reqwest::header::{HeaderMap, USER_AGENT};
 use indexmap::IndexMap;
 
-use config::config::ConfigPluginsRabbitMQ;
-use config::regex::Regex;
-use prober::manager::STORE as PROBER_STORE;
-use prober::mode::Mode;
+use crate::config::config::ConfigPluginsRabbitMQ;
+use crate::config::regex::Regex;
+use crate::prober::manager::STORE as PROBER_STORE;
+use crate::prober::mode::Mode;
 use super::states::{ServiceStates, ServiceStatesProbe, ServiceStatesProbeNode,
                     ServiceStatesProbeNodeReplica, ServiceStatesProbeNodeReplicaMetrics,
                     ServiceStatesProbeNodeReplicaMetricsRabbitMQ};

@@ -14,7 +14,7 @@ use lettre::EmailTransport;
 use lettre_email::EmailBuilder;
 
 use super::generic::{DISPATCH_TIMEOUT_SECONDS, Notification, GenericNotifier};
-use config::config::ConfigNotify;
+use crate::config::config::ConfigNotify;
 use crate::APP_CONF;
 
 pub struct EmailNotifier;

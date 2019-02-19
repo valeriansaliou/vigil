@@ -51,12 +51,12 @@ use std::time::Duration;
 use clap::{App, Arg};
 use log::LevelFilter;
 
-use config::config::Config;
-use config::logger::ConfigLogger;
-use config::reader::ConfigReader;
-use prober::manager::{run as run_prober, initialize_store as initialize_store_prober};
-use aggregator::manager::run as run_aggregator;
-use responder::manager::run as run_responder;
+use crate::config::config::Config;
+use crate::config::logger::ConfigLogger;
+use crate::config::reader::ConfigReader;
+use crate::prober::manager::{run as run_prober, initialize_store as initialize_store_prober};
+use crate::aggregator::manager::run as run_aggregator;
+use crate::responder::manager::run as run_responder;
 
 struct AppArgs {
     config: String,
