@@ -16,11 +16,18 @@ lazy_static! {
         runtime_version: env!("CARGO_PKG_VERSION").to_string(),
         page_title: APP_CONF.branding.page_title.to_owned(),
         company_name: APP_CONF.branding.company_name.to_owned(),
+
         icon_color: APP_CONF.branding.icon_color.to_owned(),
         icon_url: APP_CONF.branding.icon_url.to_owned(),
         icon_mime: ImageMime::guess_from(APP_CONF.branding.icon_url.as_str()),
+
+        apple_icon_color: APP_CONF.branding.apple_icon_color.to_owned(),
+        apple_icon_url: APP_CONF.branding.apple_icon_url.to_owned(),
+        apple_icon_mime: ImageMime::guess_from(APP_CONF.branding.apple_icon_url.as_str()),
+
         logo_color: APP_CONF.branding.logo_color.to_owned(),
         logo_url: APP_CONF.branding.logo_url.to_owned(),
+
         website_url: APP_CONF.branding.website_url.to_owned(),
         support_url: APP_CONF.branding.support_url.to_owned(),
         custom_html: APP_CONF.branding.custom_html.to_owned(),
@@ -71,11 +78,18 @@ pub struct IndexContextConfig {
     pub runtime_version: String,
     pub page_title: String,
     pub company_name: String,
+
     pub icon_color: String,
     pub icon_url: SerdeUrl,
     pub icon_mime: ImageMime,
+
+    pub apple_icon_color: String,
+    pub apple_icon_url: SerdeUrl,
+    pub apple_icon_mime: ImageMime,
+
     pub logo_color: String,
     pub logo_url: SerdeUrl,
+
     pub website_url: SerdeUrl,
     pub support_url: SerdeUrl,
     pub custom_html: Option<String>,

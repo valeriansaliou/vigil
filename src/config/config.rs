@@ -51,10 +51,16 @@ pub struct ConfigBranding {
 
     pub page_url: SerdeUrl,
     pub company_name: String,
+
     pub icon_color: String,
     pub icon_url: SerdeUrl,
+
+    pub apple_icon_color: String,
+    pub apple_icon_url: SerdeUrl,
+
     pub logo_color: String,
     pub logo_url: SerdeUrl,
+
     pub website_url: SerdeUrl,
     pub support_url: SerdeUrl,
     pub custom_html: Option<String>,

@@ -34,11 +34,9 @@ pub struct ReporterDataLoad {
 #[get("/")]
 pub fn index() -> Template {
     // Notice acquire lock in a block to release it ASAP (ie. before template renders)
-    let context = {
-        IndexContext {
-            states: &PROBER_STORE.read().unwrap().states,
-            config: &*INDEX_CONFIG,
-        }
+    let context = IndexContext {
+        states: &PROBER_STORE.read().unwrap().states,
+        config: &*INDEX_CONFIG,
     };
 
     Template::render("index", &context)

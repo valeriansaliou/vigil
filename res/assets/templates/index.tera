@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link rel="icon" href="{{ config.icon_url | escape }}" type="{{ config.icon_mime | escape }}">
-    <link rel="apple-touch-icon" href="{{ config.icon_url | escape }}" type="{{ config.icon_mime | escape }}">
+    <link rel="apple-touch-icon" href="{{ config.apple_icon_url | escape }}" type="{{ config.apple_icon_mime | escape }}">
 
     <meta name="msapplication-TileColor" content="{{ config.icon_color | escape }}">
     <meta name="msapplication-TileImage" content="{{ config.icon_url | escape }}">
