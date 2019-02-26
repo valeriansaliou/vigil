@@ -123,8 +123,12 @@ impl GenericNotifier for SlackNotifier {
         Err(false)
     }
 
-    fn is_enabled(notify: &ConfigNotify) -> bool {
-        notify.slack.is_some()
+    fn can_notify(notify: &ConfigNotify, notification: &Notification) -> bool {
+        if let Some(ref slack_config) = notify.slack {
+            notification.expected(slack_config.reminders_only)
+        } else {
+            false
+        }
     }
 
     fn name() -> &'static str {

@@ -109,8 +109,12 @@ impl GenericNotifier for XMPPNotifier {
         Err(false)
     }
 
-    fn is_enabled(notify: &ConfigNotify) -> bool {
-        notify.xmpp.is_some()
+    fn can_notify(notify: &ConfigNotify, notification: &Notification) -> bool {
+        if let Some(ref xmpp_config) = notify.xmpp {
+            notification.expected(xmpp_config.reminders_only)
+        } else {
+            false
+        }
     }
 
     fn name() -> &'static str {

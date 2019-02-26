@@ -74,3 +74,19 @@ pub fn notify_email_smtp_port() -> u16 {
 pub fn notify_email_smtp_encrypt() -> bool {
     true
 }
+
+pub fn notify_email_reminders_only() -> bool {
+    true
+}
+
+pub fn notify_twilio_reminders_only() -> bool {
+    true
+}
+
+pub fn notify_slack_reminders_only() -> bool {
+    true
+}
+
+pub fn notify_xmpp_reminders_only() -> bool {
+    true
+}

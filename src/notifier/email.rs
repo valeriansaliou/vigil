@@ -85,8 +85,12 @@ impl GenericNotifier for EmailNotifier {
         Err(false)
     }
 
-    fn is_enabled(notify: &ConfigNotify) -> bool {
-        notify.email.is_some()
+    fn can_notify(notify: &ConfigNotify, notification: &Notification) -> bool {
+        if let Some(ref email_config) = notify.email {
+            notification.expected(email_config.reminders_only)
+        } else {
+            false
+        }
     }
 
     fn name() -> &'static str {

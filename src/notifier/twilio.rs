@@ -81,8 +81,12 @@ impl GenericNotifier for TwilioNotifier {
         Err(false)
     }
 
-    fn is_enabled(notify: &ConfigNotify) -> bool {
-        notify.twilio.is_some()
+    fn can_notify(notify: &ConfigNotify, notification: &Notification) -> bool {
+        if let Some(ref twilio_config) = notify.twilio {
+            notification.expected(twilio_config.reminders_only)
+        } else {
+            false
+        }
     }
 
     fn name() -> &'static str {

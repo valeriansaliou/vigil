@@ -131,6 +131,9 @@ pub struct ConfigNotifyEmail {
 
     #[serde(default = "defaults::notify_email_smtp_encrypt")]
     pub smtp_encrypt: bool,
+
+    #[serde(default = "defaults::notify_email_reminders_only")]
+    pub reminders_only: bool,
 }
 
 #[derive(Deserialize)]
@@ -139,11 +142,17 @@ pub struct ConfigNotifyTwilio {
     pub service_sid: String,
     pub account_sid: String,
     pub auth_token: String,
+
+    #[serde(default = "defaults::notify_twilio_reminders_only")]
+    pub reminders_only: bool,
 }
 
 #[derive(Deserialize)]
 pub struct ConfigNotifySlack {
     pub hook_url: SerdeUrl,
+
+    #[serde(default = "defaults::notify_slack_reminders_only")]
+    pub reminders_only: bool,
 }
 
 #[derive(Deserialize)]
@@ -151,6 +160,9 @@ pub struct ConfigNotifyXMPP {
     pub to: String,
     pub from: String,
     pub xmpp_password: String,
+
+    #[serde(default = "defaults::notify_xmpp_reminders_only")]
+    pub reminders_only: bool,
 }
 
 #[derive(Deserialize)]

@@ -181,6 +181,7 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 * `smtp_username` (type: _string_, allowed: any string, no default) — SMTP username to use for authentication (if any)
 * `smtp_password` (type: _string_, allowed: any string, no default) — SMTP password to use for authentication (if any)
 * `smtp_encrypt` (type: _boolean_, allowed: `true`, `false`, default: `true`) — Whether to encrypt SMTP connection with `STARTTLS` or not
+* `reminders_only` (type: _boolean_, allowed: `true`, `false`, default: `false`) — Whether to send emails only for downtime reminders or everytime
 
 **[notify.twilio]**
 
@@ -188,10 +189,12 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 * `service_sid` (type: _string_, allowed: any string, no default) — Twilio service identifier (ie. `Service Sid`)
 * `account_sid` (type: _string_, allowed: any string, no default) — Twilio account identifier (ie. `Account Sid`)
 * `auth_token` (type: _string_, allowed: any string, no default) — Twilio authentication token (ie. `Auth Token`)
+* `reminders_only` (type: _boolean_, allowed: `true`, `false`, default: `false`) — Whether to send text messages only for downtime reminders or everytime
 
 **[notify.slack]**
 
 * `hook_url` (type: _string_, allowed: URL, no default) — Slack hook URL (ie. `https://hooks.slack.com/[..]`)
+* `reminders_only` (type: _boolean_, allowed: `true`, `false`, default: `false`) — Whether to send Slack messages only for downtime reminders or everytime
 
 **[notify.xmpp]**
 
@@ -200,6 +203,7 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 * `to` (type: _string_, allowed: Jabber ID, no default) — Jabber ID (JID) to which to send messages
 * `from` (type: _string_, allowed: Jabber ID, no default) — Jabber ID (JID) from which to send messages
 * `xmpp_password` (type: _string_, allowed: any string, no default) — XMPP account password to use for authentication
+* `reminders_only` (type: _boolean_, allowed: `true`, `false`, default: `false`) — Whether to send messages only for downtime reminders or everytime
 
 **[probe]**
 
