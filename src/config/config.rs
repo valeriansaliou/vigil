@@ -135,8 +135,8 @@ pub struct ConfigNotifyEmail {
 
 #[derive(Deserialize)]
 pub struct ConfigNotifyTwilio {
-    pub to: String,
-    pub from: String,
+    pub to: Vec<String>,
+    pub service_sid: String,
     pub account_sid: String,
     pub auth_token: String,
 }

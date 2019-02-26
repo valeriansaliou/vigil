@@ -41,30 +41,41 @@ impl GenericNotifier for TwilioNotifier {
 
             debug!("will send Twilio notification with message: {}", &message);
 
-            // Build form parameters
-            let mut params = HashMap::new();
+            let mut has_sub_delivery_failure = false;
 
-            params.insert("To", &twilio.to);
-            params.insert("From", &twilio.from);
-            params.insert("Body", &message);
+            for to_number in &twilio.to {
+                // Build form parameters
+                let mut params = HashMap::new();
 
-            // Submit message to Twilio
-            let response = TWILIO_HTTP_CLIENT
-                .post(&generate_api_url(&twilio.account_sid))
-                .basic_auth(
-                    twilio.account_sid.as_str(),
-                    Some(twilio.auth_token.as_str()),
-                )
-                .form(&params)
-                .send();
+                params.insert("MessagingServiceSid", &twilio.service_sid);
+                params.insert("To", to_number);
+                params.insert("Body", &message);
 
-            if let Ok(response_inner) = response {
-                if response_inner.status().is_success() == true {
-                    return Ok(());
+                // Submit message to Twilio
+                let response = TWILIO_HTTP_CLIENT
+                    .post(&generate_api_url(&twilio.account_sid))
+                    .basic_auth(
+                        twilio.account_sid.as_str(),
+                        Some(twilio.auth_token.as_str()),
+                    )
+                    .form(&params)
+                    .send();
+
+                // Check for any failure
+                if let Ok(response_inner) = response {
+                    if response_inner.status().is_success() != true {
+                        has_sub_delivery_failure = true;
+                    }
+                } else {
+                    has_sub_delivery_failure = true;
                 }
             }
 
-            return Err(true);
+            if has_sub_delivery_failure == true {
+                return Err(true);
+            }
+
+            return Ok(());
         }
 
         Err(false)

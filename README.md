@@ -184,10 +184,10 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 
 **[notify.twilio]**
 
-* `to` (type: _string_, allowed: phone number, no default) — Phone number to which to send text messages
-* `from` (type: _string_, allowed: phone number, no default) — Phone number from which to send text messages (this number must be available for use in your Twilio account)
-* `account_sid` (type: _string_, allowed: any string, no default) — Twilio account identifier (ie. `Sid`)
-* `auth_token` (type: _string_, allowed: any string, no default) — Twilio authentication token (ie. `AuthToken`)
+* `to` (type: _array[string]_, allowed: phone numbers, no default) — List of phone numbers to which to send text messages
+* `service_sid` (type: _string_, allowed: any string, no default) — Twilio service identifier (ie. `Service Sid`)
+* `account_sid` (type: _string_, allowed: any string, no default) — Twilio account identifier (ie. `Account Sid`)
+* `auth_token` (type: _string_, allowed: any string, no default) — Twilio authentication token (ie. `Auth Token`)
 
 **[notify.slack]**
 
