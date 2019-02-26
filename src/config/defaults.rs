@@ -76,17 +76,17 @@ pub fn notify_email_smtp_encrypt() -> bool {
 }
 
 pub fn notify_email_reminders_only() -> bool {
-    true
+    false
 }
 
 pub fn notify_twilio_reminders_only() -> bool {
-    true
+    false
 }
 
 pub fn notify_slack_reminders_only() -> bool {
-    true
+    false
 }
 
 pub fn notify_xmpp_reminders_only() -> bool {
-    true
+    false
 }
