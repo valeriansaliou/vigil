@@ -13,7 +13,7 @@ use libstrophe::{Connection, ConnectionEvent, Context, Stanza};
 
 use super::generic::{GenericNotifier, Notification, DISPATCH_TIMEOUT_SECONDS};
 use crate::APP_CONF;
-use config::config::ConfigNotify;
+use crate::config::config::ConfigNotify;
 
 pub struct XMPPNotifier;
 

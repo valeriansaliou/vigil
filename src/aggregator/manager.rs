@@ -25,7 +25,7 @@ use crate::notifier::twilio::TwilioNotifier;
 use crate::notifier::slack::SlackNotifier;
 
 #[cfg(feature = "notifier-xmpp")]
-use notifier::xmpp::XMPPNotifier;
+use crate::notifier::xmpp::XMPPNotifier;
 
 const AGGREGATE_INTERVAL_SECONDS: u64 = 10;
 
