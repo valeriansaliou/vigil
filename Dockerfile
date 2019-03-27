@@ -1,8 +1,7 @@
 FROM rustlang/rust:nightly AS build
 
 RUN apt-get update
-RUN apt-get install -y libstrophe-dev
-RUN cargo install vigil-server --all-features
+RUN cargo install vigil-server
 
 FROM debian:stretch-slim
 
