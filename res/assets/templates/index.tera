@@ -156,11 +156,11 @@
                             <span class="tooltip-value-details">
                               {% if replica.metrics.system %}
                                 <span class="tooltip-detail font-sans-regular">
-                                  <span class="tooltip-detail-label font-sans-semibold">CPU</span>: {{ replica.metrics.system.cpu }}%
+                                  <span class="tooltip-detail-label font-sans-semibold">Load</span>: {{ replica.metrics.system.cpu }}%
                                 </span>
 
                                 <span class="tooltip-detail font-sans-regular">
-                                  <span class="tooltip-detail-label font-sans-semibold">RAM</span>: {{ replica.metrics.system.ram }}%
+                                  <span class="tooltip-detail-label font-sans-semibold">Memory</span>: {{ replica.metrics.system.ram }}%
                                 </span>
                               {% endif %}
 
