@@ -7,6 +7,7 @@ We consider here the packaging flow of Vigil version `1.0.0` for Linux, for targ
 
 1. **How to setup `rust-musl-builder` on MacOS:**
     1. Follow setup instructions from: [rust-musl-builder](https://github.com/emk/rust-musl-builder)
+    2. Pull the nightly Docker image: `docker pull ekidd/rust-musl-builder:nightly`
 
 2. **How to bump Vigil version before a release:**
     1. Bump version in `Cargo.toml` to `1.0.0`
