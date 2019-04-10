@@ -15,11 +15,11 @@ We consider here the packaging flow of Vigil version `1.0.0` for Linux, for targ
 
 3. **How to build Vigil for Linux on MacOS:**
     1. `rust-musl-builder-nightly cargo build --target=x86_64-unknown-linux-musl --release`
+    2. `rust-musl-builder-nightly strip ./target/x86_64-unknown-linux-musl/release/vigil`
 
 4. **How to package built binary and release it on GitHub:**
     1. `mkdir vigil`
     2. `mv target/x86_64-unknown-linux-musl/release/vigil vigil/`
-    3. `strip vigil/vigil`
     4. `cp -r config.cfg res vigil/`
     5. `tar -czvf v1.0.0-x86_64.tar.gz vigil`
     6. `rm -r vigil/`
