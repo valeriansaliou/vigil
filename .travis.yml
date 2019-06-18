@@ -5,8 +5,5 @@ rust:
 cache: cargo
 
 script:
-  - rustc --version
-  - rustup --version
-  - cargo --version
   - cargo clean && cargo build --verbose --no-default-features --features "notifier-twilio","notifier-slack"
-  - cargo test --verbose
+  - cargo test --verbose --no-default-features --features "notifier-twilio","notifier-slack"
