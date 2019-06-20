@@ -14,7 +14,6 @@ RUN rustc --version && \
 
 RUN cargo clean && cargo build --release
 
-
 FROM debian:stretch-slim
 
 WORKDIR /usr/src/vigil
