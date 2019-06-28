@@ -190,7 +190,7 @@
     </main>
 
     <footer class="wrapper">
-      <p class="font-sans-semibold">© 2018 {{ config.company_name | escape }}</p>
+      <p class="font-sans-semibold">© {{ environment.year }} {{ config.company_name | escape }}</p>
       <p class="font-sans-regular">This status page is powered by <a href="https://github.com/valeriansaliou/vigil" target="_blank" class="font-sans-semibold">Vigil</a>.</p>
     </footer>
   </body>

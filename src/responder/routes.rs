@@ -12,7 +12,7 @@ use rocket_contrib::json::Json;
 use rocket_contrib::templates::Template;
 
 use super::asset_file::AssetFile;
-use super::context::{IndexContext, INDEX_CONFIG};
+use super::context::{IndexContext, INDEX_CONFIG, INDEX_ENVIRONMENT};
 use super::reporter_guard::ReporterGuard;
 use crate::prober::manager::{run_dispatch_plugins, STORE as PROBER_STORE};
 use crate::prober::report::{handle as handle_report, HandleError};
@@ -37,6 +37,7 @@ pub fn index() -> Template {
     let context = {
         IndexContext {
             states: &PROBER_STORE.read().unwrap().states,
+            environment: &*INDEX_ENVIRONMENT,
             config: &*INDEX_CONFIG,
         }
     };

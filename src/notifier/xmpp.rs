@@ -12,8 +12,8 @@ use libstrophe::error::StreamError;
 use libstrophe::{Connection, ConnectionEvent, Context, Stanza};
 
 use super::generic::{GenericNotifier, Notification, DISPATCH_TIMEOUT_SECONDS};
-use crate::APP_CONF;
 use crate::config::config::ConfigNotify;
+use crate::APP_CONF;
 
 pub struct XMPPNotifier;
 

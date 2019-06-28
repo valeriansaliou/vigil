@@ -4,6 +4,7 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
+use time;
 use url_serde::SerdeUrl;
 
 use crate::prober::states::ServiceStates;
@@ -25,6 +26,7 @@ lazy_static! {
         support_url: APP_CONF.branding.support_url.to_owned(),
         custom_html: APP_CONF.branding.custom_html.to_owned(),
     };
+    pub static ref INDEX_ENVIRONMENT: IndexContextEnvironment = IndexContextEnvironment::default();
 }
 
 #[derive(Serialize)]
@@ -60,9 +62,18 @@ impl ImageMime {
     }
 }
 
+impl Default for IndexContextEnvironment {
+    fn default() -> Self {
+        IndexContextEnvironment {
+            year: 1900 + (time::now().tm_year as u16),
+        }
+    }
+}
+
 #[derive(Serialize)]
 pub struct IndexContext<'a, 'b> {
     pub states: &'a ServiceStates,
+    pub environment: &'a IndexContextEnvironment,
     pub config: &'b IndexContextConfig,
 }
 
@@ -79,4 +90,9 @@ pub struct IndexContextConfig {
     pub website_url: SerdeUrl,
     pub support_url: SerdeUrl,
     pub custom_html: Option<String>,
+}
+
+#[derive(Serialize)]
+pub struct IndexContextEnvironment {
+    pub year: u16,
 }
