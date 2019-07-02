@@ -276,7 +276,7 @@ If you are using the Webhook notifier in Vigil, you will receive a JSON-formatte
 
 Webhook notifications can be tested with eg. [Webhook.site](https://webhook.site/), before you integrate them to your custom endpoint.
 
-_You can use those Webhook payloads to create custom notifiers to anywhere. For instance, if you are using Microsoft Teams but not Slack, you may write a tiny PHP script that receives Webhooks from Vigil and forwards a notification in Microsoft Teams. This can be handy; while Vigil only implements convenience notifiers for some selected channels, Webhook allows you to extend beyond that._
+_You can use those Webhook payloads to create custom notifiers to anywhere. For instance, if you are using Microsoft Teams but not Slack, you may write a tiny PHP script that receives Webhooks from Vigil and forwards a notification in Microsoft Teams. This can be handy; while Vigil only implements convenience notifiers for some selected channels, the Webhook notifier allows you to extend beyond that._
 
 ## How can I integrate Vigil Reporter in my code?
 
