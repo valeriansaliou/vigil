@@ -35,7 +35,7 @@ _👋 You use Vigil and you want to be listed there? [Contact me](https://valeri
 ## Features
 
 * **Monitors automatically your infrastructure services**
-* **Notifies you when a service gets down** or gets back up (via a configured channel: Slack, Email, Twilio SMS, XMPP or/and Web Hooks)
+* **Notifies you when a service gets down** or gets back up (via a configured channel: Slack, Email, Twilio SMS, XMPP or/and Webhook)
 * **Generates a status page**, that you can host on your domain for your public users (eg. `https://status.example.com`)
 
 ## How does it work?
@@ -263,6 +263,20 @@ You can also get nice realtime `down` and `up` alerts on your eg. iPhone and App
   <img src="https://valeriansaliou.github.io/vigil/images/alert-slack-watch.jpg" height="400" alt="Vigil up alert on Apple Watch (Slack)" />
   <img src="https://valeriansaliou.github.io/vigil/images/alert-twilio-iphone.png" height="400" alt="Vigil alerts on iPhone (Twilio SMS)" />
 <p>
+
+## What do Webhook payloads look like?
+
+If you are using the Webhook notifier in Vigil, you will receive a JSON-formatted payload with alert details upon any status change; plus reminders if `notify.reminder_interval` is configured.
+
+**Here is an example of a Webhook payload:**
+
+```json
+{"type": "changed", "status": "dead", "time": "08:58:28 UTC+0200", "replicas": ["web:core:tcp://edge-3.pool.net.crisp.chat:80"], "page": {"title": "Crisp Status","url": "https://status.crisp.chat/"}}
+```
+
+Webhook notifications can be tested with eg. [Webhook.site](https://webhook.site/), before you integrate them to your custom endpoint.
+
+_You can use those Webhook payloads to create custom notifiers to anywhere. For instance, if you are using Microsoft Teams but not Slack, you may write a tiny PHP script that receives Vigil Webhooks and send a notification in Microsoft Teams. This can be handy; as Vigil aims at implementing only convenience notifiers for some selected channels only, and thus Webhooks allow you to extend beyond that._
 
 ## How can I integrate Vigil Reporter in my code?
 
