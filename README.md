@@ -13,11 +13,11 @@ _Tested at Rust version: `rustc 1.35.0-nightly (aa99abeb2 2019-04-14)`_
 
 **🇭🇺 Crafted in Budapest, Hungary.**
 
-**👉 See a live demo of Vigil on [Crisp Status Page](https://status.crisp.chat).**
+**👉 See a live demo of Vigil on [Crisp Status Page](https://status.crisp.chat/).**
 
 **:newspaper: The Vigil project was announced in [a post on my personal journal](https://journal.valeriansaliou.name/announcing-vigil-how-we-monitor-crisp-at-scale/).**
 
-![Vigil](https://valeriansaliou.github.io/vigil/images/vigil.png)
+[![Vigil](https://valeriansaliou.github.io/vigil/images/vigil.png)](https://status.crisp.chat/)
 
 ## Who uses it?
 
