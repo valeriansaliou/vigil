@@ -3,7 +3,7 @@ Vigil
 
 [![Build Status](https://travis-ci.org/valeriansaliou/vigil.svg?branch=master)](https://travis-ci.org/valeriansaliou/vigil) [![Dependency Status](https://deps.rs/repo/github/valeriansaliou/vigil/status.svg)](https://deps.rs/repo/github/valeriansaliou/vigil) [![Buy Me A Coffee](https://img.shields.io/badge/buy%20me%20a%20coffee-donate-yellow.svg)](https://www.buymeacoffee.com/valeriansaliou)
 
-**Microservices Status Page. Monitors a distributed infrastructure and sends alerts to Slack.**
+**Microservices Status Page. Monitors a distributed infrastructure and sends alerts (Slack, SMS, etc.).**
 
 Vigil is an open-source Status Page you can host on your infrastructure, used to monitor all your servers and apps, and visible to your users (on a domain of your choice, eg. `status.example.com`).
 

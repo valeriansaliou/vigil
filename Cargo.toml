@@ -1,7 +1,7 @@
 [package]
 name = "vigil-server"
 version = "1.10.0"
-description = "Microservices Status Page. Monitors a distributed infrastructure and sends alerts to Slack."
+description = "Microservices Status Page. Monitors a distributed infrastructure and sends alerts (Slack, SMS, etc.)."
 readme = "README.md"
 license = "MPL-2.0"
 edition = "2018"
