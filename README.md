@@ -35,7 +35,7 @@ _👋 You use Vigil and you want to be listed there? [Contact me](https://valeri
 ## Features
 
 * **Monitors automatically your infrastructure services**
-* **Notifies you when a service gets down** or gets back up (via a configured channel: Slack, Email, Twilio SMS or/and XMPP)
+* **Notifies you when a service gets down** or gets back up (via a configured channel: Slack, Email, Twilio SMS, XMPP or/and Web Hooks)
 * **Generates a status page**, that you can host on your domain for your public users (eg. `https://status.example.com`)
 
 ## How does it work?
@@ -200,6 +200,10 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 * `from` (type: _string_, allowed: Jabber ID, no default) — Jabber ID (JID) from which to send messages
 * `xmpp_password` (type: _string_, allowed: any string, no default) — XMPP account password to use for authentication
 * `reminders_only` (type: _boolean_, allowed: `true`, `false`, default: `false`) — Whether to send messages only for downtime reminders or everytime
+
+**[notify.webhook]**
+
+* `hook_url` (type: _string_, allowed: URL, no default) — Web Hook URL (eg. `https://domain.com/webhooks/[..]`)
 
 **[probe]**
 

@@ -27,6 +27,9 @@ use crate::notifier::slack::SlackNotifier;
 #[cfg(feature = "notifier-xmpp")]
 use crate::notifier::xmpp::XMPPNotifier;
 
+#[cfg(feature = "notifier-webhook")]
+use crate::notifier::webhook::WebHookNotifier;
+
 const AGGREGATE_INTERVAL_SECONDS: u64 = 10;
 
 struct BumpedStates {
@@ -250,6 +253,9 @@ pub fn run() {
 
                 #[cfg(feature = "notifier-xmpp")]
                 Notification::dispatch::<XMPPNotifier>(notify, &notification).ok();
+
+                #[cfg(feature = "notifier-webhook")]
+                Notification::dispatch::<WebHookNotifier>(notify, &notification).ok();
             }
         }
 

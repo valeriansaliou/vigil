@@ -97,6 +97,7 @@ pub struct ConfigNotify {
     pub twilio: Option<ConfigNotifyTwilio>,
     pub slack: Option<ConfigNotifySlack>,
     pub xmpp: Option<ConfigNotifyXMPP>,
+    pub webhook: Option<ConfigNotifyWebHook>,
 }
 
 #[derive(Deserialize)]
@@ -163,6 +164,11 @@ pub struct ConfigNotifyXMPP {
 
     #[serde(default = "defaults::notify_xmpp_reminders_only")]
     pub reminders_only: bool,
+}
+
+#[derive(Deserialize)]
+pub struct ConfigNotifyWebHook {
+    pub hook_url: SerdeUrl,
 }
 
 #[derive(Deserialize)]

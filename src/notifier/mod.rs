@@ -17,3 +17,6 @@ pub mod slack;
 
 #[cfg(feature = "notifier-xmpp")]
 pub mod xmpp;
+
+#[cfg(feature = "notifier-webhook")]
+pub mod webhook;
