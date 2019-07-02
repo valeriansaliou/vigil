@@ -39,8 +39,8 @@ pub enum WebHookPayloadType {
     #[serde(rename = "changed")]
     Changed,
 
-    #[serde(rename = "still")]
-    Still,
+    #[serde(rename = "reminder")]
+    Reminder,
 }
 
 #[derive(Serialize)]
@@ -56,7 +56,7 @@ impl GenericNotifier for WebHookNotifier {
             let hook_type = if notification.changed == true {
                 WebHookPayloadType::Changed
             } else {
-                WebHookPayloadType::Still
+                WebHookPayloadType::Reminder
             };
 
             // Build paylaod
