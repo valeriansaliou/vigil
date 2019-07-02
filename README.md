@@ -271,7 +271,20 @@ If you are using the Webhook notifier in Vigil, you will receive a JSON-formatte
 **Here is an example of a Webhook payload:**
 
 ```json
-{"type": "changed", "status": "dead", "time": "08:58:28 UTC+0200", "replicas": ["web:core:tcp://edge-3.pool.net.crisp.chat:80"], "page": {"title": "Crisp Status","url": "https://status.crisp.chat/"}}
+{
+  "type": "changed",
+  "status": "dead",
+  "time": "08:58:28 UTC+0200",
+
+  "replicas": [
+    "web:core:tcp://edge-3.pool.net.crisp.chat:80"
+  ],
+
+  "page": {
+    "title": "Crisp Status",
+    "url": "https://status.crisp.chat/"
+  }
+}
 ```
 
 Webhook notifications can be tested with eg. [Webhook.site](https://webhook.site/), before you integrate them to your custom endpoint.
