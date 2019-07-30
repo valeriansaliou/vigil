@@ -89,8 +89,8 @@ impl GenericNotifier for WebHookNotifier {
         Err(false)
     }
 
-    fn can_notify(_: &ConfigNotify, _: &Notification) -> bool {
-        true
+    fn can_notify(notify: &ConfigNotify, _: &Notification) -> bool {
+        notify.webhook.is_some()
     }
 
     fn name() -> &'static str {
