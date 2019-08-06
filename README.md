@@ -35,7 +35,7 @@ _👋 You use Vigil and you want to be listed there? [Contact me](https://valeri
 ## Features
 
 * **Monitors automatically your infrastructure services**
-* **Notifies you when a service gets down** or gets back up (via a configured channel: Slack, Email, Twilio SMS, XMPP or/and Webhook)
+* **Notifies you when a service gets down** or gets back up (via a configured channel: Slack, Email, Twilio SMS, Pushover, XMPP or/and Webhook)
 * **Generates a status page**, that you can host on your domain for your public users (eg. `https://status.example.com`)
 
 ## How does it work?
@@ -191,6 +191,12 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 
 * `hook_url` (type: _string_, allowed: URL, no default) — Slack hook URL (ie. `https://hooks.slack.com/[..]`)
 * `reminders_only` (type: _boolean_, allowed: `true`, `false`, default: `false`) — Whether to send Slack messages only for downtime reminders or everytime
+
+**[notify.pushover]**
+
+* `app_token` (type: _string_, allowed: any string, no default) — Pushover application token (you need to create a dedicated Pushover application to get one)
+* `user_keys` (type: _array[string]_, allowed: any strings, no default) — List of Pushover user keys (ie. the keys of your Pushover target users for notifications)
+* `reminders_only` (type: _boolean_, allowed: `true`, `false`, default: `false`) — Whether to send Pushover notifications only for downtime reminders or everytime
 
 **[notify.xmpp]**
 

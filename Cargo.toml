@@ -44,10 +44,11 @@ lettre_email = { version = "0.8", optional = true }
 libstrophe = { version = "0.10", default-features = false, optional = true }
 
 [features]
-default = ["notifier-email", "notifier-twilio", "notifier-slack", "notifier-webhook"]
+default = ["notifier-email", "notifier-twilio", "notifier-slack", "notifier-pushover", "notifier-webhook"]
 notifier-email = ["lettre", "lettre_email"]
 notifier-twilio = []
 notifier-slack = []
+notifier-pushover = []
 notifier-webhook = []
 notifier-xmpp = ["libstrophe"]
 

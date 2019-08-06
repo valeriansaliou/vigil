@@ -87,6 +87,10 @@ pub fn notify_slack_reminders_only() -> bool {
     false
 }
 
+pub fn notify_pushover_reminders_only() -> bool {
+    false
+}
+
 pub fn notify_xmpp_reminders_only() -> bool {
     false
 }

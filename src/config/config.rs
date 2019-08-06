@@ -96,6 +96,7 @@ pub struct ConfigNotify {
     pub email: Option<ConfigNotifyEmail>,
     pub twilio: Option<ConfigNotifyTwilio>,
     pub slack: Option<ConfigNotifySlack>,
+    pub pushover: Option<ConfigNotifyPushover>,
     pub xmpp: Option<ConfigNotifyXMPP>,
     pub webhook: Option<ConfigNotifyWebHook>,
 }
@@ -153,6 +154,15 @@ pub struct ConfigNotifySlack {
     pub hook_url: SerdeUrl,
 
     #[serde(default = "defaults::notify_slack_reminders_only")]
+    pub reminders_only: bool,
+}
+
+#[derive(Deserialize)]
+pub struct ConfigNotifyPushover {
+    pub app_token: String,
+    pub user_keys: Vec<String>,
+
+    #[serde(default = "defaults::notify_pushover_reminders_only")]
     pub reminders_only: bool,
 }
 
