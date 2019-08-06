@@ -11,6 +11,7 @@ use reqwest::Client;
 
 use super::generic::{GenericNotifier, Notification, DISPATCH_TIMEOUT_SECONDS};
 use crate::config::config::ConfigNotify;
+use crate::prober::status::Status;
 use crate::APP_CONF;
 
 lazy_static! {
@@ -36,7 +37,8 @@ impl GenericNotifier for PushoverNotifier {
             }
 
             message.push_str(&format!(
-                "<u>Status:</u> <b>{}</b>\n",
+                "<u>Status:</u> <b><font color=\"{}\">{}</font></b>\n",
+                status_to_color(&notification.status),
                 notification.status.as_str().to_uppercase()
             ));
             message.push_str(&format!(
@@ -109,5 +111,13 @@ impl GenericNotifier for PushoverNotifier {
 
     fn name() -> &'static str {
         "pushover"
+    }
+}
+
+fn status_to_color(status: &Status) -> &'static str {
+    match status {
+        &Status::Healthy => "#54A158",
+        &Status::Sick => "#D5A048",
+        &Status::Dead => "#C4291C",
     }
 }
