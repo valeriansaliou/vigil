@@ -32,12 +32,18 @@ impl GenericNotifier for PushoverNotifier {
             let mut message = String::new();
 
             if notification.changed == false {
-                message.push_str("This is a reminder.");
+                message.push_str("<b>This is a reminder.</b>\n");
             }
 
-            message.push_str(&format!("Status: {:?}\n", notification.status));
-            message.push_str(&format!("Nodes: {}\n", &notification.replicas.join(", ")));
-            message.push_str(&format!("Time: {}\n", &notification.time));
+            message.push_str(&format!(
+                "<u>Status:</u> <b>{:?}</b>\n",
+                notification.status
+            ));
+            message.push_str(&format!(
+                "<u>Nodes:</u> {}\n",
+                &notification.replicas.join(", ")
+            ));
+            message.push_str(&format!("<u>Time:</u> {}\n", &notification.time));
 
             debug!("will send Pushover notification with message: {}", &message);
 
@@ -45,7 +51,7 @@ impl GenericNotifier for PushoverNotifier {
 
             for user_key in &pushover.user_keys {
                 // Build form parameters
-                let mut params = HashMap::new();
+                let mut params: HashMap<&str, &str> = HashMap::new();
 
                 // Append authorization values
                 params.insert("token", &pushover.app_token);
@@ -54,10 +60,11 @@ impl GenericNotifier for PushoverNotifier {
                 // Append title & message
                 params.insert("title", &APP_CONF.branding.page_title);
                 params.insert("message", &message);
+                params.insert("html", "1");
 
                 // Append target URL
                 params.insert("url_title", &APP_CONF.branding.page_title);
-                params.insert("url", &APP_CONF.branding.page_url);
+                params.insert("url", APP_CONF.branding.page_url.as_str());
 
                 // Mark as high-priority? (reminder)
                 if notification.changed == false {
