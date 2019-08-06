@@ -35,7 +35,13 @@ _👋 You use Vigil and you want to be listed there? [Contact me](https://valeri
 ## Features
 
 * **Monitors automatically your infrastructure services**
-* **Notifies you when a service gets down** or gets back up (via a configured channel: Slack, Email, Twilio SMS, Pushover, XMPP or/and Webhook)
+* **Notifies you when a service gets down** or gets back up via a configured channel:
+  * Email
+  * Twilio (SMS)
+  * Slack
+  * Pushover
+  * XMPP
+  * Webhook
 * **Generates a status page**, that you can host on your domain for your public users (eg. `https://status.example.com`)
 
 ## How does it work?
