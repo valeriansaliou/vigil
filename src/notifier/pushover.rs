@@ -32,18 +32,18 @@ impl GenericNotifier for PushoverNotifier {
             let mut message = String::new();
 
             if notification.changed == false {
-                message.push_str("<b>This is a reminder.</b>\n");
+                message.push_str("<b><i>This is a reminder.</i></b>\n\n");
             }
 
             message.push_str(&format!(
-                "<u>Status:</u> <b>{:?}</b>\n",
-                notification.status
+                "<u>Status:</u> <b>{}</b>\n",
+                notification.status.as_str().to_uppercase()
             ));
             message.push_str(&format!(
                 "<u>Nodes:</u> {}\n",
                 &notification.replicas.join(", ")
             ));
-            message.push_str(&format!("<u>Time:</u> {}\n", &notification.time));
+            message.push_str(&format!("<u>Time:</u> {}", &notification.time));
 
             debug!("will send Pushover notification with message: {}", &message);
 
@@ -63,7 +63,9 @@ impl GenericNotifier for PushoverNotifier {
                 params.insert("html", "1");
 
                 // Append target URL
-                params.insert("url_title", &APP_CONF.branding.page_title);
+                let url_title = format!("Details on {}", APP_CONF.branding.page_title);
+
+                params.insert("url_title", &url_title);
                 params.insert("url", APP_CONF.branding.page_url.as_str());
 
                 // Mark as high-priority? (reminder)
