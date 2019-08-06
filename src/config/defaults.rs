@@ -83,6 +83,10 @@ pub fn notify_twilio_reminders_only() -> bool {
     false
 }
 
+pub fn notify_slack_mention_channel() -> bool {
+    false
+}
+
 pub fn notify_slack_reminders_only() -> bool {
     false
 }

@@ -153,6 +153,9 @@ pub struct ConfigNotifyTwilio {
 pub struct ConfigNotifySlack {
     pub hook_url: SerdeUrl,
 
+    #[serde(default = "defaults::notify_slack_mention_channel")]
+    pub mention_channel: bool,
+
     #[serde(default = "defaults::notify_slack_reminders_only")]
     pub reminders_only: bool,
 }

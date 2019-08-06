@@ -56,9 +56,15 @@ impl GenericNotifier for SlackNotifier {
                 format!("Status is still: *{}*.", notification.status.as_str())
             };
 
+            let payload_text = if slack.mention_channel == true {
+                format!("<!channel> {}", &message_text)
+            } else {
+                message_text.to_owned()
+            };
+
             // Build paylaod
             let mut payload = SlackPayload {
-                text: format!("<!channel> {}", &message_text),
+                text: payload_text,
                 attachments: Vec::new(),
             };
 

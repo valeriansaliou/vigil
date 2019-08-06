@@ -190,6 +190,7 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 **[notify.slack]**
 
 * `hook_url` (type: _string_, allowed: URL, no default) — Slack hook URL (ie. `https://hooks.slack.com/[..]`)
+* `mention_channel` (type: _boolean_, allowed: `true`, `false`, default: `false`) — Whether to mention channel when sending Slack messages (using _@channel_, which is handy to receive a high-priority notification)
 * `reminders_only` (type: _boolean_, allowed: `true`, `false`, default: `false`) — Whether to send Slack messages only for downtime reminders or everytime
 
 **[notify.pushover]**
