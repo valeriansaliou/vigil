@@ -5,8 +5,8 @@ WORKDIR /app
 COPY . /app
 
 RUN rustup --version
-RUN rustup install nightly-2019-05-14 && \
-    rustup default nightly-2019-05-14
+RUN rustup install nightly-2019-04-16 && \
+    rustup default nightly-2019-04-16
 
 RUN rustc --version && \
     rustup --version && \
