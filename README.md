@@ -26,11 +26,15 @@ _Tested at Rust version: `rustc 1.35.0-nightly (70f130954 2019-04-16)`_
 <td align="center"><a href="https://crisp.chat/"><img src="https://valeriansaliou.github.io/vigil/images/crisp-icon.png" height="64" /></a></td>
 <td align="center"><a href="https://www.meilisearch.com/"><img src="https://valeriansaliou.github.io/vigil/images/meili-icon.png" height="64" /></a></td>
 <td align="center"><a href="https://miragespace.com/"><img src="https://valeriansaliou.github.io/vigil/images/miragespace-icon.png" height="64" /></a></td>
+<td align="center"><a href="https://www.redsmin.com/"><img src="https://valeriansaliou.github.io/vigil/images/redsmin-icon.png" height="64" /></a></td>
+<td align="center"><a href="https://www.image-charts.com/"><img src="https://valeriansaliou.github.io/vigil/images/imagecharts-icon.png" height="64" /></a></td>
 </tr>
 <tr>
 <td align="center">Crisp</td>
 <td align="center">Meili</td>
 <td align="center">miragespace</td>
+<td align="center">Redsmin</td>
+<td align="center">Image-Charts</td>
 </tr>
 </table>
 
