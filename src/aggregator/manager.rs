@@ -114,7 +114,7 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
                     // Check RabbitMQ queue full marker?
                     if replica_status == Status::Healthy {
                         if let Some(ref replica_load) = replica.load {
-                            if replica_load.queue == true {
+                            if replica_load.queue {
                                 replica_status = Status::Sick;
                             }
                         }
@@ -181,7 +181,7 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
 
     // Check if should re-notify? (in case status did not change; only if dead)
     // Notice: this is used to send periodic reminders of downtime (ie. 'still down' messages)
-    if has_changed == false && should_notify == false && general_status == Status::Dead {
+    if !has_changed && !should_notify && general_status == Status::Dead {
         debug!("status unchanged, but may need to re-notify; checking");
 
         if let Some(ref notify) = APP_CONF.notify {
@@ -215,7 +215,7 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
         store.states.date = Some(time_string);
     }
 
-    if should_notify == true {
+    if should_notify {
         store.notified = Some(SystemTime::now());
 
         Some(BumpedStates {
@@ -242,7 +242,7 @@ pub fn run() {
         if let Some(ref bumped_states_inner) = bumped_states {
             let notification = Notification {
                 status: &bumped_states_inner.status,
-                time: time_now_as_string().unwrap_or("".to_string()),
+                time: time_now_as_string().unwrap_or_else(|_| "".to_string()),
                 replicas: Vec::from_iter(bumped_states_inner.replicas.iter().map(String::as_str)),
                 changed: bumped_states_inner.changed,
             };

@@ -26,7 +26,7 @@ impl Authorization {
                 .or(Err(()))
                 .and_then(|decoded| String::from_utf8(decoded).or(Err(())))
                 .and_then(|text| {
-                    let parts: Vec<&str> = text.split(":").collect();
+                    let parts: Vec<&str> = text.split(':').collect();
 
                     if parts.len() == 2 {
                         Ok(Authorization {

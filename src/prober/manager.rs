@@ -134,17 +134,17 @@ fn proceed_replica_probe(
 ) -> (Status, Duration) {
     let start_time = SystemTime::now();
 
-    let is_up = match replica_url {
-        &ReplicaURL::TCP(ref host, port) => proceed_replica_probe_tcp(host, port),
-        &ReplicaURL::HTTP(ref url) => proceed_replica_probe_http(url, body_match),
-        &ReplicaURL::HTTPS(ref url) => proceed_replica_probe_http(url, body_match),
+    let is_up = match *replica_url {
+        ReplicaURL::TCP(ref host, port) => proceed_replica_probe_tcp(host, port),
+        ReplicaURL::HTTP(ref url) => proceed_replica_probe_http(url, body_match),
+        ReplicaURL::HTTPS(ref url) => proceed_replica_probe_http(url, body_match),
     };
 
     let duration_latency = SystemTime::now()
         .duration_since(start_time)
         .unwrap_or(Duration::from_secs(0));
 
-    if is_up == true {
+    if is_up {
         // Probe reports as sick?
         if duration_latency >= Duration::from_secs(APP_CONF.metrics.poll_delay_sick) {
             return (Status::Sick, duration_latency);
@@ -163,13 +163,11 @@ fn proceed_replica_probe_tcp(host: &str, port: u16) -> bool {
         if let Some(address_value) = address.next() {
             debug!("prober poll will fire for tcp target: {}", address_value);
 
-            return match TcpStream::connect_timeout(
+            return TcpStream::connect_timeout(
                 &address_value,
                 Duration::from_secs(APP_CONF.metrics.poll_delay_dead),
-            ) {
-                Ok(_) => true,
-                Err(_) => false,
-            };
+            )
+            .is_ok();
         }
     }
 
@@ -178,7 +176,7 @@ fn proceed_replica_probe_tcp(host: &str, port: u16) -> bool {
 
 fn proceed_replica_probe_http(url: &str, body_match: &Option<Regex>) -> bool {
     // Acquire query string separator (if the URL already contains a query string, use append mode)
-    let query_separator = if url.contains("?") { "&" } else { "?" };
+    let query_separator = if url.contains('?') { "&" } else { "?" };
 
     // Generate URL with cache buster, to bypass any upstream cache (eg. CDN cache layer)
     let url_bang = format!(
@@ -209,7 +207,7 @@ fn proceed_replica_probe_http(url: &str, body_match: &Option<Regex>) -> bool {
             && status_code < APP_CONF.metrics.poll_http_status_healthy_below
         {
             // Check response body for match? (if configured)
-            if let &Some(ref body_match_regex) = body_match {
+            if let Some(ref body_match_regex) = *body_match {
                 if let Ok(text) = response_inner.text() {
                     debug!(
                         "checking prober poll result response text for url: {} for any match: {}",
@@ -217,7 +215,7 @@ fn proceed_replica_probe_http(url: &str, body_match: &Option<Regex>) -> bool {
                     );
 
                     // Doesnt match? Consider as DOWN.
-                    if body_match_regex.is_match(&text) == false {
+                    if !body_match_regex.is_match(&text) {
                         return false;
                     }
                 } else {
@@ -352,7 +350,7 @@ fn dispatch_plugins_rabbitmq(probe_id: String, node_id: String, queue: Option<St
                 // Check once again? (the queue can be seen as loaded from check #1, but if we \
                 //   check again a few milliseconds later, it will actually be empty; so not loaded)
                 // Notice: this prevents false-positive 'sick' statuses.
-                if rabbitmq_queue_load.0 == true {
+                if rabbitmq_queue_load.0 {
                     if let Some(retry_delay) = rabbitmq.queue_loaded_retry_delay {
                         debug!(
                             "rabbitmq queue is loaded, checking once again in {}ms: {}:{} [{}]",
@@ -386,8 +384,8 @@ fn dispatch_plugins_rabbitmq(probe_id: String, node_id: String, queue: Option<St
                                 if let Some((queue_ready, queue_nack)) = rabbitmq_queue_load.1 {
                                     replica.metrics.rabbitmq =
                                         Some(ServiceStatesProbeNodeReplicaMetricsRabbitMQ {
-                                            queue_ready: queue_ready,
-                                            queue_nack: queue_nack,
+                                            queue_ready,
+                                            queue_nack,
                                         });
                                 } else {
                                     replica.metrics.rabbitmq = None

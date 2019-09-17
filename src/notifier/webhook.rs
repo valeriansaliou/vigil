@@ -53,7 +53,7 @@ impl GenericNotifier for WebHookNotifier {
     fn attempt(notify: &ConfigNotify, notification: &Notification) -> Result<(), bool> {
         if let Some(ref webhook) = notify.webhook {
             // Acquire hook type
-            let hook_type = if notification.changed == true {
+            let hook_type = if notification.changed {
                 WebHookPayloadType::Changed
             } else {
                 WebHookPayloadType::Reminder
@@ -78,7 +78,7 @@ impl GenericNotifier for WebHookNotifier {
                 .send();
 
             if let Ok(response_inner) = response {
-                if response_inner.status().is_success() == true {
+                if response_inner.status().is_success() {
                     return Ok(());
                 }
             }

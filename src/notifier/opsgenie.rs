@@ -11,7 +11,7 @@
 //! To enable this notifier, vigil must be built with the feature `notifier-opsgenie`.
 use std::collections::HashMap;
 
-use failure::{Error, ResultExt, format_err};
+use failure::{format_err, Error, ResultExt};
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 
@@ -62,27 +62,23 @@ impl GenericNotifier for OpsGenieNotifier {
                     // If the alert exist and the status is not healthy, send a new alert else
                     // if it is a recovery, close gracefully the alert.
                     if &Status::Healthy != notification.status {
-                        if let Err(err) = create(
-                            config,
-                            &AlertCreation::new(config, notification, replica),
-                        ) {
+                        if let Err(err) =
+                            create(config, &AlertCreation::new(config, notification, replica))
+                        {
                             error!("could not create alert, {}", err);
                             has_err = true;
                         }
-                    } else {
-                        if let Err(err) = close(config, alert) {
-                            error!("could not close alert, {}", err);
-                            has_err = true;
-                        }
+                    } else if let Err(err) = close(config, alert) {
+                        error!("could not close alert, {}", err);
+                        has_err = true;
                     }
                 }
                 None => {
                     if &Status::Healthy != notification.status {
                         // The alert do not exist, send a new alert.
-                        if let Err(err) = create(
-                            config,
-                            &AlertCreation::new(config, notification, replica),
-                        ) {
+                        if let Err(err) =
+                            create(config, &AlertCreation::new(config, notification, replica))
+                        {
                             error!("could not create alert, {}", err);
                             has_err = true;
                         }
@@ -112,9 +108,18 @@ struct AlertCreation {
 
 impl AlertCreation {
     pub fn new(config: &ConfigNotifyOpsGenie, notification: &Notification, replica: &str) -> Self {
-        let message = match notification.changed {
-            true => format!("Node '{}' status changed to '{}'", replica, notification.status.as_str()),
-            false => format!("Node '{}' status is still '{}'", replica, notification.status.as_str()),
+        let message = if notification.changed {
+            format!(
+                "Node '{}' status changed to '{}'",
+                replica,
+                notification.status.as_str()
+            )
+        } else {
+            format!(
+                "Node '{}' status is still '{}'",
+                replica,
+                notification.status.as_str()
+            )
         };
 
         let mut details = config.details.to_owned();
@@ -168,7 +173,7 @@ fn get(config: &ConfigNotifyOpsGenie, replica: &str) -> Result<Option<Alert>, Er
         .with_context(|err| format!("could not deserialize search response, {}", err))?;
 
     for alert in search.data {
-        if &alert.alias == replica {
+        if alert.alias == replica {
             return Ok(Some(alert));
         }
     }
@@ -182,10 +187,9 @@ fn create(config: &ConfigNotifyOpsGenie, alert: &AlertCreation) -> Result<(), Er
         .post(&format!("{}/v2/alerts", config.url))
         .header("Authorization", format!("GenieKey {}", config.key))
         .header("Content-Type", "application/json")
-        .body(
-            serde_json::to_string(alert)
-                .with_context(|err| format_err!("could not serialize alert creation payload, {}", err))?
-        )
+        .body(serde_json::to_string(alert).with_context(|err| {
+            format_err!("could not serialize alert creation payload, {}", err)
+        })?)
         .send()
         .with_context(|err| format!("could not get opsgenie's alert, {}", err))?;
 

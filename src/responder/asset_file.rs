@@ -60,7 +60,7 @@ impl<'r> Responder<'r> for AssetFile {
         ]));
 
         response.set_header(Expires(HttpDate(
-            time::now() + Duration::seconds(ASSETS_EXPIRE_SECONDS as i64),
+            time::now() + Duration::seconds(ASSETS_EXPIRE_SECONDS.into()),
         )));
 
         // Set content type header?

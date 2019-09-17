@@ -29,7 +29,7 @@ impl GenericNotifier for EmailNotifier {
             // Build up the message text
             let mut message = String::new();
 
-            if notification.changed == true {
+            if notification.changed {
                 message.push_str(&format!(
                     "Status change report from: {}\n",
                     APP_CONF.branding.page_title
@@ -107,11 +107,11 @@ fn acquire_transport(
 ) -> Result<SmtpTransport, ()> {
     let mut security = ClientSecurity::None;
 
-    if smtp_encrypt == true {
+    if smtp_encrypt {
         if let Ok(connector_builder) = TlsConnector::builder() {
             if let Ok(connector) = connector_builder.build() {
                 security = ClientSecurity::Required(ClientTlsParameters {
-                    connector: connector,
+                    connector,
                     domain: smtp_host.to_string(),
                 });
             }

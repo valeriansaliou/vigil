@@ -72,9 +72,9 @@ pub fn handle(
             node.replicas.insert(
                 replica_id.to_string(),
                 ServiceStatesProbeNodeReplica {
-                    status: status,
+                    status,
                     url: None,
-                    metrics: metrics,
+                    metrics,
                     load: Some(ServiceStatesProbeNodeReplicaLoad {
                         cpu: load_cpu,
                         ram: load_ram,

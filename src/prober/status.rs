@@ -18,10 +18,10 @@ pub enum Status {
 
 impl Status {
     pub fn as_str(&self) -> &'static str {
-        match self {
-            &Status::Healthy => "healthy",
-            &Status::Sick => "sick",
-            &Status::Dead => "dead",
+        match *self {
+            Status::Healthy => "healthy",
+            Status::Sick => "sick",
+            Status::Dead => "dead",
         }
     }
 }

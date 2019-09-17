@@ -32,7 +32,7 @@ impl GenericNotifier for PushoverNotifier {
             // Build up the message text
             let mut message = String::new();
 
-            if notification.changed == false {
+            if !notification.changed {
                 message.push_str("<b><i>This is a reminder.</i></b>\n\n");
             }
 
@@ -71,7 +71,7 @@ impl GenericNotifier for PushoverNotifier {
                 params.insert("url", APP_CONF.branding.page_url.as_str());
 
                 // Mark as high-priority? (reminder)
-                if notification.changed == false {
+                if !notification.changed {
                     params.insert("priority", "1");
                 }
 
@@ -83,7 +83,7 @@ impl GenericNotifier for PushoverNotifier {
 
                 // Check for any failure
                 if let Ok(response_inner) = response {
-                    if response_inner.status().is_success() != true {
+                    if !response_inner.status().is_success() {
                         has_sub_delivery_failure = true;
                     }
                 } else {
@@ -91,7 +91,7 @@ impl GenericNotifier for PushoverNotifier {
                 }
             }
 
-            if has_sub_delivery_failure == true {
+            if has_sub_delivery_failure {
                 return Err(true);
             }
 
@@ -115,9 +115,9 @@ impl GenericNotifier for PushoverNotifier {
 }
 
 fn status_to_color(status: &Status) -> &'static str {
-    match status {
-        &Status::Healthy => "#54A158",
-        &Status::Sick => "#D5A048",
-        &Status::Dead => "#C4291C",
+    match *status {
+        Status::Healthy => "#54A158",
+        Status::Sick => "#D5A048",
+        Status::Dead => "#C4291C",
     }
 }

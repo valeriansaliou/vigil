@@ -29,7 +29,7 @@ impl GenericNotifier for TwilioNotifier {
             // Build up the message text
             let mut message = String::new();
 
-            if notification.changed == false {
+            if !notification.changed {
                 message.push_str("Reminder for: ");
             }
 
@@ -63,7 +63,7 @@ impl GenericNotifier for TwilioNotifier {
 
                 // Check for any failure
                 if let Ok(response_inner) = response {
-                    if response_inner.status().is_success() != true {
+                    if !response_inner.status().is_success() {
                         has_sub_delivery_failure = true;
                     }
                 } else {
@@ -71,7 +71,7 @@ impl GenericNotifier for TwilioNotifier {
                 }
             }
 
-            if has_sub_delivery_failure == true {
+            if has_sub_delivery_failure {
                 return Err(true);
             }
 
