@@ -224,6 +224,16 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 * `xmpp_password` (type: _string_, allowed: any string, no default) — XMPP account password to use for authentication
 * `reminders_only` (type: _boolean_, allowed: `true`, `false`, default: `false`) — Whether to send messages only for downtime reminders or everytime
 
+**[notify.opsgenie]**
+
+* `url` (type: _string_, allowed: url, default: `https://api.opsgenie.com`) -- OpsGenie's API URL
+* `key` (type: _string_, allowed: any string, no default) -- OpsGenie's API key
+* `priority` (type: _string_, allowed: `P1`, `P2`, `P3`, `P4` or `P5`, no default, optional) -- Priority of alerts by default OpsGenie set to `P3` 
+* `user` (type: _string_, allowed: any string, no default, optional) -- User used to create alerts
+* `details` (type: _map[string]string_, allowed: any map using string index and values, no default, optional) -- Details to append to alerts
+* `actions` (type: _[]string_, allowed: any string array, no default, optional) -- Actions to append to alerts
+* `tags` (type: _[]string_, allowed: any string array, no default, optional) -- Tags to append to alertss
+
 **[notify.webhook]**
 
 * `hook_url` (type: _string_, allowed: URL, no default) — Web Hook URL (eg. `https://domain.com/webhooks/[..]`)
