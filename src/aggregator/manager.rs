@@ -30,6 +30,9 @@ use crate::notifier::pushover::PushoverNotifier;
 #[cfg(feature = "notifier-xmpp")]
 use crate::notifier::xmpp::XMPPNotifier;
 
+#[cfg(feature = "notifier-opsgenie")]
+use crate::notifier::opsgenie::OpsGenieNotifier;
+
 #[cfg(feature = "notifier-webhook")]
 use crate::notifier::webhook::WebHookNotifier;
 
@@ -262,6 +265,9 @@ pub fn run() {
 
                 #[cfg(feature = "notifier-webhook")]
                 Notification::dispatch::<WebHookNotifier>(notify, &notification).ok();
+
+                #[cfg(feature = "notifier-opsgenie")]
+                Notification::dispatch::<OpsGenieNotifier>(notify, &notification).ok();
             }
         }
 

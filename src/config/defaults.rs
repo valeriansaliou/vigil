@@ -98,3 +98,7 @@ pub fn notify_pushover_reminders_only() -> bool {
 pub fn notify_xmpp_reminders_only() -> bool {
     false
 }
+
+pub fn notify_opsgenie_url() -> String {
+    "https://api.opsgenie.com".into()
+}

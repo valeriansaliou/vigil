@@ -12,6 +12,7 @@ use url_serde::SerdeUrl;
 use super::defaults;
 use super::regex::Regex;
 use crate::prober::mode::Mode;
+use std::collections::HashMap;
 
 #[derive(Deserialize)]
 pub struct Config {
@@ -99,6 +100,7 @@ pub struct ConfigNotify {
     pub pushover: Option<ConfigNotifyPushover>,
     pub xmpp: Option<ConfigNotifyXMPP>,
     pub webhook: Option<ConfigNotifyWebHook>,
+    pub opsgenie: Option<ConfigNotifyOpsGenie>,
 }
 
 #[derive(Deserialize)]
@@ -182,6 +184,24 @@ pub struct ConfigNotifyXMPP {
 #[derive(Deserialize)]
 pub struct ConfigNotifyWebHook {
     pub hook_url: SerdeUrl,
+}
+
+#[derive(Deserialize)]
+pub struct ConfigNotifyOpsGenie {
+    #[serde(default = "defaults::notify_opsgenie_url")]
+    pub url: String,
+    pub key: String,
+    pub priority: Option<String>,
+    pub user: Option<String>,
+
+    #[serde(default = "std::default::Default::default")]
+    pub details: HashMap<String, String>,
+
+    #[serde(default = "std::default::Default::default")]
+    pub actions: Vec<String>,
+
+    #[serde(default = "std::default::Default::default")]
+    pub tags: Vec<String>,
 }
 
 #[derive(Deserialize)]
