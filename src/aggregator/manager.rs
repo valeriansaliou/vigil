@@ -111,7 +111,9 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
                     // Check RabbitMQ queue full marker?
                     if replica_status == Status::Healthy {
                         if let Some(ref replica_load) = replica.load {
-                            if replica_load.queue == true {
+                            if replica_load.queue.stalled == true {
+                                replica_status = Status::Dead;
+                            } else if replica_load.queue.loaded == true {
                                 replica_status = Status::Sick;
                             }
                         }

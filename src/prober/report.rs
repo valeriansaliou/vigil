@@ -8,8 +8,8 @@ use std::time::{Duration, SystemTime};
 
 use super::states::{
     ServiceStatesProbeNodeReplica, ServiceStatesProbeNodeReplicaLoad,
-    ServiceStatesProbeNodeReplicaMetrics, ServiceStatesProbeNodeReplicaMetricsSystem,
-    ServiceStatesProbeNodeReplicaReport,
+    ServiceStatesProbeNodeReplicaLoadQueue, ServiceStatesProbeNodeReplicaMetrics,
+    ServiceStatesProbeNodeReplicaMetricsSystem, ServiceStatesProbeNodeReplicaReport,
 };
 use crate::prober::manager::STORE as PROBER_STORE;
 use crate::prober::mode::Mode;
@@ -48,14 +48,14 @@ pub fn handle(
             // Acquire previous replica status + previous queue load status (follow-up values)
             let (status, mut metrics, mut load_queue);
 
-            load_queue = false;
+            load_queue = ServiceStatesProbeNodeReplicaLoadQueue::default();
 
             if let Some(ref replica) = node.replicas.get(replica_id) {
                 status = replica.status.to_owned();
                 metrics = replica.metrics.to_owned();
 
                 if let Some(ref replica_load) = replica.load {
-                    load_queue = replica_load.queue;
+                    load_queue = replica_load.queue.clone();
                 }
             } else {
                 status = Status::Healthy;

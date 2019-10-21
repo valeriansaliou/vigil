@@ -69,7 +69,13 @@ pub struct ServiceStatesProbeNodeReplicaMetricsRabbitMQ {
 pub struct ServiceStatesProbeNodeReplicaLoad {
     pub cpu: f32,
     pub ram: f32,
-    pub queue: bool,
+    pub queue: ServiceStatesProbeNodeReplicaLoadQueue,
+}
+
+#[derive(Serialize, Clone, Default)]
+pub struct ServiceStatesProbeNodeReplicaLoadQueue {
+    pub loaded: bool,
+    pub stalled: bool,
 }
 
 #[derive(Serialize)]
