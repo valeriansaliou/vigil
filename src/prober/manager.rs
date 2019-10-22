@@ -298,10 +298,14 @@ fn proceed_rabbitmq_queue_probe(
                     }
 
                     // Queue stalled?
-                    if response_json.messages_ready > rabbitmq.queue_ready_dead_above {
+                    if response_json.messages_ready > rabbitmq.queue_ready_dead_above
+                        || response_json.messages_unacknowledged > rabbitmq.queue_nack_dead_above
+                    {
                         info!(
-                            "got stalled rabbitmq queue: {} (ready: {})",
-                            rabbitmq_queue, response_json.messages_ready
+                            "got stalled rabbitmq queue: {} (ready: {}, unacknowledged: {})",
+                            rabbitmq_queue,
+                            response_json.messages_ready,
+                            response_json.messages_unacknowledged
                         );
 
                         queue_stalled = true;

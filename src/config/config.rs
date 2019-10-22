@@ -115,6 +115,7 @@ pub struct ConfigPluginsRabbitMQ {
     pub queue_ready_healthy_below: u32,
     pub queue_nack_healthy_below: u32,
     pub queue_ready_dead_above: u32,
+    pub queue_nack_dead_above: u32,
     pub queue_loaded_retry_delay: Option<u64>,
 }
 
