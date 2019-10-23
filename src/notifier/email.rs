@@ -8,10 +8,8 @@ use std::time::Duration;
 
 use lettre::smtp::authentication::Credentials;
 use lettre::smtp::client::net::ClientTlsParameters;
-use lettre::smtp::{
-    ClientSecurity, ConnectionReuseParameters, SmtpTransport, SmtpTransportBuilder,
-};
-use lettre::EmailTransport;
+use lettre::smtp::{ClientSecurity, ConnectionReuseParameters, SmtpTransport, SmtpClient};
+use lettre::Transport;
 use lettre_email::EmailBuilder;
 use native_tls::TlsConnector;
 
@@ -77,7 +75,7 @@ impl GenericNotifier for EmailNotifier {
                 email_config.smtp_password.to_owned(),
                 email_config.smtp_encrypt,
             )
-            .map(|mut transport| transport.send(&email_message))
+            .map(|mut transport| transport.send(email_message.into()))
             .and(Ok(()))
             .or(Err(true));
         }
@@ -108,13 +106,12 @@ fn acquire_transport(
     let mut security = ClientSecurity::None;
 
     if smtp_encrypt == true {
-        if let Ok(connector_builder) = TlsConnector::builder() {
-            if let Ok(connector) = connector_builder.build() {
-                security = ClientSecurity::Required(ClientTlsParameters {
-                    connector: connector,
-                    domain: smtp_host.to_string(),
-                });
-            }
+        let connector_builder = TlsConnector::builder();
+        if let Ok(connector) = connector_builder.build() {
+            security = ClientSecurity::Required(ClientTlsParameters {
+                connector: connector,
+                domain: smtp_host.to_string(),
+            });
         }
 
         // Do not deliver email if TLS context cannot be acquired (prevents unencrypted emails \
@@ -126,7 +123,7 @@ fn acquire_transport(
         }
     }
 
-    match SmtpTransportBuilder::new(format!("{}:{}", smtp_host, smtp_port), security) {
+    match SmtpClient::new(format!("{}:{}", smtp_host, smtp_port), security) {
         Ok(transport) => {
             let mut transport_builder = transport
                 .timeout(Some(Duration::from_secs(DISPATCH_TIMEOUT_SECONDS)))
@@ -140,7 +137,7 @@ fn acquire_transport(
                 _ => {}
             }
 
-            Ok(transport_builder.build())
+            Ok(transport_builder.transport())
         }
         Err(err) => {
             error!("could not acquire smtp transport: {}", err);

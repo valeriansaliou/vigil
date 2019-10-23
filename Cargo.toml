@@ -36,11 +36,11 @@ url_serde = { version = "0.2", default-features = false }
 indexmap = { version = "1.0", features = ["serde-1"] }
 rocket = { version = "0.4", default-features = false }
 rocket_contrib = { version = "0.4", features = ["tera_templates"] }
-native-tls = "0.1"
+native-tls = "0.2.3"
 openssl-probe = "0.1"
 reqwest = "0.9"
-lettre = { version = "0.8", features = ["smtp-transport"], optional = true }
-lettre_email = { version = "0.8", optional = true }
+lettre = { version = "0.9.2", features = ["smtp-transport"], optional = true }
+lettre_email = { version = "0.9.2", optional = true }
 libstrophe = { version = "0.10", default-features = false, optional = true }
 
 [features]
