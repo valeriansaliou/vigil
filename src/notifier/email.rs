@@ -8,7 +8,7 @@ use std::time::Duration;
 
 use lettre::smtp::authentication::Credentials;
 use lettre::smtp::client::net::ClientTlsParameters;
-use lettre::smtp::{ClientSecurity, ConnectionReuseParameters, SmtpTransport, SmtpClient};
+use lettre::smtp::{ClientSecurity, ConnectionReuseParameters, SmtpClient, SmtpTransport};
 use lettre::Transport;
 use lettre_email::EmailBuilder;
 use native_tls::TlsConnector;
