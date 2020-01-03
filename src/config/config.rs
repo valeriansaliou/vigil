@@ -4,9 +4,11 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
+use std::env;
 use std::net::SocketAddr;
 use std::path::PathBuf;
 
+use serde::de::{Deserialize as _, Deserializer, Error as _};
 use url_serde::SerdeUrl;
 
 use super::defaults;
@@ -191,11 +193,48 @@ pub struct ConfigProbe {
     pub service: Vec<ConfigProbeService>,
 }
 
+// Work around https://github.com/serde-rs/serde/issues/1030
+const fn make_true() -> bool {
+    true
+}
+
+fn deserialize_env_var<'de, D: Deserializer<'de>>(deserializer: D) -> Result<String, D::Error> {
+    <&'de str>::deserialize(deserializer).and_then(|var_name| {
+        env::var(var_name)
+            .map_err(|error| {
+                D::Error::custom(format!("failed to read env var `{}`: {}", var_name, error))
+            })
+            .and_then(|value| {
+                if value.trim().is_empty() {
+                    Err(D::Error::custom(format!("empty env var `{}`", var_name)))
+                } else {
+                    Ok(value)
+                }
+            })
+    })
+}
+
+fn deserialize_opt_env_var<'de, D: Deserializer<'de>>(
+    deserializer: D,
+) -> Result<Option<String>, D::Error> {
+    #[derive(Deserialize)]
+    struct EnvVarValue(#[serde(deserialize_with = "deserialize_env_var")] String);
+    Option::<EnvVarValue>::deserialize(deserializer).map(|option| option.map(|wrapped| wrapped.0))
+}
+
 #[derive(Deserialize)]
 pub struct ConfigProbeService {
     pub id: String,
     pub label: String,
     pub node: Vec<ConfigProbeServiceNode>,
+    #[serde(
+        rename = "bearer_token_env_var",
+        deserialize_with = "deserialize_opt_env_var",
+        default = "Default::default"
+    )]
+    pub bearer_token: Option<String>,
+    #[serde(default = "make_true")]
+    pub cache_busting_query_parameter: bool,
 }
 
 #[derive(Deserialize)]
@@ -205,5 +244,6 @@ pub struct ConfigProbeServiceNode {
     pub mode: Mode,
     pub replicas: Option<Vec<String>>,
     pub http_body_healthy_match: Option<Regex>,
+    pub post_json: Option<String>,
     pub rabbitmq_queue: Option<String>,
 }

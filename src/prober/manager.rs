@@ -73,7 +73,16 @@ fn make_default_headers() -> HeaderMap {
     headers
 }
 
-fn map_poll_replicas() -> Vec<(String, String, String, ReplicaURL, Option<Regex>)> {
+fn map_poll_replicas() -> Vec<(
+    String,
+    String,
+    String,
+    ReplicaURL,
+    Option<Regex>,
+    Option<String>,
+    Option<String>,
+    bool,
+)> {
     let mut replica_list = Vec::new();
 
     // Acquire states
@@ -95,6 +104,9 @@ fn map_poll_replicas() -> Vec<(String, String, String, ReplicaURL, Option<Regex>
                             replica_id.to_owned(),
                             replica_url.to_owned(),
                             node.http_body_healthy_match.to_owned(),
+                            probe.bearer_token.to_owned(),
+                            node.post_json.to_owned(),
+                            probe.cache_busting_query_parameter,
                         ));
                     }
                 }
@@ -108,6 +120,9 @@ fn map_poll_replicas() -> Vec<(String, String, String, ReplicaURL, Option<Regex>
 fn proceed_replica_probe_with_retry(
     replica_url: &ReplicaURL,
     body_match: &Option<Regex>,
+    bearer_token: &Option<String>,
+    post_json: &Option<String>,
+    cache_busting_query_parameter: bool,
 ) -> (Status, Option<Duration>) {
     let (mut status, mut latency, mut retry_count) = (Status::Dead, None, 0);
 
@@ -121,7 +136,13 @@ fn proceed_replica_probe_with_retry(
 
         thread::sleep(Duration::from_millis(PROBE_HOLD_MILLISECONDS));
 
-        let probe_results = proceed_replica_probe(replica_url, body_match);
+        let probe_results = proceed_replica_probe(
+            replica_url,
+            body_match,
+            bearer_token,
+            post_json,
+            cache_busting_query_parameter,
+        );
 
         status = probe_results.0;
         latency = Some(probe_results.1);
@@ -133,13 +154,28 @@ fn proceed_replica_probe_with_retry(
 fn proceed_replica_probe(
     replica_url: &ReplicaURL,
     body_match: &Option<Regex>,
+    bearer_token: &Option<String>,
+    post_json: &Option<String>,
+    cache_busting_query_parameter: bool,
 ) -> (Status, Duration) {
     let start_time = SystemTime::now();
 
     let is_up = match replica_url {
         &ReplicaURL::TCP(ref host, port) => proceed_replica_probe_tcp(host, port),
-        &ReplicaURL::HTTP(ref url) => proceed_replica_probe_http(url, body_match),
-        &ReplicaURL::HTTPS(ref url) => proceed_replica_probe_http(url, body_match),
+        &ReplicaURL::HTTP(ref url) => proceed_replica_probe_http(
+            url,
+            body_match,
+            bearer_token,
+            post_json,
+            cache_busting_query_parameter,
+        ),
+        &ReplicaURL::HTTPS(ref url) => proceed_replica_probe_http(
+            url,
+            body_match,
+            bearer_token,
+            post_json,
+            cache_busting_query_parameter,
+        ),
     };
 
     let duration_latency = SystemTime::now()
@@ -178,32 +214,52 @@ fn proceed_replica_probe_tcp(host: &str, port: u16) -> bool {
     false
 }
 
-fn proceed_replica_probe_http(url: &str, body_match: &Option<Regex>) -> bool {
-    // Acquire query string separator (if the URL already contains a query string, use append mode)
-    let query_separator = if url.contains("?") { "&" } else { "?" };
+fn proceed_replica_probe_http(
+    raw_url: &str,
+    body_match: &Option<Regex>,
+    bearer_token: &Option<String>,
+    post_json: &Option<String>,
+    cache_busting_query_parameter: bool,
+) -> bool {
+    let url_bang;
+    let url = if cache_busting_query_parameter {
+        // Acquire query string separator (if the URL already contains a query string, use append mode)
+        let query_separator = if raw_url.contains("?") { "&" } else { "?" };
 
-    // Generate URL with cache buster, to bypass any upstream cache (eg. CDN cache layer)
-    let url_bang = format!(
-        "{}{}{}",
-        url,
-        query_separator,
-        time::now().to_timespec().sec
-    );
-
-    debug!("prober poll will fire for http target: {}", &url_bang);
-
-    let response = if body_match.is_some() {
-        PROBE_HTTP_CLIENT.get(&url_bang).send()
+        // Generate URL with cache buster, to bypass any upstream cache (eg. CDN cache layer)
+        url_bang = format!(
+            "{}{}{}",
+            raw_url,
+            query_separator,
+            time::now().to_timespec().sec
+        );
+        &url_bang
     } else {
-        PROBE_HTTP_CLIENT.head(&url_bang).send()
+        raw_url
     };
 
-    if let Ok(response_inner) = response {
+    debug!("prober poll will fire for http target: {}", url);
+
+    let mut request = if let Some(body) = post_json.as_ref() {
+        PROBE_HTTP_CLIENT
+            .post(url)
+            .header("Content-Type", "application/json")
+            .body(body.clone())
+    } else if body_match.is_some() {
+        PROBE_HTTP_CLIENT.get(url)
+    } else {
+        PROBE_HTTP_CLIENT.head(url)
+    };
+    if let Some(bearer_token) = bearer_token.as_ref() {
+        request = request.bearer_auth(bearer_token);
+    }
+
+    if let Ok(response_inner) = request.send() {
         let status_code = response_inner.status().as_u16();
 
         debug!(
             "prober poll result received for url: {} with status: {}",
-            &url_bang, status_code
+            url, status_code
         );
 
         // Consider as UP?
@@ -215,7 +271,7 @@ fn proceed_replica_probe_http(url: &str, body_match: &Option<Regex>) -> bool {
                 if let Ok(text) = response_inner.text() {
                     debug!(
                         "checking prober poll result response text for url: {} for any match: {}",
-                        &url_bang, &text
+                        url, &text
                     );
 
                     // Doesnt match? Consider as DOWN.
@@ -223,7 +279,7 @@ fn proceed_replica_probe_http(url: &str, body_match: &Option<Regex>) -> bool {
                         return false;
                     }
                 } else {
-                    debug!("could not unpack response text for url: {}", &url_bang);
+                    debug!("could not unpack response text for url: {}", url);
 
                     // Consider as DOWN (the response text could not be checked)
                     return false;
@@ -233,7 +289,7 @@ fn proceed_replica_probe_http(url: &str, body_match: &Option<Regex>) -> bool {
             return true;
         }
     } else {
-        debug!("prober poll result was not received for url: {}", &url_bang);
+        debug!("prober poll result was not received for url: {}", url);
     }
 
     // Consider as DOWN.
@@ -332,8 +388,13 @@ fn proceed_rabbitmq_queue_probe(
 fn dispatch_polls() {
     // Probe hosts
     for probe_replica in map_poll_replicas() {
-        let (replica_status, replica_latency) =
-            proceed_replica_probe_with_retry(&probe_replica.3, &probe_replica.4);
+        let (replica_status, replica_latency) = proceed_replica_probe_with_retry(
+            &probe_replica.3,
+            &probe_replica.4,
+            &probe_replica.5,
+            &probe_replica.6,
+            probe_replica.7,
+        );
 
         debug!(
             "replica probe result: {}:{}:{} => {:?}",
@@ -441,6 +502,8 @@ pub fn initialize_store() {
             status: Status::Healthy,
             label: service.label.to_owned(),
             nodes: IndexMap::new(),
+            bearer_token: service.bearer_token.to_owned(),
+            cache_busting_query_parameter: service.cache_busting_query_parameter,
         };
 
         debug!("prober store: got service {}", service.id);
@@ -454,6 +517,7 @@ pub fn initialize_store() {
                 mode: node.mode.to_owned(),
                 replicas: IndexMap::new(),
                 http_body_healthy_match: node.http_body_healthy_match.to_owned(),
+                post_json: node.post_json.to_owned(),
                 rabbitmq_queue: node.rabbitmq_queue.to_owned(),
             };
 
