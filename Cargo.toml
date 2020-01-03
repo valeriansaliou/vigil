@@ -41,7 +41,7 @@ openssl-probe = "0.1"
 reqwest = { version = "0.10", features = ["native-tls-vendored", "gzip", "blocking", "json"], default-features = false }
 lettre = { version = "0.9.2", features = ["smtp-transport"], optional = true }
 lettre_email = { version = "0.9.2", optional = true }
-libstrophe = { version = "0.10", default-features = false, optional = true }
+libstrophe = { version = "0.13", default-features = false, optional = true }
 
 [features]
 default = ["notifier-email", "notifier-twilio", "notifier-slack", "notifier-pushover", "notifier-webhook"]

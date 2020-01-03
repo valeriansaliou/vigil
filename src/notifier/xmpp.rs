@@ -8,8 +8,7 @@ use std::sync::RwLock;
 use std::time::Duration;
 use time;
 
-use libstrophe::error::StreamError;
-use libstrophe::{Connection, ConnectionEvent, Context, Stanza};
+use libstrophe::{Connection, ConnectionEvent, Context, Stanza, StreamError};
 
 use super::generic::{GenericNotifier, Notification, DISPATCH_TIMEOUT_SECONDS};
 use crate::config::config::ConfigNotify;
@@ -43,14 +42,13 @@ impl GenericNotifier for XMPPNotifier {
                              connection: &mut Connection,
                              event: ConnectionEvent,
                              _error: i32,
-                             _stream_error: Option<&StreamError>| {
+                             _stream_error: Option<StreamError>| {
                 match event {
                     ConnectionEvent::XMPP_CONN_CONNECT => {
                         debug!("connected to XMPP account: {}", &xmpp.from);
 
                         // Send status message
                         let mut message_stanza = Stanza::new_message(
-                            &context,
                             Some("chat"),
                             Some(&format!("vigil-{}", time::now().to_timespec().sec)),
                             Some(&xmpp.to),
