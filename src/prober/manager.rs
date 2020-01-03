@@ -12,8 +12,10 @@ use std::time::{Duration, SystemTime};
 use time;
 
 use indexmap::IndexMap;
+use reqwest::blocking::Client;
 use reqwest::header::{HeaderMap, USER_AGENT};
-use reqwest::{Client, RedirectPolicy, StatusCode};
+use reqwest::redirect::Policy as RedirectPolicy;
+use reqwest::StatusCode;
 
 use super::replica::ReplicaURL;
 use super::states::{
@@ -196,7 +198,7 @@ fn proceed_replica_probe_http(url: &str, body_match: &Option<Regex>) -> bool {
         PROBE_HTTP_CLIENT.head(&url_bang).send()
     };
 
-    if let Ok(mut response_inner) = response {
+    if let Ok(response_inner) = response {
         let status_code = response_inner.status().as_u16();
 
         debug!(
@@ -263,7 +265,7 @@ fn proceed_rabbitmq_queue_probe(
             )
             .send();
 
-        if let Ok(mut response_inner) = response {
+        if let Ok(response_inner) = response {
             let status = response_inner.status();
 
             debug!(
