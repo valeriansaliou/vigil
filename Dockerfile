@@ -24,7 +24,6 @@ COPY ./res/assets/ ./res/assets/
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=build /app/target/x86_64-unknown-linux-musl/release/vigil /usr/local/bin/vigil
 
-
 CMD [ "vigil", "-c", "/etc/vigil.cfg" ]
 
 EXPOSE 8080
