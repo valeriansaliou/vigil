@@ -23,17 +23,17 @@ doc = false
 
 [dependencies]
 log = "0.4"
-clap = { version = "2.29", default-features = false }
-lazy_static = "1.0"
+clap = { version = "2.33", default-features = false }
+lazy_static = "1.4"
 time = "0.1"
 serde = "1.0"
 serde_derive = "1.0"
 toml = "0.5"
 base64 = "0.11"
-regex = "1.0"
+regex = "1.3"
 url = { version = "2.1", default-features = false }
 url_serde = { version = "0.2", default-features = false }
-indexmap = { version = "1.0", features = ["serde-1"] }
+indexmap = { version = "1.3", features = ["serde-1"] }
 rocket = { version = "0.4", default-features = false }
 rocket_contrib = { version = "0.4", features = ["tera_templates"] }
 native-tls = { version = "0.2.3", features = ["vendored"] }
