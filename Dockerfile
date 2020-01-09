@@ -15,6 +15,7 @@ RUN rustc --version && \
 WORKDIR /app
 COPY . /app
 RUN cargo clean && cargo build --release --target x86_64-unknown-linux-musl
+RUN strip ./target/x86_64-unknown-linux-musl/release/vigil
 
 FROM scratch
 
