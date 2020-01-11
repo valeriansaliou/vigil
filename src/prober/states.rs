@@ -25,6 +25,8 @@ pub struct ServiceStatesProbe {
     pub status: Status,
     pub label: String,
     pub nodes: IndexMap<String, ServiceStatesProbeNode>,
+    pub bearer_token: Option<String>,
+    pub cache_busting_query_parameter: bool,
 }
 
 #[derive(Serialize)]
@@ -34,6 +36,7 @@ pub struct ServiceStatesProbeNode {
     pub mode: Mode,
     pub replicas: IndexMap<String, ServiceStatesProbeNodeReplica>,
     pub http_body_healthy_match: Option<Regex>,
+    pub post_json: Option<String>,
     pub rabbitmq_queue: Option<String>,
 }
 
