@@ -4,7 +4,7 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
-use std::net::{TcpStream, ToSocketAddrs};
+use std::net::{SocketAddr, TcpStream, ToSocketAddrs};
 use std::sync::Arc;
 use std::sync::RwLock;
 use std::thread;
@@ -166,45 +166,62 @@ fn proceed_replica_probe_icmp(host: &str) -> bool {
     let address_results = (host, 0).to_socket_addrs();
 
     match address_results {
-        Ok(mut address) => {
-            if let Some(address_value) = address.next() {
-                let address_ip = address_value.ip();
+        Ok(address) => {
+            // Notice: the ICMP probe checker is a bit special, in the sense that it checks all \
+            //   resolved addresses. As we check for an host health at the IP level (ie. not at \
+            //   the application layer level), checking only the first host in the list is not \
+            //   sufficient for the whole replica group to be up. This can be used as an handy way \
+            //   to check for the health of a group of IP hosts, configured in a single DNS record.
+            let address_values: Vec<SocketAddr> = address.collect();
 
-                debug!("prober poll will fire for icmp target: {}", address_ip);
+            if !address_values.is_empty() {
+                // Probe all returned addresses (sequentially)
+                for address_value in address_values {
+                    let address_ip = address_value.ip();
 
-                // As ICMP ping timeouts are hard-coded in the underlying ping library, it is not \
-                //   possible to specify a custom timeout using the regular 'poll_delay_dead' \
-                //   configuration variable.
-                let (pinger, results) =
-                    Pinger::new(None, None).expect("failed to create icmp pinger");
+                    debug!("prober poll will fire for icmp target: {}", address_ip);
 
-                pinger.add_ipaddr(&address_ip.to_string());
-                pinger.ping_once();
+                    // As ICMP ping timeouts are hard-coded in the underlying ping library, it is \
+                    //   not possible to specify a custom timeout using the regular \
+                    //   'poll_delay_dead' configuration variable.
+                    let (pinger, results) =
+                        Pinger::new(None, None).expect("failed to create icmp pinger");
 
-                return match results.recv() {
-                    Ok(result) => match result {
-                        PingResult::Receive { addr: _, rtt: _ } => true,
-                        PingResult::Idle { addr: _ } => {
-                            // An idle host host is routable, but unreachable
-                            debug!("prober poll host idle for icmp target: {}", address_ip);
+                    pinger.add_ipaddr(&address_ip.to_string());
+                    pinger.ping_once();
 
-                            false
+                    match results.recv() {
+                        Ok(result) => match result {
+                            PingResult::Receive { addr: _, rtt: _ } => {
+                                // Do not return (consider address as reachable)
+                            }
+                            PingResult::Idle { addr: _ } => {
+                                debug!("prober poll host idle for icmp target: {}", address_ip);
+
+                                // Consider ICMP idle hosts as a failure (ie. routable, but \
+                                //   unreachable)
+                                return false;
+                            }
+                        },
+                        Err(err) => {
+                            debug!(
+                                "prober poll error for icmp target: {} (error: {})",
+                                address_ip, err
+                            );
+
+                            // Consider ICMP errors as a failure
+                            return false;
                         }
-                    },
-                    Err(err) => {
-                        debug!(
-                            "prober poll error for icmp target: {} (error: {})",
-                            address_ip, err
-                        );
-
-                        false
-                    }
-                };
+                    };
+                }
             } else {
                 debug!(
                     "prober poll did not resolve any address for icmp replica: {}",
                     host
                 );
+
+                // Consider empty as a failure
+                return false;
             }
         }
         Err(err) => {
@@ -212,10 +229,14 @@ fn proceed_replica_probe_icmp(host: &str) -> bool {
                 "prober poll address for icmp replica is invalid: {} (error: {})",
                 host, err
             );
+
+            // Consider invalid URL as a failure
+            return false;
         }
     };
 
-    false
+    // If there was no early return, consider all the hosts as reachable for replica
+    true
 }
 
 fn proceed_replica_probe_tcp(host: &str, port: u16) -> bool {
