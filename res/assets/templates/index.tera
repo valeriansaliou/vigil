@@ -147,7 +147,7 @@
                               {% if node.mode == "push" %}
                                 Checked via a push probe (Reporter).
                               {% else %}
-                                Checked via a poll probe (HTTP or TCP).
+                                Checked via a poll probe (HTTP, TCP or ICMP).
                               {% endif %}
                             </span>
                           </span>

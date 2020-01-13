@@ -4,6 +4,7 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
+use std::cmp::min;
 use std::net::{TcpStream, ToSocketAddrs};
 use std::sync::Arc;
 use std::sync::RwLock;
@@ -12,6 +13,7 @@ use std::time::{Duration, SystemTime};
 use time;
 
 use indexmap::IndexMap;
+use ping::ping;
 use reqwest::blocking::Client;
 use reqwest::header::{HeaderMap, USER_AGENT};
 use reqwest::redirect::Policy as RedirectPolicy;
@@ -30,6 +32,7 @@ use crate::prober::mode::Mode;
 use crate::APP_CONF;
 
 const PROBE_HOLD_MILLISECONDS: u64 = 250;
+const PROBE_ICMP_TIMEOUT_SECONDS: u64 = 4;
 
 lazy_static! {
     pub static ref STORE: Arc<RwLock<Store>> = Arc::new(RwLock::new(Store {
@@ -137,6 +140,7 @@ fn proceed_replica_probe(
     let start_time = SystemTime::now();
 
     let is_up = match replica_url {
+        &ReplicaURL::ICMP(ref host) => proceed_replica_probe_icmp(host),
         &ReplicaURL::TCP(ref host, port) => proceed_replica_probe_tcp(host, port),
         &ReplicaURL::HTTP(ref url) => proceed_replica_probe_http(url, body_match),
         &ReplicaURL::HTTPS(ref url) => proceed_replica_probe_http(url, body_match),
@@ -156,6 +160,42 @@ fn proceed_replica_probe(
     } else {
         (Status::Dead, duration_latency)
     }
+}
+
+fn proceed_replica_probe_icmp(host: &str) -> bool {
+    // Notice: a dummy port of value '0' is set here, so that we can resolve the host to an actual \
+    //   IP address using the standard library, which avoids depending on an additional library.
+    let address_results = (host, 0).to_socket_addrs();
+
+    if let Ok(mut address) = address_results {
+        if let Some(address_value) = address.next() {
+            debug!(
+                "prober poll will fire for icmp target: {}",
+                address_value.ip()
+            );
+
+            // As ICMP pings require a lower-than-usual timeout, an hard-coded ICMP timeout value \
+            //   is used by default, though the configured dead delay value is preferred in the \
+            //   event it is lower than the hard-coded value (unlikely though possible in some \
+            //   setups).
+            return match ping(
+                address_value.ip(),
+                Some(Duration::from_secs(min(
+                    PROBE_ICMP_TIMEOUT_SECONDS,
+                    APP_CONF.metrics.poll_delay_dead,
+                ))),
+                None,
+                None,
+                None,
+                None,
+            ) {
+                Ok(_) => true,
+                Err(_) => false,
+            };
+        }
+    }
+
+    false
 }
 
 fn proceed_replica_probe_tcp(host: &str, port: u16) -> bool {
