@@ -58,7 +58,7 @@ Vigil monitors all your infrastructure services. You first need to configure tar
 
 **There are two kinds of services Vigil can monitor:**
 
-* **HTTP / TCP / ICMP services**: Vigil frequently probe an HTTP, TCP or ICMP target and checks for reachability
+* **HTTP / TCP / ICMP services**: Vigil frequently probes an HTTP, TCP or ICMP target and checks for reachability
 * **Application services**: Install the Vigil Reporter library eg. on your NodeJS app and get reports when your app gets down, as well as when the host server system is overloaded
 
 It is recommended to configure Vigil or Vigil Reporter to send frequent probe checks, as to ensure you are quickly notified when a service gets down (thus to reduce unexpected downtime on your services).
