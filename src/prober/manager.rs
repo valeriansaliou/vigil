@@ -4,7 +4,6 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
-use std::cmp::min;
 use std::net::{TcpStream, ToSocketAddrs};
 use std::sync::Arc;
 use std::sync::RwLock;
@@ -12,8 +11,8 @@ use std::thread;
 use std::time::{Duration, SystemTime};
 use time;
 
+use fastping_rs::{PingResult, Pinger};
 use indexmap::IndexMap;
-use ping::ping;
 use reqwest::blocking::Client;
 use reqwest::header::{HeaderMap, USER_AGENT};
 use reqwest::redirect::Policy as RedirectPolicy;
@@ -32,7 +31,6 @@ use crate::prober::mode::Mode;
 use crate::APP_CONF;
 
 const PROBE_HOLD_MILLISECONDS: u64 = 250;
-const PROBE_ICMP_TIMEOUT_SECONDS: u64 = 4;
 
 lazy_static! {
     pub static ref STORE: Arc<RwLock<Store>> = Arc::new(RwLock::new(Store {
@@ -174,22 +172,25 @@ fn proceed_replica_probe_icmp(host: &str) -> bool {
 
                 debug!("prober poll will fire for icmp target: {}", address_ip);
 
-                // As ICMP pings require a lower-than-usual timeout, an hard-coded ICMP timeout value \
-                //   is used by default, though the configured dead delay value is preferred in the \
-                //   event it is lower than the hard-coded value (unlikely though possible in some \
-                //   setups).
-                return match ping(
-                    address_ip,
-                    Some(Duration::from_secs(min(
-                        PROBE_ICMP_TIMEOUT_SECONDS,
-                        APP_CONF.metrics.poll_delay_dead,
-                    ))),
-                    None,
-                    None,
-                    None,
-                    None,
-                ) {
-                    Ok(_) => true,
+                // As ICMP ping timeouts are hard-coded in the underlying ping library, it is not \
+                //   possible to specify a custom timeout using the regular 'poll_delay_dead' \
+                //   configuration variable.
+                let (pinger, results) =
+                    Pinger::new(None, None).expect("failed to create icmp pinger");
+
+                pinger.add_ipaddr(&address_ip.to_string());
+                pinger.ping_once();
+
+                return match results.recv() {
+                    Ok(result) => match result {
+                        PingResult::Receive { addr: _, rtt: _ } => true,
+                        PingResult::Idle { addr: _ } => {
+                            // An idle host host is routable, but unreachable
+                            debug!("prober poll host idle for icmp target: {}", address_ip);
+
+                            false
+                        }
+                    },
                     Err(err) => {
                         debug!(
                             "prober poll error for icmp target: {} (error: {})",

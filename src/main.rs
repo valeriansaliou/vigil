@@ -17,10 +17,10 @@ extern crate serde_derive;
 #[macro_use]
 extern crate rocket;
 extern crate base64;
+extern crate fastping_rs;
 extern crate indexmap;
 extern crate native_tls;
 extern crate openssl_probe;
-extern crate ping;
 extern crate regex;
 extern crate reqwest;
 extern crate rocket_contrib;
