@@ -4,6 +4,7 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
+use std::cmp::min;
 use std::net::{SocketAddr, TcpStream, ToSocketAddrs};
 use std::sync::Arc;
 use std::sync::RwLock;
@@ -31,6 +32,7 @@ use crate::prober::mode::Mode;
 use crate::APP_CONF;
 
 const PROBE_HOLD_MILLISECONDS: u64 = 250;
+const PROBE_ICMP_TIMEOUT_MILLISECONDS: u64 = 1000;
 
 lazy_static! {
     pub static ref STORE: Arc<RwLock<Store>> = Arc::new(RwLock::new(Store {
@@ -137,16 +139,19 @@ fn proceed_replica_probe(
 ) -> (Status, Duration) {
     let start_time = SystemTime::now();
 
-    let is_up = match replica_url {
+    let (is_up, poll_duration) = match replica_url {
         &ReplicaURL::ICMP(ref host) => proceed_replica_probe_icmp(host),
         &ReplicaURL::TCP(ref host, port) => proceed_replica_probe_tcp(host, port),
         &ReplicaURL::HTTP(ref url) => proceed_replica_probe_http(url, body_match),
         &ReplicaURL::HTTPS(ref url) => proceed_replica_probe_http(url, body_match),
     };
 
-    let duration_latency = SystemTime::now()
-        .duration_since(start_time)
-        .unwrap_or(Duration::from_secs(0));
+    let duration_latency = match poll_duration {
+        Some(poll_duration) => poll_duration,
+        None => SystemTime::now()
+            .duration_since(start_time)
+            .unwrap_or(Duration::from_secs(0)),
+    };
 
     if is_up == true {
         // Probe reports as sick?
@@ -160,10 +165,13 @@ fn proceed_replica_probe(
     }
 }
 
-fn proceed_replica_probe_icmp(host: &str) -> bool {
+fn proceed_replica_probe_icmp(host: &str) -> (bool, Option<Duration>) {
     // Notice: a dummy port of value '0' is set here, so that we can resolve the host to an actual \
     //   IP address using the standard library, which avoids depending on an additional library.
     let address_results = (host, 0).to_socket_addrs();
+
+    // Storage variable for the maximum round-trip-time found for received ping responses
+    let mut maximum_rtt = None;
 
     match address_results {
         Ok(address) => {
@@ -181,26 +189,44 @@ fn proceed_replica_probe_icmp(host: &str) -> bool {
 
                     debug!("prober poll will fire for icmp target: {}", address_ip);
 
-                    // As ICMP ping timeouts are hard-coded in the underlying ping library, it is \
-                    //   not possible to specify a custom timeout using the regular \
-                    //   'poll_delay_dead' configuration variable.
-                    let (pinger, results) =
-                        Pinger::new(None, None).expect("failed to create icmp pinger");
+                    // As ICMP pings require a lower-than-usual timeout, an hard-coded ICMP \
+                    //   timeout value is used by default, though the configured dead delay value \
+                    //   is preferred in the event it is lower than the hard-coded value (unlikely \
+                    //   though possible in some setups).
+                    let pinger_timeout = min(
+                        PROBE_ICMP_TIMEOUT_MILLISECONDS,
+                        APP_CONF.metrics.poll_delay_dead * 1000,
+                    );
+
+                    let (pinger, results) = Pinger::new(Some(pinger_timeout), None)
+                        .expect("failed to create icmp pinger");
 
                     pinger.add_ipaddr(&address_ip.to_string());
                     pinger.ping_once();
 
                     match results.recv() {
                         Ok(result) => match result {
-                            PingResult::Receive { addr: _, rtt: _ } => {
+                            PingResult::Receive { addr, rtt } => {
                                 // Do not return (consider address as reachable)
+                                // Notice: update maximum observed round-trip-time, if higher than \
+                                //   last highest observed.
+                                maximum_rtt = match maximum_rtt {
+                                    Some(maximum_rtt) => {
+                                        if rtt > maximum_rtt {
+                                            Some(rtt)
+                                        } else {
+                                            Some(maximum_rtt)
+                                        }
+                                    }
+                                    None => Some(rtt),
+                                };
                             }
                             PingResult::Idle { addr: _ } => {
                                 debug!("prober poll host idle for icmp target: {}", address_ip);
 
                                 // Consider ICMP idle hosts as a failure (ie. routable, but \
                                 //   unreachable)
-                                return false;
+                                return (false, None);
                             }
                         },
                         Err(err) => {
@@ -210,7 +236,7 @@ fn proceed_replica_probe_icmp(host: &str) -> bool {
                             );
 
                             // Consider ICMP errors as a failure
-                            return false;
+                            return (false, None);
                         }
                     };
                 }
@@ -221,7 +247,7 @@ fn proceed_replica_probe_icmp(host: &str) -> bool {
                 );
 
                 // Consider empty as a failure
-                return false;
+                return (false, None);
             }
         }
         Err(err) => {
@@ -231,15 +257,15 @@ fn proceed_replica_probe_icmp(host: &str) -> bool {
             );
 
             // Consider invalid URL as a failure
-            return false;
+            return (false, None);
         }
     };
 
     // If there was no early return, consider all the hosts as reachable for replica
-    true
+    (true, maximum_rtt)
 }
 
-fn proceed_replica_probe_tcp(host: &str, port: u16) -> bool {
+fn proceed_replica_probe_tcp(host: &str, port: u16) -> (bool, Option<Duration>) {
     let address_results = (host, port).to_socket_addrs();
 
     match address_results {
@@ -251,14 +277,14 @@ fn proceed_replica_probe_tcp(host: &str, port: u16) -> bool {
                     &address_value,
                     Duration::from_secs(APP_CONF.metrics.poll_delay_dead),
                 ) {
-                    Ok(_) => true,
+                    Ok(_) => (true, None),
                     Err(err) => {
                         debug!(
                             "prober poll error for tcp target: {} (error: {})",
                             address_value, err
                         );
 
-                        false
+                        (false, None)
                     }
                 };
             } else {
@@ -276,10 +302,10 @@ fn proceed_replica_probe_tcp(host: &str, port: u16) -> bool {
         }
     };
 
-    false
+    (false, None)
 }
 
-fn proceed_replica_probe_http(url: &str, body_match: &Option<Regex>) -> bool {
+fn proceed_replica_probe_http(url: &str, body_match: &Option<Regex>) -> (bool, Option<Duration>) {
     // Acquire query string separator (if the URL already contains a query string, use append mode)
     let query_separator = if url.contains("?") { "&" } else { "?" };
 
@@ -321,7 +347,7 @@ fn proceed_replica_probe_http(url: &str, body_match: &Option<Regex>) -> bool {
 
                     // Doesnt match? Consider as DOWN.
                     if body_match_regex.is_match(&text) == false {
-                        return false;
+                        return (false, None);
                     }
                 } else {
                     debug!(
@@ -330,11 +356,11 @@ fn proceed_replica_probe_http(url: &str, body_match: &Option<Regex>) -> bool {
                     );
 
                     // Consider as DOWN (the response text could not be checked)
-                    return false;
+                    return (false, None);
                 }
             }
 
-            return true;
+            return (true, None);
         }
     } else {
         debug!(
@@ -344,7 +370,7 @@ fn proceed_replica_probe_http(url: &str, body_match: &Option<Regex>) -> bool {
     }
 
     // Consider as DOWN.
-    false
+    (false, None)
 }
 
 fn proceed_rabbitmq_queue_probe(
