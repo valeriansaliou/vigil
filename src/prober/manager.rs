@@ -167,39 +167,52 @@ fn proceed_replica_probe_icmp(host: &str) -> bool {
     //   IP address using the standard library, which avoids depending on an additional library.
     let address_results = (host, 0).to_socket_addrs();
 
-    if let Ok(mut address) = address_results {
-        if let Some(address_value) = address.next() {
-            let address_ip = address_value.ip();
+    match address_results {
+        Ok(mut address) => {
+            if let Some(address_value) = address.next() {
+                let address_ip = address_value.ip();
 
-            debug!("prober poll will fire for icmp target: {}", address_ip);
+                debug!("prober poll will fire for icmp target: {}", address_ip);
 
-            // As ICMP pings require a lower-than-usual timeout, an hard-coded ICMP timeout value \
-            //   is used by default, though the configured dead delay value is preferred in the \
-            //   event it is lower than the hard-coded value (unlikely though possible in some \
-            //   setups).
-            return match ping(
-                address_ip,
-                Some(Duration::from_secs(min(
-                    PROBE_ICMP_TIMEOUT_SECONDS,
-                    APP_CONF.metrics.poll_delay_dead,
-                ))),
-                None,
-                None,
-                None,
-                None,
-            ) {
-                Ok(_) => true,
-                Err(err) => {
-                    debug!(
-                        "prober poll error for icmp target: {} (error: {})",
-                        address_ip, err
-                    );
+                // As ICMP pings require a lower-than-usual timeout, an hard-coded ICMP timeout value \
+                //   is used by default, though the configured dead delay value is preferred in the \
+                //   event it is lower than the hard-coded value (unlikely though possible in some \
+                //   setups).
+                return match ping(
+                    address_ip,
+                    Some(Duration::from_secs(min(
+                        PROBE_ICMP_TIMEOUT_SECONDS,
+                        APP_CONF.metrics.poll_delay_dead,
+                    ))),
+                    None,
+                    None,
+                    None,
+                    None,
+                ) {
+                    Ok(_) => true,
+                    Err(err) => {
+                        debug!(
+                            "prober poll error for icmp target: {} (error: {})",
+                            address_ip, err
+                        );
 
-                    false
-                }
-            };
+                        false
+                    }
+                };
+            } else {
+                debug!(
+                    "prober poll did not resolve any address for icmp replica: {}",
+                    host
+                );
+            }
         }
-    }
+        Err(err) => {
+            error!(
+                "prober poll address for icmp replica is invalid: {} (error: {})",
+                host, err
+            );
+        }
+    };
 
     false
 }
@@ -207,26 +220,39 @@ fn proceed_replica_probe_icmp(host: &str) -> bool {
 fn proceed_replica_probe_tcp(host: &str, port: u16) -> bool {
     let address_results = (host, port).to_socket_addrs();
 
-    if let Ok(mut address) = address_results {
-        if let Some(address_value) = address.next() {
-            debug!("prober poll will fire for tcp target: {}", address_value);
+    match address_results {
+        Ok(mut address) => {
+            if let Some(address_value) = address.next() {
+                debug!("prober poll will fire for tcp target: {}", address_value);
 
-            return match TcpStream::connect_timeout(
-                &address_value,
-                Duration::from_secs(APP_CONF.metrics.poll_delay_dead),
-            ) {
-                Ok(_) => true,
-                Err(err) => {
-                    debug!(
-                        "prober poll error for tcp target: {} (error: {})",
-                        address_value, err
-                    );
+                return match TcpStream::connect_timeout(
+                    &address_value,
+                    Duration::from_secs(APP_CONF.metrics.poll_delay_dead),
+                ) {
+                    Ok(_) => true,
+                    Err(err) => {
+                        debug!(
+                            "prober poll error for tcp target: {} (error: {})",
+                            address_value, err
+                        );
 
-                    false
-                }
-            };
+                        false
+                    }
+                };
+            } else {
+                debug!(
+                    "prober poll did not resolve any address for tcp replica: {}:{}",
+                    host, port
+                );
+            }
         }
-    }
+        Err(err) => {
+            error!(
+                "prober poll address for tcp replica is invalid: {}:{} (error: {})",
+                host, port, err
+            );
+        }
+    };
 
     false
 }
