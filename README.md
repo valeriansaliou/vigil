@@ -369,7 +369,7 @@ Where:
 * `load.cpu`: The general CPU load, from `0.00` to `1.00` (can be more than `1.00` if the CPU is overloaded)
 * `load.ram`: The general RAM load, from `0.00` to `1.00`
 
-## Troubleshoot Issues
+## :children_crossing: Troubleshoot Issues
 
 ### ICMP replicas always report as `dead`
 
