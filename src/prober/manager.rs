@@ -183,30 +183,47 @@ fn proceed_replica_probe_icmp(host: &str) -> (bool, Option<Duration>) {
             let address_values: Vec<SocketAddr> = address.collect();
 
             if !address_values.is_empty() {
+                debug!(
+                    "prober poll will fire for icmp host: {} ({} targets)",
+                    host,
+                    address_values.len()
+                );
+
+                // As ICMP pings require a lower-than-usual timeout, an hard-coded ICMP \
+                //   timeout value is used by default, though the configured dead delay value \
+                //   is preferred in the event it is lower than the hard-coded value (unlikely \
+                //   though possible in some setups).
+                let pinger_timeout = min(
+                    PROBE_ICMP_TIMEOUT_MILLISECONDS,
+                    APP_CONF.metrics.poll_delay_dead * 1000,
+                );
+
+                let (pinger, results) =
+                    Pinger::new(Some(pinger_timeout), None).expect("failed to create icmp pinger");
+
                 // Probe all returned addresses (sequentially)
-                for address_value in address_values {
+                for address_value in &address_values {
                     let address_ip = address_value.ip();
 
-                    debug!("prober poll will fire for icmp target: {}", address_ip);
-
-                    // As ICMP pings require a lower-than-usual timeout, an hard-coded ICMP \
-                    //   timeout value is used by default, though the configured dead delay value \
-                    //   is preferred in the event it is lower than the hard-coded value (unlikely \
-                    //   though possible in some setups).
-                    let pinger_timeout = min(
-                        PROBE_ICMP_TIMEOUT_MILLISECONDS,
-                        APP_CONF.metrics.poll_delay_dead * 1000,
+                    debug!(
+                        "prober poll will send icmp ping to target: {} from host: {}",
+                        address_ip, host
                     );
 
-                    let (pinger, results) = Pinger::new(Some(pinger_timeout), None)
-                        .expect("failed to create icmp pinger");
-
                     pinger.add_ipaddr(&address_ip.to_string());
-                    pinger.ping_once();
+                }
 
+                pinger.ping_once();
+
+                for _ in &address_values {
                     match results.recv() {
                         Ok(result) => match result {
                             PingResult::Receive { addr, rtt } => {
+                                debug!(
+                                    "got prober poll result for icmp target: {} from host: {}",
+                                    addr, host
+                                );
+
                                 // Do not return (consider address as reachable)
                                 // Notice: update maximum observed round-trip-time, if higher than \
                                 //   last highest observed.
@@ -221,8 +238,11 @@ fn proceed_replica_probe_icmp(host: &str) -> (bool, Option<Duration>) {
                                     None => Some(rtt),
                                 };
                             }
-                            PingResult::Idle { addr: _ } => {
-                                debug!("prober poll host idle for icmp target: {}", address_ip);
+                            PingResult::Idle { addr } => {
+                                debug!(
+                                    "prober poll host idle for icmp target: {} from host: {}",
+                                    addr, host
+                                );
 
                                 // Consider ICMP idle hosts as a failure (ie. routable, but \
                                 //   unreachable)
@@ -230,10 +250,7 @@ fn proceed_replica_probe_icmp(host: &str) -> (bool, Option<Duration>) {
                             }
                         },
                         Err(err) => {
-                            debug!(
-                                "prober poll error for icmp target: {} (error: {})",
-                                address_ip, err
-                            );
+                            debug!("prober poll error for icmp host: {} (error: {})", host, err);
 
                             // Consider ICMP errors as a failure
                             return (false, None);
@@ -277,7 +294,11 @@ fn proceed_replica_probe_tcp(host: &str, port: u16) -> (bool, Option<Duration>) 
                     &address_value,
                     Duration::from_secs(APP_CONF.metrics.poll_delay_dead),
                 ) {
-                    Ok(_) => (true, None),
+                    Ok(_) => {
+                        debug!("prober poll success for tcp target: {}", address_value);
+
+                        (true, None)
+                    }
                     Err(err) => {
                         debug!(
                             "prober poll error for tcp target: {} (error: {})",
