@@ -9,6 +9,7 @@ Group=vigil
 ExecStartPre=/sbin/setcap 'cap_net_raw+ep' /bin/vigil
 ExecStart=/bin/vigil -c /etc/vigil.cfg
 Restart=on-failure
+PermissionsStartOnly=true
 
 [Install]
 WantedBy=multi-user.target
