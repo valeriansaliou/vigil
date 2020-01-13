@@ -169,17 +169,16 @@ fn proceed_replica_probe_icmp(host: &str) -> bool {
 
     if let Ok(mut address) = address_results {
         if let Some(address_value) = address.next() {
-            debug!(
-                "prober poll will fire for icmp target: {}",
-                address_value.ip()
-            );
+            let address_ip = address_value.ip();
+
+            debug!("prober poll will fire for icmp target: {}", address_ip);
 
             // As ICMP pings require a lower-than-usual timeout, an hard-coded ICMP timeout value \
             //   is used by default, though the configured dead delay value is preferred in the \
             //   event it is lower than the hard-coded value (unlikely though possible in some \
             //   setups).
             return match ping(
-                address_value.ip(),
+                address_ip,
                 Some(Duration::from_secs(min(
                     PROBE_ICMP_TIMEOUT_SECONDS,
                     APP_CONF.metrics.poll_delay_dead,
@@ -190,7 +189,14 @@ fn proceed_replica_probe_icmp(host: &str) -> bool {
                 None,
             ) {
                 Ok(_) => true,
-                Err(_) => false,
+                Err(err) => {
+                    debug!(
+                        "prober poll error for icmp target: {} (error: {})",
+                        address_ip, err
+                    );
+
+                    false
+                }
             };
         }
     }
@@ -210,7 +216,14 @@ fn proceed_replica_probe_tcp(host: &str, port: u16) -> bool {
                 Duration::from_secs(APP_CONF.metrics.poll_delay_dead),
             ) {
                 Ok(_) => true,
-                Err(_) => false,
+                Err(err) => {
+                    debug!(
+                        "prober poll error for tcp target: {} (error: {})",
+                        address_value, err
+                    );
+
+                    false
+                }
             };
         }
     }
@@ -242,7 +255,7 @@ fn proceed_replica_probe_http(url: &str, body_match: &Option<Regex>) -> bool {
         let status_code = response_inner.status().as_u16();
 
         debug!(
-            "prober poll result received for url: {} with status: {}",
+            "prober poll result received for http target: {} with status: {}",
             &url_bang, status_code
         );
 
@@ -254,7 +267,7 @@ fn proceed_replica_probe_http(url: &str, body_match: &Option<Regex>) -> bool {
             if let &Some(ref body_match_regex) = body_match {
                 if let Ok(text) = response_inner.text() {
                     debug!(
-                        "checking prober poll result response text for url: {} for any match: {}",
+                        "checking prober poll response text for http target: {} for any match: {}",
                         &url_bang, &text
                     );
 
@@ -263,7 +276,10 @@ fn proceed_replica_probe_http(url: &str, body_match: &Option<Regex>) -> bool {
                         return false;
                     }
                 } else {
-                    debug!("could not unpack response text for url: {}", &url_bang);
+                    debug!(
+                        "could not unpack response text for http target: {}",
+                        &url_bang
+                    );
 
                     // Consider as DOWN (the response text could not be checked)
                     return false;
@@ -273,7 +289,10 @@ fn proceed_replica_probe_http(url: &str, body_match: &Option<Regex>) -> bool {
             return true;
         }
     } else {
-        debug!("prober poll result was not received for url: {}", &url_bang);
+        debug!(
+            "prober poll result was not received for http target: {}",
+            &url_bang
+        );
     }
 
     // Consider as DOWN.
