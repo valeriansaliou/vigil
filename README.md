@@ -369,6 +369,20 @@ Where:
 * `load.cpu`: The general CPU load, from `0.00` to `1.00` (can be more than `1.00` if the CPU is overloaded)
 * `load.ram`: The general RAM load, from `0.00` to `1.00`
 
+## Troubleshoot Issues
+
+### ICMP replicas always report as `dead`
+
+On Linux systems, non-priviledge users cannot create raw sockets, which Vigil ICMP probing system requires. It means that, by default, all ICMP probe attempts will fail silently, as if the host being probed was always down.
+
+This can easily be fixed by allowing Vigil to create raw sockets:
+
+```bash
+setcap 'cap_net_raw+ep' /bin/vigil
+```
+
+_Note that HTTP and TCP probes do not require those raw socket capabilities._
+
 ## :fire: Report A Vulnerability
 
 If you find a vulnerability in Vigil, you are more than welcome to report it directly to [@valeriansaliou](https://github.com/valeriansaliou) by sending an encrypted email to [valerian@valeriansaliou.name](mailto:valerian@valeriansaliou.name). Do not report vulnerabilities in public GitHub issues, as they may be exploited by malicious people to target production servers running an unpatched Vigil server.
