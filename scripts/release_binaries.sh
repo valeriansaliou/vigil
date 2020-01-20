@@ -35,11 +35,13 @@ fi
 
 # Define release pipeline
 function release_for_architecture {
+    alias vigil-rust-musl-builder='docker run --rm -it -v "$(pwd)":/home/rust/src ekidd/rust-musl-builder:nightly'
+
     final_tar="v$VIGIL_VERSION-$1.tar.gz"
 
     rm -rf ./vigil/ && \
-        docker run --rm -it -v "$(pwd)":/home/rust/src ekidd/rust-musl-builder:nightly cargo build --target=$2 --release && \
-        docker run --rm -it -v "$(pwd)":/home/rust/src ekidd/rust-musl-builder:nightly strip ./target/$2/release/vigil && \
+        vigil-rust-musl-builder cargo build --target=$2 --release && \
+        vigil-rust-musl-builder strip ./target/$2/release/vigil && \
         mkdir ./vigil && \
         mv "target/$2/release/vigil" ./vigil/ && \
         cp -r ./config.cfg ./res vigil/ && \
