@@ -13,18 +13,14 @@ We consider here the packaging flow of Vigil version `1.0.0` for Linux.
     1. Bump version in `Cargo.toml` to `1.0.0`
     2. Execute `cargo update` to bump `Cargo.lock`
 
-3. **How to build Vigil for Linux on MacOS (multiple architectures):**
-    1. `rust-musl-builder-nightly cargo build --target=x86_64-unknown-linux-musl --release`
-    2. `rust-musl-builder-nightly strip ./target/x86_64-unknown-linux-musl/release/vigil`
-
-4. **How to build Vigil, package it and release it on GitHub:**
+3. **How to build Vigil, package it and release it on GitHub (multiple architectures):**
     1. `./scripts/release/release_binaries.sh --version=1.0.0`
-    2. Publish the built archives on the [releases](https://github.com/valeriansaliou/vigil/releases) page on GitHub
+    2. Publish all the built archives on the [releases](https://github.com/valeriansaliou/vigil/releases) page on GitHub
 
-5. **How to update Crates:**
+4. **How to update Crates:**
     1. Publish package on Crates: `cargo publish --no-verify`
 
-6. **How to update Docker:**
+5. **How to update Docker:**
     1. `docker build .`
     2. `docker tag [DOCKER_IMAGE_ID] valeriansaliou/vigil:v1.0.0` (insert the built image identifier)
     3. `docker push valeriansaliou/vigil:v1.0.0`
