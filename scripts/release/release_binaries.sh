@@ -56,7 +56,7 @@ function release_for_architecture {
 
 # Run release tasks
 ABSPATH=$(cd "$(dirname "$0")"; pwd)
-BASE_DIR="$ABSPATH/../../"
+BASE_DIR="$ABSPATH/../"
 
 rc=0
 

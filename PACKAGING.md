@@ -14,7 +14,7 @@ We consider here the packaging flow of Vigil version `1.0.0` for Linux.
     2. Execute `cargo update` to bump `Cargo.lock`
 
 3. **How to build Vigil, package it and release it on GitHub (multiple architectures):**
-    1. `./scripts/release/release_binaries.sh --version=1.0.0`
+    1. `./scripts/release_binaries.sh --version=1.0.0`
     2. Publish all the built archives on the [releases](https://github.com/valeriansaliou/vigil/releases) page on GitHub
 
 4. **How to update Crates:**
