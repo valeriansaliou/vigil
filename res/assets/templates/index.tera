@@ -152,7 +152,7 @@
                             </span>
                           </span>
 
-                          {% if replica.metrics.system or replica.metrics.latency or replica.metrics.rabbitmq %}
+                          {% if replica.metrics.system or replica.metrics.latency or replica.metrics.latency == 0 or replica.metrics.rabbitmq %}
                             <span class="tooltip-value-details">
                               {% if replica.metrics.system %}
                                 <span class="tooltip-detail font-sans-regular">
@@ -164,7 +164,7 @@
                                 </span>
                               {% endif %}
 
-                              {% if replica.metrics.latency %}
+                              {% if replica.metrics.latency or replica.metrics.latency == 0 %}
                                 <span class="tooltip-detail font-sans-regular">
                                   <span class="tooltip-detail-label font-sans-semibold">Latency</span>: {{ replica.metrics.latency }}ms
                                 </span>
