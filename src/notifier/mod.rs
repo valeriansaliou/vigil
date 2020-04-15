@@ -15,6 +15,9 @@ pub mod twilio;
 #[cfg(feature = "notifier-slack")]
 pub mod slack;
 
+#[cfg(feature = "notifier-telegram")]
+pub mod telegram;
+
 #[cfg(feature = "notifier-pushover")]
 pub mod pushover;
 
