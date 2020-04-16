@@ -211,6 +211,11 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 * `mention_channel` (type: _boolean_, allowed: `true`, `false`, default: `false`) — Whether to mention channel when sending Slack messages (using _@channel_, which is handy to receive a high-priority notification)
 * `reminders_only` (type: _boolean_, allowed: `true`, `false`, default: `false`) — Whether to send Slack messages only for downtime reminders or everytime
 
+**[notify.telegram]**
+
+* `bot_token` (type: _string_, allowed: any strings, no default) — [Telegram bot token](https://core.telegram.org/bots/api#authorizing-your-bot)
+* `chat_id` (type: _string_, allowed: any strings, no default) — Chat id where you want Vigil to send messages. Can be group chat id (_e.g._ `"@foo"`) or user chat id (_e.g._ `"123456789"`)
+
 **[notify.pushover]**
 
 * `app_token` (type: _string_, allowed: any string, no default) — Pushover application token (you need to create a dedicated Pushover application to get one)
