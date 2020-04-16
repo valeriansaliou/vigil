@@ -786,11 +786,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "libstrophe"
-version = "0.13.1"
+version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "bitflags 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "libstrophe-sys-bindgen 2.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libstrophe-sys-bindgen 4.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "num 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "once_cell 1.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "scopeguard 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -798,7 +798,7 @@ dependencies = [
 
 [[package]]
 name = "libstrophe-sys-bindgen"
-version = "2.1.0"
+version = "4.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
@@ -2143,7 +2143,7 @@ dependencies = [
  "lazy_static 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "lettre 0.9.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "lettre_email 0.9.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "libstrophe 0.13.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libstrophe 0.14.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "native-tls 0.2.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "openssl-probe 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -2424,8 +2424,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum lettre 0.9.2 (registry+https://github.com/rust-lang/crates.io-index)" = "c66afaa5dfadbb81d4e00fd1d1ab057c7cd4c799c5a44e0009386d553587e728"
 "checksum lettre_email 0.9.2 (registry+https://github.com/rust-lang/crates.io-index)" = "bbb68ca999042d965476e47bbdbacd52db0927348b6f8062c44dd04a3b1fd43b"
 "checksum libc 0.2.69 (registry+https://github.com/rust-lang/crates.io-index)" = "99e85c08494b21a9054e7fe1374a732aeadaff3980b6990b94bfd3a70f690005"
-"checksum libstrophe 0.13.1 (registry+https://github.com/rust-lang/crates.io-index)" = "ce666e3764ce25b4d0b802ab715cc8cf157a0bdd19a813cb7df6cbc976e15b9b"
-"checksum libstrophe-sys-bindgen 2.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "a6d851ce22ccfaf9a9b1e620bb8bc4cf619fa5a893e7c7465b850496355f378c"
+"checksum libstrophe 0.14.0 (registry+https://github.com/rust-lang/crates.io-index)" = "ac37d78cce2b990196669ffacef40a49c36c7d7b01f9c10c0a529578c508e5f8"
+"checksum libstrophe-sys-bindgen 4.0.0 (registry+https://github.com/rust-lang/crates.io-index)" = "837ab6b21b9e03f11a6763039fd206c5544b01608a9a2eee23f206b66c653647"
 "checksum log 0.3.9 (registry+https://github.com/rust-lang/crates.io-index)" = "e19e8d5c34a3e0e2223db8e060f9e8264aeeb5c5fc64a4ee9965c062211c024b"
 "checksum log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)" = "14b6052be84e6b71ab17edffc2eeabf5c2c3ae1fdb464aae35ac50c67a44e1f7"
 "checksum maplit 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)" = "3e2e65a1a2e43cfcb47a895c4c8b10d1f4a61097f9f254f183aee60cad9c651d"
