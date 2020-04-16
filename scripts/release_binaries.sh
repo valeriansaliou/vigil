@@ -38,7 +38,7 @@ function release_for_architecture {
     final_tar="v$VIGIL_VERSION-$1.tar.gz"
 
     rm -rf ./vigil/ && \
-        cross build --target "$2" --release && \
+        RUSTFLAGS="-C link-arg=-s" cross build --target "$2" --release && \
         mkdir ./vigil && \
         cp -p "target/$2/release/vigil" ./vigil/ && \
         cp -r ./config.cfg ./res vigil/ && \
