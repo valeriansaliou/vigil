@@ -38,10 +38,9 @@ function release_for_architecture {
     final_tar="v$VIGIL_VERSION-$1.tar.gz"
 
     rm -rf ./vigil/ && \
-        docker run --rm -it -v "$(pwd)":/home/rust/src ekidd/rust-musl-builder:nightly cargo build --target=$2 --release && \
-        docker run --rm -it -v "$(pwd)":/home/rust/src ekidd/rust-musl-builder:nightly strip ./target/$2/release/vigil && \
+        cross build --target "$2" --release && \
         mkdir ./vigil && \
-        mv "target/$2/release/vigil" ./vigil/ && \
+        cp -p "target/$2/release/vigil" ./vigil/ && \
         cp -r ./config.cfg ./res vigil/ && \
         tar -czvf "$final_tar" ./vigil && \
         rm -r ./vigil/
@@ -63,7 +62,9 @@ rc=0
 pushd "$BASE_DIR" > /dev/null
     echo "Executing release steps for Vigil v$VIGIL_VERSION..."
 
-    release_for_architecture "x86_64" "x86_64-unknown-linux-musl"
+    release_for_architecture "x86_64" "x86_64-unknown-linux-musl" && \
+        release_for_architecture "i686" "i686-unknown-linux-musl" && \
+        release_for_architecture "armv7" "armv7-unknown-linux-musleabihf"
     rc=$?
 
     if [ $rc -eq 0 ]; then
