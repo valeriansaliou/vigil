@@ -47,6 +47,7 @@ _👋 You use Vigil and you want to be listed there? [Contact me](https://valeri
   * Email
   * Twilio (SMS)
   * Slack
+  * Telegram
   * Pushover
   * XMPP
   * Webhook
@@ -214,7 +215,7 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 **[notify.telegram]**
 
 * `bot_token` (type: _string_, allowed: any strings, no default) — [Telegram bot token](https://core.telegram.org/bots/api#authorizing-your-bot)
-* `chat_id` (type: _string_, allowed: any strings, no default) — Chat id where you want Vigil to send messages. Can be group chat id (_e.g._ `"@foo"`) or user chat id (_e.g._ `"123456789"`)
+* `chat_id` (type: _string_, allowed: any strings, no default) — Chat identifier where you want Vigil to send messages. Can be group chat identifier (eg. `"@foo"`) or user chat identifier (eg. `"123456789"`)
 
 **[notify.pushover]**
 
