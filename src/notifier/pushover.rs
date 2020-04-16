@@ -32,7 +32,9 @@ impl GenericNotifier for PushoverNotifier {
             // Build up the message text
             let mut message = String::new();
 
-            if notification.changed == false {
+            if notification.startup == true {
+                message.push_str("<b><i>This is a startup alert.</i></b>\n\n");
+            } else if notification.changed == false {
                 message.push_str("<b><i>This is a reminder.</i></b>\n\n");
             }
 

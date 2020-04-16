@@ -50,7 +50,9 @@ impl GenericNotifier for SlackNotifier {
             let mut nodes_label = String::new();
 
             // Build message
-            let message_text = if notification.changed == true {
+            let message_text = if notification.startup == true {
+                format!("Status started up, as: *{}*.", notification.status.as_str())
+            } else if notification.changed == true {
                 format!("Status changed to: *{}*.", notification.status.as_str())
             } else {
                 format!("Status is still: *{}*.", notification.status.as_str())

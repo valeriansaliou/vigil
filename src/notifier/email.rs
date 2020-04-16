@@ -27,7 +27,12 @@ impl GenericNotifier for EmailNotifier {
             // Build up the message text
             let mut message = String::new();
 
-            if notification.changed == true {
+            if notification.startup == true {
+                message.push_str(&format!(
+                    "Status startup alert from: {}\n",
+                    APP_CONF.branding.page_title
+                ));
+            } else if notification.changed == true {
                 message.push_str(&format!(
                     "Status change report from: {}\n",
                     APP_CONF.branding.page_title

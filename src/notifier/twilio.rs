@@ -29,7 +29,9 @@ impl GenericNotifier for TwilioNotifier {
             // Build up the message text
             let mut message = String::new();
 
-            if notification.changed == false {
+            if notification.startup == true {
+                message.push_str("Startup alert for: ");
+            } else if notification.changed == false {
                 message.push_str("Reminder for: ");
             }
 

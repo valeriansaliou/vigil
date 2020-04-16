@@ -36,6 +36,9 @@ struct WebHookPayload<'a> {
 
 #[derive(Serialize)]
 pub enum WebHookPayloadType {
+    #[serde(rename = "startup")]
+    Startup,
+
     #[serde(rename = "changed")]
     Changed,
 
@@ -53,7 +56,9 @@ impl GenericNotifier for WebHookNotifier {
     fn attempt(notify: &ConfigNotify, notification: &Notification) -> Result<(), bool> {
         if let Some(ref webhook) = notify.webhook {
             // Acquire hook type
-            let hook_type = if notification.changed == true {
+            let hook_type = if notification.startup == true {
+                WebHookPayloadType::Startup
+            } else if notification.changed == true {
                 WebHookPayloadType::Changed
             } else {
                 WebHookPayloadType::Reminder

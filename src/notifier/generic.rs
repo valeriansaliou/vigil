@@ -19,6 +19,7 @@ pub struct Notification<'a> {
     pub time: String,
     pub replicas: Vec<&'a str>,
     pub changed: bool,
+    pub startup: bool,
 }
 
 pub trait GenericNotifier {

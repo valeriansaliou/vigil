@@ -44,15 +44,21 @@ impl GenericNotifier for TelegramNotifier {
     fn attempt(notify: &ConfigNotify, notification: &Notification) -> Result<(), bool> {
         if let Some(ref telegram) = notify.telegram {
             // Build message
-            let mut message = if notification.changed == true {
+            let mut message = if notification.startup == true {
                 format!(
-                    "{} Status changed to *{}*.\n",
+                    "{} Status started up, as: *{}*.\n",
+                    notification.status.as_icon(),
+                    notification.status.as_str().to_uppercase()
+                )
+            } else if notification.changed == true {
+                format!(
+                    "{} Status changed to: *{}*.\n",
                     notification.status.as_icon(),
                     notification.status.as_str().to_uppercase()
                 )
             } else {
                 format!(
-                    "{} Status is still *{}*.\n",
+                    "{} Status is still: *{}*.\n",
                     notification.status.as_icon(),
                     notification.status.as_str().to_uppercase()
                 )

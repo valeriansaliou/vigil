@@ -42,6 +42,7 @@ struct BumpedStates {
     status: Status,
     replicas: Vec<String>,
     changed: bool,
+    startup: bool,
 }
 
 fn check_child_status(parent_status: &Status, child_status: &Status) -> Option<Status> {
@@ -224,6 +225,7 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
             status: general_status,
             replicas: bumped_replicas,
             changed: has_changed,
+            startup: false,
         })
     } else {
         None
@@ -243,6 +245,7 @@ fn dispatch_startup_notification() {
                 status: Status::Healthy,
                 replicas: Vec::new(),
                 changed: true,
+                startup: true,
             });
         }
     }
@@ -254,6 +257,7 @@ fn notify(bumped_states: &BumpedStates) {
         time: time_now_as_string().unwrap_or("".to_string()),
         replicas: Vec::from_iter(bumped_states.replicas.iter().map(String::as_str)),
         changed: bumped_states.changed,
+        startup: bumped_states.startup,
     };
 
     if let Some(ref notify) = APP_CONF.notify {
