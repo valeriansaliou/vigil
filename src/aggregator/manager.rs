@@ -234,7 +234,57 @@ fn time_now_as_string() -> Result<String, ()> {
     time::strftime("%H:%M:%S UTC%z", &time::now()).or(Err(()))
 }
 
+fn dispatch_startup_notification() {
+    if let Some(ref conf_notify) = APP_CONF.notify {
+        if conf_notify.startup_notification == true {
+            debug!("sending aggregate startup notification...");
+
+            notify(&BumpedStates {
+                status: Status::Healthy,
+                replicas: Vec::new(),
+                changed: true,
+            });
+        }
+    }
+}
+
+fn notify(bumped_states: &BumpedStates) {
+    let notification = Notification {
+        status: &bumped_states.status,
+        time: time_now_as_string().unwrap_or("".to_string()),
+        replicas: Vec::from_iter(bumped_states.replicas.iter().map(String::as_str)),
+        changed: bumped_states.changed,
+    };
+
+    if let Some(ref notify) = APP_CONF.notify {
+        #[cfg(feature = "notifier-email")]
+        Notification::dispatch::<EmailNotifier>(notify, &notification).ok();
+
+        #[cfg(feature = "notifier-twilio")]
+        Notification::dispatch::<TwilioNotifier>(notify, &notification).ok();
+
+        #[cfg(feature = "notifier-slack")]
+        Notification::dispatch::<SlackNotifier>(notify, &notification).ok();
+
+        #[cfg(feature = "notifier-telegram")]
+        Notification::dispatch::<TelegramNotifier>(notify, &notification).ok();
+
+        #[cfg(feature = "notifier-pushover")]
+        Notification::dispatch::<PushoverNotifier>(notify, &notification).ok();
+
+        #[cfg(feature = "notifier-xmpp")]
+        Notification::dispatch::<XMPPNotifier>(notify, &notification).ok();
+
+        #[cfg(feature = "notifier-webhook")]
+        Notification::dispatch::<WebHookNotifier>(notify, &notification).ok();
+    }
+}
+
 pub fn run() {
+    // Notify that systems are healthy (when booting up aggregator)
+    dispatch_startup_notification();
+
+    // Start aggregate loop
     loop {
         debug!("running an aggregate operation...");
 
@@ -242,35 +292,7 @@ pub fn run() {
         let bumped_states = scan_and_bump_states();
 
         if let Some(ref bumped_states_inner) = bumped_states {
-            let notification = Notification {
-                status: &bumped_states_inner.status,
-                time: time_now_as_string().unwrap_or("".to_string()),
-                replicas: Vec::from_iter(bumped_states_inner.replicas.iter().map(String::as_str)),
-                changed: bumped_states_inner.changed,
-            };
-
-            if let Some(ref notify) = APP_CONF.notify {
-                #[cfg(feature = "notifier-email")]
-                Notification::dispatch::<EmailNotifier>(notify, &notification).ok();
-
-                #[cfg(feature = "notifier-twilio")]
-                Notification::dispatch::<TwilioNotifier>(notify, &notification).ok();
-
-                #[cfg(feature = "notifier-slack")]
-                Notification::dispatch::<SlackNotifier>(notify, &notification).ok();
-
-                #[cfg(feature = "notifier-telegram")]
-                Notification::dispatch::<TelegramNotifier>(notify, &notification).ok();
-
-                #[cfg(feature = "notifier-pushover")]
-                Notification::dispatch::<PushoverNotifier>(notify, &notification).ok();
-
-                #[cfg(feature = "notifier-xmpp")]
-                Notification::dispatch::<XMPPNotifier>(notify, &notification).ok();
-
-                #[cfg(feature = "notifier-webhook")]
-                Notification::dispatch::<WebHookNotifier>(notify, &notification).ok();
-            }
+            notify(bumped_states_inner);
         }
 
         info!(

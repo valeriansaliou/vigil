@@ -185,6 +185,7 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 
 **[notify]**
 
+* `startup_notification` (type: _boolean_, allowed: `true`, `false`, default: `true`) — Whether to send startup notification or not (stating that systems are `healthy`)
 * `reminder_interval` (type: _integer_, allowed: seconds, no default) — Interval at which downtime reminder notifications should be sent (if any)
 
 **[notify.email]**

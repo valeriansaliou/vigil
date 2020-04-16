@@ -92,6 +92,9 @@ pub struct ConfigMetrics {
 
 #[derive(Deserialize)]
 pub struct ConfigNotify {
+    #[serde(default = "defaults::notify_startup_notification")]
+    pub startup_notification: bool,
+
     pub reminder_interval: Option<u64>,
     pub email: Option<ConfigNotifyEmail>,
     pub twilio: Option<ConfigNotifyTwilio>,

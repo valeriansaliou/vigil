@@ -81,10 +81,7 @@ impl GenericNotifier for TelegramNotifier {
             message.push_str(&nodes_count_list_text);
             message.push_str(&format!("\nLink: {}", APP_CONF.branding.page_url.as_str()));
 
-            debug!(
-                "will send Telegram notification with message: {}",
-                &message
-            );
+            debug!("will send Telegram notification with message: {}", &message);
 
             // Generate Telegram chat identifier
             let chat_id = match &telegram.chat_id.parse::<u64>() {

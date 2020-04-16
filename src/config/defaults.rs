@@ -63,6 +63,10 @@ pub fn metrics_push_system_ram_sick_above() -> f32 {
     0.99
 }
 
+pub fn notify_startup_notification() -> bool {
+    true
+}
+
 pub fn notify_email_smtp_host() -> String {
     "localhost".to_string()
 }
