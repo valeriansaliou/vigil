@@ -5,6 +5,7 @@ use reqwest::blocking::Client;
 
 use super::generic::{GenericNotifier, Notification, DISPATCH_TIMEOUT_SECONDS};
 use crate::config::config::ConfigNotify;
+use crate::prober::status::Status;
 use crate::APP_CONF;
 
 lazy_static! {
@@ -36,10 +37,24 @@ impl GenericNotifier for TelegramNotifier {
     fn attempt(notify: &ConfigNotify, notification: &Notification) -> Result<(), bool> {
         if let Some(ref telegram) = notify.telegram {
             // Build message
+            let status_icon = match &notification.status {
+                Status::Dead => "\u{274c}",
+                Status::Sick => "\u{26a0}",
+                Status::Healthy => "\u{2705}",
+            };
+
             let mut message_text = if notification.changed == true {
-                format!("Status changed to *{}*.\n", notification.status.as_str())
+                format!(
+                    "{} Status changed to *{}*.\n",
+                    status_icon,
+                    notification.status.as_str()
+                )
             } else {
-                format!("Status is still *{}*.\n", notification.status.as_str())
+                format!(
+                    "{} Status is still *{}*.\n",
+                    status_icon,
+                    notification.status.as_str()
+                )
             };
 
             let mut replicas_count: HashMap<String, u32> = HashMap::new();
