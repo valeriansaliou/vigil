@@ -42,7 +42,7 @@ _👋 You use Vigil and you want to be listed there? [Contact me](https://valeri
 
 ## Features
 
-* **Monitors automatically your infrastructure services**
+* **Monitors your infrastructure services automatically**
 * **Notifies you when a service gets down** or gets back up via a configured channel:
   * Email
   * Twilio (SMS)
