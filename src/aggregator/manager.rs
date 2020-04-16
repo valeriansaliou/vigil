@@ -24,6 +24,9 @@ use crate::notifier::twilio::TwilioNotifier;
 #[cfg(feature = "notifier-slack")]
 use crate::notifier::slack::SlackNotifier;
 
+#[cfg(feature = "notifier-telegram")]
+use crate::notifier::telegram::TelegramNotifier;
+
 #[cfg(feature = "notifier-pushover")]
 use crate::notifier::pushover::PushoverNotifier;
 
@@ -255,6 +258,9 @@ pub fn run() {
 
                 #[cfg(feature = "notifier-slack")]
                 Notification::dispatch::<SlackNotifier>(notify, &notification).ok();
+
+                #[cfg(feature = "notifier-telegram")]
+                Notification::dispatch::<TelegramNotifier>(notify, &notification).ok();
 
                 #[cfg(feature = "notifier-pushover")]
                 Notification::dispatch::<PushoverNotifier>(notify, &notification).ok();
