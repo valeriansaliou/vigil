@@ -20,6 +20,7 @@ pub fn run() {
         .address(APP_CONF.server.inet.ip().to_string())
         .port(APP_CONF.server.inet.port())
         .workers(APP_CONF.server.workers)
+        .keep_alive(0)
         .finalize()
         .unwrap();
 
