@@ -9,7 +9,7 @@ Vigil is an open-source Status Page you can host on your infrastructure, used to
 
 It is useful in microservices contexts to monitor both apps and backends. If a node goes down in your infrastructure, you receive a status change notification in a Slack channel, Email, Twilio SMS or/and XMPP.
 
-_Tested at Rust version: `rustc 1.42.0-nightly (0a58f5864 2020-01-02)`_
+_Tested at Rust version: `rustc 1.44.0-nightly (dbf8b6bf1 2020-04-19)`_
 
 **🇭🇺 Crafted in Budapest, Hungary.**
 
@@ -111,13 +111,13 @@ You might find it convenient to run Vigil via Docker. You can find the pre-built
 First, pull the `valeriansaliou/vigil` image:
 
 ```bash
-docker pull valeriansaliou/vigil:v1.15.1
+docker pull valeriansaliou/vigil:v1.16.0
 ```
 
 Then, seed it a configuration file and run it (replace `/path/to/your/vigil/config.cfg` with the path to your configuration file):
 
 ```bash
-docker run -p 8080:8080 -v /path/to/your/vigil/config.cfg:/etc/vigil.cfg valeriansaliou/vigil:v1.15.1
+docker run -p 8080:8080 -v /path/to/your/vigil/config.cfg:/etc/vigil.cfg valeriansaliou/vigil:v1.16.0
 ```
 
 In the configuration file, ensure that:
