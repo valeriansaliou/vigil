@@ -12,8 +12,8 @@ use std::thread;
 use std::time::{Duration, SystemTime};
 use time;
 
-use fastping_rs::{PingResult, Pinger};
 use indexmap::IndexMap;
+use ping::ping;
 use reqwest::blocking::Client;
 use reqwest::header::{HeaderMap, USER_AGENT};
 use reqwest::redirect::Policy as RedirectPolicy;
@@ -32,7 +32,7 @@ use crate::prober::mode::Mode;
 use crate::APP_CONF;
 
 const PROBE_HOLD_MILLISECONDS: u64 = 250;
-const PROBE_ICMP_TIMEOUT_MILLISECONDS: u64 = 1000;
+const PROBE_ICMP_TIMEOUT_SECONDS: u64 = 1;
 
 lazy_static! {
     pub static ref STORE: Arc<RwLock<Store>> = Arc::new(RwLock::new(Store {
@@ -193,13 +193,10 @@ fn proceed_replica_probe_icmp(host: &str) -> (bool, Option<Duration>) {
                 //   timeout value is used by default, though the configured dead delay value \
                 //   is preferred in the event it is lower than the hard-coded value (unlikely \
                 //   though possible in some setups).
-                let pinger_timeout = min(
-                    PROBE_ICMP_TIMEOUT_MILLISECONDS,
-                    APP_CONF.metrics.poll_delay_dead * 1000,
-                );
-
-                let (pinger, results) =
-                    Pinger::new(Some(pinger_timeout), None).expect("failed to create icmp pinger");
+                let pinger_timeout = Duration::from_secs(min(
+                    PROBE_ICMP_TIMEOUT_SECONDS,
+                    APP_CONF.metrics.poll_delay_dead,
+                ));
 
                 // Probe all returned addresses (sequentially)
                 for address_value in &address_values {
@@ -210,52 +207,46 @@ fn proceed_replica_probe_icmp(host: &str) -> (bool, Option<Duration>) {
                         address_ip, host
                     );
 
-                    pinger.add_ipaddr(&address_ip.to_string());
-                }
+                    // Acquire ping start time (used for RTT calculation)
+                    let ping_start_time = SystemTime::now();
 
-                pinger.ping_once();
+                    // Ping target IP address
+                    match ping(address_ip, Some(pinger_timeout), None, None, None, None) {
+                        Ok(_) => {
+                            debug!(
+                                "got prober poll response for icmp target: {} from host: {}",
+                                address_ip, host
+                            );
 
-                for _ in &address_values {
-                    match results.recv() {
-                        Ok(result) => match result {
-                            PingResult::Receive { addr, rtt } => {
-                                debug!(
-                                    "got prober poll result for icmp target: {} from host: {}",
-                                    addr, host
-                                );
+                            // Process ping RTT
+                            let ping_rtt = SystemTime::now()
+                                .duration_since(ping_start_time)
+                                .unwrap_or(Duration::from_secs(0));
 
-                                // Do not return (consider address as reachable)
-                                // Notice: update maximum observed round-trip-time, if higher than \
-                                //   last highest observed.
-                                maximum_rtt = match maximum_rtt {
-                                    Some(maximum_rtt) => {
-                                        if rtt > maximum_rtt {
-                                            Some(rtt)
-                                        } else {
-                                            Some(maximum_rtt)
-                                        }
+                            // Do not return (consider address as reachable)
+                            // Notice: update maximum observed round-trip-time, if higher than \
+                            //   last highest observed.
+                            maximum_rtt = match maximum_rtt {
+                                Some(maximum_rtt) => {
+                                    if ping_rtt > maximum_rtt {
+                                        Some(ping_rtt)
+                                    } else {
+                                        Some(maximum_rtt)
                                     }
-                                    None => Some(rtt),
-                                };
-                            }
-                            PingResult::Idle { addr } => {
-                                debug!(
-                                    "prober poll host idle for icmp target: {} from host: {}",
-                                    addr, host
-                                );
-
-                                // Consider ICMP idle hosts as a failure (ie. routable, but \
-                                //   unreachable)
-                                return (false, None);
-                            }
-                        },
+                                }
+                                None => Some(ping_rtt),
+                            };
+                        }
                         Err(err) => {
-                            debug!("prober poll error for icmp host: {} (error: {})", host, err);
+                            debug!(
+                                "prober poll error for icmp target: {} from host: {} (error: {})",
+                                address_ip, host, err
+                            );
 
                             // Consider ICMP errors as a failure
                             return (false, None);
                         }
-                    };
+                    }
                 }
             } else {
                 debug!(
