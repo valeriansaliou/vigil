@@ -24,6 +24,7 @@ extern crate ping;
 extern crate regex;
 extern crate reqwest;
 extern crate rocket_contrib;
+extern crate run_script;
 extern crate serde;
 extern crate time;
 extern crate toml;
@@ -56,14 +57,18 @@ use crate::aggregator::manager::run as run_aggregator;
 use crate::config::config::Config;
 use crate::config::logger::ConfigLogger;
 use crate::config::reader::ConfigReader;
-use crate::prober::manager::{initialize_store as initialize_store_prober, run as run_prober};
+use crate::prober::manager::{
+    initialize_store as initialize_store_prober, run_poll as run_poll_prober,
+    run_script as run_script_prober,
+};
 use crate::responder::manager::run as run_responder;
 
 struct AppArgs {
     config: String,
 }
 
-pub static THREAD_NAME_PROBER: &'static str = "vigil-prober";
+pub static THREAD_NAME_PROBER_POLL: &'static str = "vigil-prober-poll";
+pub static THREAD_NAME_PROBER_SCRIPT: &'static str = "vigil-prober-script";
 pub static THREAD_NAME_AGGREGATOR: &'static str = "vigil-aggregator";
 pub static THREAD_NAME_RESPONDER: &'static str = "vigil-responder";
 
@@ -101,7 +106,18 @@ lazy_static! {
     static ref APP_CONF: Config = ConfigReader::make();
 }
 
-gen_spawn_managed!("prober", spawn_prober, THREAD_NAME_PROBER, run_prober);
+gen_spawn_managed!(
+    "prober-poll",
+    spawn_poll_prober,
+    THREAD_NAME_PROBER_POLL,
+    run_poll_prober
+);
+gen_spawn_managed!(
+    "prober-script",
+    spawn_script_prober,
+    THREAD_NAME_PROBER_SCRIPT,
+    run_script_prober
+);
 gen_spawn_managed!(
     "aggregator",
     spawn_aggregator,
@@ -167,7 +183,8 @@ fn main() {
     initialize_store_prober();
 
     // Spawn probes (background thread)
-    thread::spawn(spawn_prober);
+    thread::spawn(spawn_poll_prober);
+    thread::spawn(spawn_script_prober);
 
     // Spawn aggregator (background thread)
     thread::spawn(spawn_aggregator);

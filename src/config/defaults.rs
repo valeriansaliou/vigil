@@ -63,6 +63,10 @@ pub fn metrics_push_system_ram_sick_above() -> f32 {
     0.99
 }
 
+pub fn metrics_script_interval() -> u64 {
+    300
+}
+
 pub fn notify_startup_notification() -> bool {
     true
 }

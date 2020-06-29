@@ -11,4 +11,7 @@ pub enum Mode {
 
     #[serde(rename = "push")]
     Push,
+
+    #[serde(rename = "script")]
+    Script,
 }

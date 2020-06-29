@@ -74,6 +74,7 @@ pub fn handle(
                 ServiceStatesProbeNodeReplica {
                     status: status,
                     url: None,
+                    script: None,
                     metrics: metrics,
                     load: Some(ServiceStatesProbeNodeReplicaLoad {
                         cpu: load_cpu,

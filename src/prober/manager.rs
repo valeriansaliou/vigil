@@ -18,6 +18,7 @@ use reqwest::blocking::Client;
 use reqwest::header::{HeaderMap, USER_AGENT};
 use reqwest::redirect::Policy as RedirectPolicy;
 use reqwest::StatusCode;
+use run_script::{self, ScriptOptions};
 
 use super::replica::ReplicaURL;
 use super::states::{
@@ -63,6 +64,11 @@ pub struct Store {
     pub notified: Option<SystemTime>,
 }
 
+enum DispatchMode<'a> {
+    Poll(&'a ReplicaURL, &'a Option<Regex>),
+    Script(&'a String),
+}
+
 fn make_default_headers() -> HeaderMap {
     let mut headers = HeaderMap::new();
 
@@ -82,7 +88,7 @@ fn map_poll_replicas() -> Vec<(String, String, String, ReplicaURL, Option<Regex>
     // Acquire states
     let states = &PROBER_STORE.read().unwrap().states;
 
-    // Map hosts to be probed
+    // Map replica URLs to be probed
     for (probe_id, probe) in states.probes.iter() {
         for (node_id, node) in probe.nodes.iter() {
             if node.mode == Mode::Poll {
@@ -108,7 +114,36 @@ fn map_poll_replicas() -> Vec<(String, String, String, ReplicaURL, Option<Regex>
     replica_list
 }
 
-fn proceed_replica_probe_with_retry(
+fn map_script_replicas() -> Vec<(String, String, String, String)> {
+    let mut replica_list = Vec::new();
+
+    // Acquire states
+    let states = &PROBER_STORE.read().unwrap().states;
+
+    // Map scripts to be probed
+    for (probe_id, probe) in states.probes.iter() {
+        for (node_id, node) in probe.nodes.iter() {
+            if node.mode == Mode::Script {
+                for (replica_id, replica) in node.replicas.iter() {
+                    if let Some(ref replica_script) = replica.script {
+                        // Clone values to scan; this ensure the write lock is not held while \
+                        //   the script execution is performed. Same as in `map_poll_replicas()`.
+                        replica_list.push((
+                            probe_id.to_owned(),
+                            node_id.to_owned(),
+                            replica_id.to_owned(),
+                            replica_script.to_owned(),
+                        ));
+                    }
+                }
+            }
+        }
+    }
+
+    replica_list
+}
+
+fn proceed_replica_probe_poll_with_retry(
     replica_url: &ReplicaURL,
     body_match: &Option<Regex>,
 ) -> (Status, Option<Duration>) {
@@ -124,7 +159,7 @@ fn proceed_replica_probe_with_retry(
 
         thread::sleep(Duration::from_millis(PROBE_HOLD_MILLISECONDS));
 
-        let probe_results = proceed_replica_probe(replica_url, body_match);
+        let probe_results = proceed_replica_probe_poll(replica_url, body_match);
 
         status = probe_results.0;
         latency = Some(probe_results.1);
@@ -133,17 +168,17 @@ fn proceed_replica_probe_with_retry(
     (status, latency)
 }
 
-fn proceed_replica_probe(
+fn proceed_replica_probe_poll(
     replica_url: &ReplicaURL,
     body_match: &Option<Regex>,
 ) -> (Status, Duration) {
     let start_time = SystemTime::now();
 
     let (is_up, poll_duration) = match replica_url {
-        &ReplicaURL::ICMP(ref host) => proceed_replica_probe_icmp(host),
-        &ReplicaURL::TCP(ref host, port) => proceed_replica_probe_tcp(host, port),
-        &ReplicaURL::HTTP(ref url) => proceed_replica_probe_http(url, body_match),
-        &ReplicaURL::HTTPS(ref url) => proceed_replica_probe_http(url, body_match),
+        &ReplicaURL::ICMP(ref host) => proceed_replica_probe_poll_icmp(host),
+        &ReplicaURL::TCP(ref host, port) => proceed_replica_probe_poll_tcp(host, port),
+        &ReplicaURL::HTTP(ref url) => proceed_replica_probe_poll_http(url, body_match),
+        &ReplicaURL::HTTPS(ref url) => proceed_replica_probe_poll_http(url, body_match),
     };
 
     let duration_latency = match poll_duration {
@@ -165,7 +200,7 @@ fn proceed_replica_probe(
     }
 }
 
-fn proceed_replica_probe_icmp(host: &str) -> (bool, Option<Duration>) {
+fn proceed_replica_probe_poll_icmp(host: &str) -> (bool, Option<Duration>) {
     // Notice: a dummy port of value '0' is set here, so that we can resolve the host to an actual \
     //   IP address using the standard library, which avoids depending on an additional library.
     let address_results = (host, 0).to_socket_addrs();
@@ -273,7 +308,7 @@ fn proceed_replica_probe_icmp(host: &str) -> (bool, Option<Duration>) {
     (true, maximum_rtt)
 }
 
-fn proceed_replica_probe_tcp(host: &str, port: u16) -> (bool, Option<Duration>) {
+fn proceed_replica_probe_poll_tcp(host: &str, port: u16) -> (bool, Option<Duration>) {
     let address_results = (host, port).to_socket_addrs();
 
     match address_results {
@@ -317,7 +352,10 @@ fn proceed_replica_probe_tcp(host: &str, port: u16) -> (bool, Option<Duration>) 
     (false, None)
 }
 
-fn proceed_replica_probe_http(url: &str, body_match: &Option<Regex>) -> (bool, Option<Duration>) {
+fn proceed_replica_probe_poll_http(
+    url: &str,
+    body_match: &Option<Regex>,
+) -> (bool, Option<Duration>) {
     // Acquire query string separator (if the URL already contains a query string, use append mode)
     let query_separator = if url.contains("?") { "&" } else { "?" };
 
@@ -383,6 +421,29 @@ fn proceed_replica_probe_http(url: &str, body_match: &Option<Regex>) -> (bool, O
 
     // Consider as DOWN.
     (false, None)
+}
+
+fn proceed_replica_probe_script(script: &String) -> Status {
+    match run_script::run(script, &Vec::new(), &ScriptOptions::new()) {
+        Ok((code, _, _)) => {
+            debug!(
+                "prober script execution succeeded with return code: {}",
+                code
+            );
+
+            // Return code '0' goes for 'healthy', '1' goes for 'sick'; any other code is 'dead'
+            match code {
+                0 => Status::Healthy,
+                1 => Status::Sick,
+                _ => Status::Dead,
+            }
+        }
+        Err(err) => {
+            error!("prober script execution failed with error: {}", err);
+
+            Status::Dead
+        }
+    }
 }
 
 fn proceed_rabbitmq_queue_probe(
@@ -474,32 +535,58 @@ fn proceed_rabbitmq_queue_probe(
     (false, false, None)
 }
 
-fn dispatch_polls() {
-    // Probe hosts
-    for probe_replica in map_poll_replicas() {
-        let (replica_status, replica_latency) =
-            proceed_replica_probe_with_retry(&probe_replica.3, &probe_replica.4);
+fn dispatch_replica<'a>(mode: DispatchMode<'a>, probe_id: &str, node_id: &str, replica_id: &str) {
+    // Acquire replica status (with optional latency)
+    let (replica_status, replica_latency) = match mode {
+        DispatchMode::Poll(replica_url, body_match) => {
+            proceed_replica_probe_poll_with_retry(replica_url, body_match)
+        }
+        DispatchMode::Script(script) => (proceed_replica_probe_script(script), None),
+    };
 
-        debug!(
-            "replica probe result: {}:{}:{} => {:?}",
-            &probe_replica.0, &probe_replica.1, &probe_replica.2, replica_status
-        );
+    debug!(
+        "replica probe result: {}:{}:{} => {:?}",
+        probe_id, node_id, replica_id, replica_status
+    );
 
-        // Update replica status (write-lock the store)
-        {
-            let mut store = STORE.write().unwrap();
+    // Update replica status (write-lock the store)
+    {
+        let mut store = STORE.write().unwrap();
 
-            if let Some(ref mut probe) = store.states.probes.get_mut(&probe_replica.0) {
-                if let Some(ref mut node) = probe.nodes.get_mut(&probe_replica.1) {
-                    if let Some(ref mut replica) = node.replicas.get_mut(&probe_replica.2) {
-                        replica.status = replica_status;
+        if let Some(ref mut probe) = store.states.probes.get_mut(probe_id) {
+            if let Some(ref mut node) = probe.nodes.get_mut(node_id) {
+                if let Some(ref mut replica) = node.replicas.get_mut(replica_id) {
+                    replica.status = replica_status;
 
-                        replica.metrics.latency =
-                            replica_latency.map(|duration| duration.as_millis() as u64);
-                    }
+                    replica.metrics.latency =
+                        replica_latency.map(|duration| duration.as_millis() as u64);
                 }
             }
         }
+    }
+}
+
+fn dispatch_polls() {
+    // Probe hosts
+    for probe_replica in map_poll_replicas() {
+        dispatch_replica(
+            DispatchMode::Poll(&probe_replica.3, &probe_replica.4),
+            &probe_replica.0,
+            &probe_replica.1,
+            &probe_replica.2,
+        );
+    }
+}
+
+fn dispatch_scripts() {
+    // Run scripts
+    for probe_replica in map_script_replicas() {
+        dispatch_replica(
+            DispatchMode::Script(&probe_replica.3),
+            &probe_replica.0,
+            &probe_replica.1,
+            &probe_replica.2,
+        );
     }
 }
 
@@ -602,6 +689,7 @@ pub fn initialize_store() {
                 rabbitmq_queue: node.rabbitmq_queue.to_owned(),
             };
 
+            // Node with replicas? (might be a poll node)
             if let Some(ref replicas) = node.replicas {
                 if node.mode != Mode::Poll {
                     panic!("non-poll node cannot have replicas");
@@ -620,6 +708,33 @@ pub fn initialize_store() {
                         ServiceStatesProbeNodeReplica {
                             status: Status::Healthy,
                             url: Some(replica_url),
+                            script: None,
+                            metrics: ServiceStatesProbeNodeReplicaMetrics::default(),
+                            load: None,
+                            report: None,
+                        },
+                    );
+                }
+            }
+
+            // Node with scripts? (might be a script node)
+            if let Some(ref scripts) = node.scripts {
+                if node.mode != Mode::Script {
+                    panic!("non-script node cannot have scripts");
+                }
+
+                for (index, script) in scripts.iter().enumerate() {
+                    debug!(
+                        "prober store: got script {}:{}:#{}",
+                        service.id, node.id, index
+                    );
+
+                    probe_node.replicas.insert(
+                        index.to_string(),
+                        ServiceStatesProbeNodeReplica {
+                            status: Status::Healthy,
+                            url: None,
+                            script: Some(script.to_owned()),
                             metrics: ServiceStatesProbeNodeReplicaMetrics::default(),
                             load: None,
                             report: None,
@@ -637,15 +752,28 @@ pub fn initialize_store() {
     info!("initialized prober store");
 }
 
-pub fn run() {
+pub fn run_poll() {
     loop {
-        debug!("running a probe operation...");
+        debug!("running a poll probe operation...");
 
         dispatch_polls();
 
-        info!("ran probe operation");
+        info!("ran poll probe operation");
 
         // Hold for next aggregate run
         thread::sleep(Duration::from_secs(APP_CONF.metrics.poll_interval));
+    }
+}
+
+pub fn run_script() {
+    loop {
+        debug!("running a script probe operation...");
+
+        dispatch_scripts();
+
+        info!("ran script probe operation");
+
+        // Hold for next aggregate run
+        thread::sleep(Duration::from_secs(APP_CONF.metrics.script_interval));
     }
 }

@@ -88,6 +88,9 @@ pub struct ConfigMetrics {
 
     #[serde(default = "defaults::metrics_push_system_ram_sick_above")]
     pub push_system_ram_sick_above: f32,
+
+    #[serde(default = "defaults::metrics_script_interval")]
+    pub script_interval: u64,
 }
 
 #[derive(Deserialize)]
@@ -217,6 +220,7 @@ pub struct ConfigProbeServiceNode {
     pub label: String,
     pub mode: Mode,
     pub replicas: Option<Vec<String>>,
+    pub scripts: Option<Vec<String>>,
     pub http_body_healthy_match: Option<Regex>,
     pub rabbitmq_queue: Option<String>,
 }
