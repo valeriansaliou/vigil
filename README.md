@@ -333,9 +333,9 @@ Those scripts can be used by advanced Vigil users when their monitoring use case
 
 The replica health should be returned by the script shell as return codes, where:
 
-* **RC `0`**: `healthy`
-* **RC `1`**: `sick`
-* **RC `2` and higher**: `dead`
+* **`rc=0`**: `healthy`
+* **`rc=1`**: `sick`
+* **`rc=2` and higher**: `dead`
 
 As scripts are usually multi-line, script contents can be passed as a literal string, enclosed between `'''`.
 
