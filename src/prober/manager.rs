@@ -423,8 +423,10 @@ fn proceed_replica_probe_poll_http(
     (false, None)
 }
 
-fn proceed_replica_probe_script(script: &String) -> Status {
-    match run_script::run(script, &Vec::new(), &ScriptOptions::new()) {
+fn proceed_replica_probe_script(script: &String) -> (Status, Option<Duration>) {
+    let start_time = SystemTime::now();
+
+    let status = match run_script::run(script, &Vec::new(), &ScriptOptions::new()) {
         Ok((code, _, _)) => {
             debug!(
                 "prober script execution succeeded with return code: {}",
@@ -443,7 +445,9 @@ fn proceed_replica_probe_script(script: &String) -> Status {
 
             Status::Dead
         }
-    }
+    };
+
+    (status, SystemTime::now().duration_since(start_time).ok())
 }
 
 fn proceed_rabbitmq_queue_probe(
@@ -541,7 +545,7 @@ fn dispatch_replica<'a>(mode: DispatchMode<'a>, probe_id: &str, node_id: &str, r
         DispatchMode::Poll(replica_url, body_match) => {
             proceed_replica_probe_poll_with_retry(replica_url, body_match)
         }
-        DispatchMode::Script(script) => (proceed_replica_probe_script(script), None),
+        DispatchMode::Script(script) => proceed_replica_probe_script(script),
     };
 
     debug!(
