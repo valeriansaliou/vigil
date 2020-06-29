@@ -325,6 +325,33 @@ Webhook notifications can be tested with eg. [Webhook.site](https://webhook.site
 
 _You can use those Webhook payloads to create custom notifiers to anywhere. For instance, if you are using Microsoft Teams but not Slack, you may write a tiny PHP script that receives Webhooks from Vigil and forwards a notification to Microsoft Teams. This can be handy; while Vigil only implements convenience notifiers for some selected channels, the Webhook notifier allows you to extend beyond that._
 
+## How can I build script probes?
+
+Vigil lets you build custom probes written as shell scripts, passed in the Vigil configuration as a list of scripts to be executed for a given node.
+
+Those scripts can be used by advanced Vigil users when their monitoring use case requires scripting, ie. when `push` and `poll` probes are not enough.
+
+The replica health should be returned by the script shell as return codes, where:
+
+* RC `0`: `healthy`
+* RC `1`: `sick`
+* RC `2` and higher: `dead`
+
+As scripts are usually multi-line, script contents can be passed as a literal string, enclosed between `'''`.
+
+As an example, the following script configuration always return as `sick`:
+
+```
+scripts = [
+  '''
+  # Do some work...
+  exit 1
+  '''
+]
+```
+
+_Note that scripts are executed in a system shell ran by a Vigil-owned sub-process. Make sure that Vigil runs on an UNIX user with limited privileges. Running Vigil as root would let any configured script perform root-level actions on the machine, which is not recommended._
+
 ## How can I integrate Vigil Reporter in my code?
 
 Vigil Reporter is used to actively submit health information to Vigil from your apps. Apps are best monitored via application probes, which are able to report detailed system information such as CPU and RAM load. This lets Vigil show if an application host system is under high load.
