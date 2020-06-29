@@ -325,9 +325,9 @@ Webhook notifications can be tested with eg. [Webhook.site](https://webhook.site
 
 _You can use those Webhook payloads to create custom notifiers to anywhere. For instance, if you are using Microsoft Teams but not Slack, you may write a tiny PHP script that receives Webhooks from Vigil and forwards a notification to Microsoft Teams. This can be handy; while Vigil only implements convenience notifiers for some selected channels, the Webhook notifier allows you to extend beyond that._
 
-## How can I build script probes?
+## How can I create script probes?
 
-Vigil lets you build custom probes written as shell scripts, passed in the Vigil configuration as a list of scripts to be executed for a given node.
+Vigil lets you create custom probes written as shell scripts, passed in the Vigil configuration as a list of scripts to be executed for a given node.
 
 Those scripts can be used by advanced Vigil users when their monitoring use case requires scripting, ie. when `push` and `poll` probes are not enough.
 
