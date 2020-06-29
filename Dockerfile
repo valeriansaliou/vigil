@@ -4,8 +4,8 @@ RUN apt-get update
 RUN apt-get install -y musl-tools
 
 RUN rustup --version
-RUN rustup install nightly-2020-01-02 && \
-    rustup default nightly-2020-01-02 && \
+RUN rustup install nightly-2020-06-26 && \
+    rustup default nightly-2020-06-26 && \
     rustup target add x86_64-unknown-linux-musl
 
 RUN rustc --version && \
