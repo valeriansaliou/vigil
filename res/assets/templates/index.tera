@@ -144,7 +144,9 @@
                             </span>
 
                             <span class="tooltip-label font-sans-light">
-                              {% if node.mode == "push" %}
+                              {% if node.mode == "script" %}
+                                Checked via a script probe.
+                              {% elif replica.status == "push" %}
                                 Checked via a push probe (Reporter).
                               {% else %}
                                 Checked via a poll probe (HTTP, TCP or ICMP).
