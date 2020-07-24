@@ -407,9 +407,11 @@ Where:
 * `load.cpu`: The general CPU load, from `0.00` to `1.00` (can be more than `1.00` if the CPU is overloaded)
 * `load.ram`: The general RAM load, from `0.00` to `1.00`
 
-## How can I monitor services that are unreachable to Vigil using Vigil Local?
+## How can I monitor services on a different LAN using Vigil Local?
 
 Vigil Local is an (optional) slave daemon that you can use to report internal service health to your Vigil-powered status page master server. It is designed to be used behind a firewall, and to monitor hosts bound to a local loop or LAN network, that are not available to your main Vigil status page.
+
+Vigil Local monitors local `poll` and `script` replicas, and reports their status to Vigil on a periodic basis.
 
 You can [read more on Vigil Local](https://github.com/valeriansaliou/vigil-local) on its repository, and follow the setup instructions.
 
