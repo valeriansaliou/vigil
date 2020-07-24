@@ -409,9 +409,9 @@ Where:
 
 ## How can I monitor services that are unreachable to Vigil using Vigil Local?
 
-Vigil Local is an (optional) slave daemon that you can use to report internal service health to your Vigil-powered status page master server. It is designed to be used behind a firewall, and to monitor hosts bound to a local loop or LAN network, that are not available to your main Vigil status page. It can prove useful as well if you want to fully isolate your Vigil status page from your internal services.
+Vigil Local is an (optional) slave daemon that you can use to report internal service health to your Vigil-powered status page master server. It is designed to be used behind a firewall, and to monitor hosts bound to a local loop or LAN network, that are not available to your main Vigil status page.
 
-You can [read more on Vigil Local](https://github.com/valeriansaliou/vigil-local) on its repository, and follow its setup instructions.
+You can [read more on Vigil Local](https://github.com/valeriansaliou/vigil-local) on its repository, and follow the setup instructions.
 
 ## :children_crossing: Troubleshoot Issues
 
