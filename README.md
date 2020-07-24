@@ -57,12 +57,13 @@ _👋 You use Vigil and you want to be listed there? [Contact me](https://valeri
 
 Vigil monitors all your infrastructure services. You first need to configure target services to be monitored, and then Vigil does the rest for you.
 
-**There are two kinds of services Vigil can monitor:**
+**There are three kinds of services Vigil can monitor:**
 
 * **HTTP / TCP / ICMP services**: Vigil frequently probes an HTTP, TCP or ICMP target and checks for reachability
 * **Application services**: Install the Vigil Reporter library eg. on your NodeJS app and get reports when your app gets down, as well as when the host server system is overloaded
+* **Local services**: Install a slave [Vigil Local](https://github.com/valeriansaliou/vigil-local) daemon to monitor services that cannot be reached by the Vigil master server (eg. services that are on a different LAN)
 
-It is recommended to configure Vigil or Vigil Reporter to send frequent probe checks, as to ensure you are quickly notified when a service gets down (thus to reduce unexpected downtime on your services).
+It is recommended to configure Vigil, Vigil Reporter or Vigil Local to send frequent probe checks, as to ensure you are quickly notified when a service gets down (thus to reduce unexpected downtime on your services).
 
 ## Hosted alternative to Vigil
 
@@ -405,6 +406,12 @@ Where:
 * `interval`: The push interval (in seconds)
 * `load.cpu`: The general CPU load, from `0.00` to `1.00` (can be more than `1.00` if the CPU is overloaded)
 * `load.ram`: The general RAM load, from `0.00` to `1.00`
+
+## How can I monitor services that are unreachable to Vigil using Vigil Local?
+
+Vigil Local is an (optional) slave daemon that you can use to report internal service health to your Vigil-powered status page master server. It is designed to be used behind a firewall, and to monitor hosts bound to a local loop or LAN network, that are not available to your main Vigil status page. It can prove useful as well if you want to fully isolate your Vigil status page from your internal services.
+
+You can [read more on Vigil Local](https://github.com/valeriansaliou/vigil-local) on its repository, and follow its setup instructions.
 
 ## :children_crossing: Troubleshoot Issues
 
