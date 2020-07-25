@@ -15,14 +15,19 @@ use super::asset_file::AssetFile;
 use super::context::{IndexContext, INDEX_CONFIG, INDEX_ENVIRONMENT};
 use super::reporter_guard::ReporterGuard;
 use crate::prober::manager::{run_dispatch_plugins, STORE as PROBER_STORE};
-use crate::prober::report::{handle as handle_report, HandleError};
+use crate::prober::report::{
+    handle_health as handle_health_report, handle_load as handle_load_report, HandleHealthError,
+    HandleLoadError,
+};
+use crate::prober::status::Status as HealthStatus;
 use crate::APP_CONF;
 
 #[derive(Deserialize)]
 pub struct ReporterData {
     replica: String,
     interval: u64,
-    load: ReporterDataLoad,
+    health: Option<HealthStatus>,
+    load: Option<ReporterDataLoad>,
 }
 
 #[derive(Deserialize)]
@@ -56,23 +61,37 @@ pub fn reporter(
     node_id: String,
     data: Json<ReporterData>,
 ) -> Result<(), Status> {
-    match handle_report(
-        &probe_id,
-        &node_id,
-        &data.replica,
-        data.interval,
-        data.load.cpu,
-        data.load.ram,
-    ) {
-        Ok(forward) => {
-            // Trigger a plugins check
-            run_dispatch_plugins(&probe_id, &node_id, forward);
+    // Route report to handler (depending on its contents)
+    if let Some(ref load) = data.load {
+        // Load reports should come for 'push' nodes only
+        match handle_load_report(
+            &probe_id,
+            &node_id,
+            &data.replica,
+            data.interval,
+            load.cpu,
+            load.ram,
+        ) {
+            Ok(forward) => {
+                // Trigger a plugins check
+                run_dispatch_plugins(&probe_id, &node_id, forward);
 
-            Ok(())
+                Ok(())
+            }
+            Err(HandleLoadError::InvalidLoad) => Err(Status::BadRequest),
+            Err(HandleLoadError::WrongMode) => Err(Status::PreconditionFailed),
+            Err(HandleLoadError::NotFound) => Err(Status::NotFound),
         }
-        Err(HandleError::InvalidLoad) => Err(Status::BadRequest),
-        Err(HandleError::WrongMode) => Err(Status::PreconditionFailed),
-        Err(HandleError::NotFound) => Err(Status::NotFound),
+    } else if let Some(ref health) = data.health {
+        // Health reports should come for 'local' nodes only
+        match handle_health_report(&probe_id, &node_id, &data.replica, data.interval, health) {
+            Ok(_) => Ok(()),
+            Err(HandleHealthError::WrongMode) => Err(Status::PreconditionFailed),
+            Err(HandleHealthError::NotFound) => Err(Status::NotFound),
+        }
+    } else {
+        // Report contents is invalid
+        Err(Status::BadRequest)
     }
 }
 

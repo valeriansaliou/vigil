@@ -75,55 +75,84 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
             for (replica_id, replica) in node.replicas.iter_mut() {
                 let mut replica_status = Status::Healthy;
 
-                // Process push metrics?
-                if node.mode == Mode::Push {
-                    // Compare delays and compute a new status?
-                    if let Some(ref replica_report) = replica.report {
-                        if let Ok(duration_since_report) =
-                            SystemTime::now().duration_since(replica_report.time)
-                        {
-                            if duration_since_report
-                                >= (replica_report.interval
-                                    + Duration::from_secs(APP_CONF.metrics.push_delay_dead))
+                // Process metrics
+                match node.mode {
+                    Mode::Push => {
+                        // Compare delays and compute a new status?
+                        if let Some(ref replica_report) = replica.report {
+                            if let Ok(duration_since_report) =
+                                SystemTime::now().duration_since(replica_report.time)
                             {
-                                debug!(
-                                    "replica: {}:{}:{} is dead because it didnt report in a while",
-                                    probe_id, node_id, replica_id
-                                );
+                                if duration_since_report
+                                    >= (replica_report.interval
+                                        + Duration::from_secs(APP_CONF.metrics.push_delay_dead))
+                                {
+                                    debug!(
+                                        "replica: {}:{}:{} is dead because it didnt report in a while",
+                                        probe_id, node_id, replica_id
+                                    );
 
-                                replica_status = Status::Dead;
+                                    replica_status = Status::Dead;
+                                }
+                            }
+                        }
+
+                        // Compare system load indices and compute a new status?
+                        if replica_status == Status::Healthy {
+                            if let Some(ref replica_load) = replica.load {
+                                if (replica_load.cpu > APP_CONF.metrics.push_system_cpu_sick_above)
+                                    || (replica_load.ram
+                                        > APP_CONF.metrics.push_system_ram_sick_above)
+                                {
+                                    debug!(
+                                        "replica: {}:{}:{} is sick because it is overloaded",
+                                        probe_id, node_id, replica_id
+                                    );
+
+                                    replica_status = Status::Sick;
+                                }
+                            }
+                        }
+
+                        // Check RabbitMQ queue full marker?
+                        if replica_status == Status::Healthy {
+                            if let Some(ref replica_load) = replica.load {
+                                if replica_load.queue.stalled == true {
+                                    replica_status = Status::Dead;
+                                } else if replica_load.queue.loaded == true {
+                                    replica_status = Status::Sick;
+                                }
                             }
                         }
                     }
+                    Mode::Local => {
+                        // Assign stored status by default ('local' nodes report their status \
+                        //   themselves)
+                        replica_status = replica.status.to_owned();
 
-                    // Compare system load indices and compute a new status?
-                    if replica_status == Status::Healthy {
-                        if let Some(ref replica_load) = replica.load {
-                            if (replica_load.cpu > APP_CONF.metrics.push_system_cpu_sick_above)
-                                || (replica_load.ram > APP_CONF.metrics.push_system_ram_sick_above)
+                        // Compare delays and compute a new status?
+                        if let Some(ref replica_report) = replica.report {
+                            if let Ok(duration_since_report) =
+                                SystemTime::now().duration_since(replica_report.time)
                             {
-                                debug!(
-                                    "replica: {}:{}:{} is sick because it is overloaded",
-                                    probe_id, node_id, replica_id
-                                );
+                                if duration_since_report
+                                    >= (replica_report.interval
+                                        + Duration::from_secs(APP_CONF.metrics.local_delay_dead))
+                                {
+                                    debug!(
+                                        "replica: {}:{}:{} is dead because it didnt report in a while",
+                                        probe_id, node_id, replica_id
+                                    );
 
-                                replica_status = Status::Sick;
+                                    replica_status = Status::Dead;
+                                }
                             }
                         }
                     }
-
-                    // Check RabbitMQ queue full marker?
-                    if replica_status == Status::Healthy {
-                        if let Some(ref replica_load) = replica.load {
-                            if replica_load.queue.stalled == true {
-                                replica_status = Status::Dead;
-                            } else if replica_load.queue.loaded == true {
-                                replica_status = Status::Sick;
-                            }
-                        }
+                    _ => {
+                        // Forward stored status (eg. 'poll' or 'script' nodes)
+                        replica_status = replica.status.to_owned();
                     }
-                } else {
-                    replica_status = replica.status.to_owned();
                 }
 
                 // Bump node status with worst replica status?

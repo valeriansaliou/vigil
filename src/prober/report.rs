@@ -15,25 +15,33 @@ use crate::prober::manager::STORE as PROBER_STORE;
 use crate::prober::mode::Mode;
 use crate::prober::status::Status;
 
-pub enum HandleError {
+pub enum HandleLoadError {
     InvalidLoad,
     WrongMode,
     NotFound,
 }
 
-pub fn handle(
+pub enum HandleHealthError {
+    WrongMode,
+    NotFound,
+}
+
+pub fn handle_load(
     probe_id: &str,
     node_id: &str,
     replica_id: &str,
     interval: u64,
     load_cpu: f32,
     load_ram: f32,
-) -> Result<Option<String>, HandleError> {
-    debug!("report handle: {}:{}:{}", probe_id, node_id, replica_id);
+) -> Result<Option<String>, HandleLoadError> {
+    debug!(
+        "load report handle: {}:{}:{}",
+        probe_id, node_id, replica_id
+    );
 
     // Validate loads
     if load_cpu < 0.00 || load_ram < 0.00 {
-        return Err(HandleError::InvalidLoad);
+        return Err(HandleLoadError::InvalidLoad);
     }
 
     let mut store = PROBER_STORE.write().unwrap();
@@ -42,7 +50,7 @@ pub fn handle(
         if let Some(ref mut node) = probe.nodes.get_mut(node_id) {
             // Mode isnt push? Dont accept report
             if node.mode != Mode::Push {
-                return Err(HandleError::WrongMode);
+                return Err(HandleLoadError::WrongMode);
             }
 
             // Acquire previous replica status + previous queue load status (follow-up values)
@@ -93,9 +101,58 @@ pub fn handle(
     }
 
     warn!(
-        "report could not be stored: {}:{}:{}",
+        "load report could not be stored: {}:{}:{}",
         probe_id, node_id, replica_id
     );
 
-    Err(HandleError::NotFound)
+    Err(HandleLoadError::NotFound)
+}
+
+pub fn handle_health(
+    probe_id: &str,
+    node_id: &str,
+    replica_id: &str,
+    interval: u64,
+    health: &Status,
+) -> Result<(), HandleHealthError> {
+    debug!(
+        "health report handle: {}:{}:{}",
+        probe_id, node_id, replica_id
+    );
+
+    let mut store = PROBER_STORE.write().unwrap();
+
+    if let Some(ref mut probe) = store.states.probes.get_mut(probe_id) {
+        if let Some(ref mut node) = probe.nodes.get_mut(node_id) {
+            // Mode isnt local? Dont accept report
+            if node.mode != Mode::Local {
+                return Err(HandleHealthError::WrongMode);
+            }
+
+            // Bump stored replica
+            node.replicas.insert(
+                replica_id.to_string(),
+                ServiceStatesProbeNodeReplica {
+                    status: health.to_owned(),
+                    url: None,
+                    script: None,
+                    metrics: ServiceStatesProbeNodeReplicaMetrics::default(),
+                    load: None,
+                    report: Some(ServiceStatesProbeNodeReplicaReport {
+                        time: SystemTime::now(),
+                        interval: Duration::from_secs(interval),
+                    }),
+                },
+            );
+
+            return Ok(());
+        }
+    }
+
+    warn!(
+        "health report could not be stored: {}:{}:{}",
+        probe_id, node_id, replica_id
+    );
+
+    Err(HandleHealthError::NotFound)
 }
