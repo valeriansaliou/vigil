@@ -144,7 +144,9 @@
                             </span>
 
                             <span class="tooltip-label font-sans-light">
-                              {% if node.mode == "script" %}
+                              {% if node.mode == "local" %}
+                                Checked via a local probe (internal).
+                              {% elif node.mode == "script" %}
                                 Checked via a script probe.
                               {% elif replica.status == "push" %}
                                 Checked via a push probe (Reporter).

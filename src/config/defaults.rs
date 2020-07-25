@@ -67,6 +67,10 @@ pub fn metrics_script_interval() -> u64 {
     300
 }
 
+pub fn metrics_local_delay_dead() -> u64 {
+    40
+}
+
 pub fn notify_startup_notification() -> bool {
     true
 }

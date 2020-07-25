@@ -14,4 +14,7 @@ pub enum Mode {
 
     #[serde(rename = "script")]
     Script,
+
+    #[serde(rename = "local")]
+    Local,
 }

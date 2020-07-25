@@ -170,6 +170,7 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 * `push_system_cpu_sick_above` (type: _float_, allowed: system CPU loads, default: `0.90`) — System load indice for CPU above which to consider a node in `push` mode `sick` (ie. UNIX system load)
 * `push_system_ram_sick_above` (type: _float_, allowed: system RAM loads, default: `0.90`) — System load indice for RAM above which to consider a node in `push` mode `sick` (ie. percent RAM used)
 * `script_interval` (type: _integer_, allowed: seconds, default: `300`) — Interval for which to probe nodes in `script` mode
+* `local_delay_dead` (type: _integer_, allowed: seconds, default: `40`) — Delay after which a node in `local` mode is to be considered `dead` (ie. time after which the node did not report)
 
 **[plugins]**
 
@@ -250,7 +251,7 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 
 * `id` (type: _string_, allowed: any unique lowercase string, no default) — Unique identifier of the probed service node (not visible on the status page)
 * `label` (type: _string_, allowed: any string, no default) — Name of the probed service node (visible on the status page)
-* `mode` (type: _string_, allowed: `poll`, `push`, `script`, no default) — Probe mode for this node (ie. `poll` is direct HTTP, TCP or ICMP poll to the URLs set in `replicas`, while `push` is for Vigil Reporter nodes and `script` is used to execute a shell script)
+* `mode` (type: _string_, allowed: `poll`, `push`, `script`, `local`, no default) — Probe mode for this node (ie. `poll` is direct HTTP, TCP or ICMP poll to the URLs set in `replicas`, while `push` is for Vigil Reporter nodes, `script` is used to execute a shell script and `local` is for Vigil Local nodes)
 * `replicas` (type: _array[string]_, allowed: TCP, ICMP or HTTP URLs, default: empty) — Node replica URLs to be probed (only used if `mode` is `poll`)
 * `scripts` (type: _array[string]_, allowed: shell scripts as source code, default: empty) — Shell scripts to be executed on the system as a Vigil sub-process; they are handy to build custom probes (only used if `mode` is `script`)
 * `http_body_healthy_match` (type: _string_, allowed: regular expressions, no default) — HTTP response body for which to report node replica as `healthy` (if the body does not match, the replica will be reported as `dead`, even if the status code check passes; the check uses a `GET` rather than the usual `HEAD` if this option is set)

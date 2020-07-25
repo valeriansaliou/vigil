@@ -91,6 +91,9 @@ pub struct ConfigMetrics {
 
     #[serde(default = "defaults::metrics_script_interval")]
     pub script_interval: u64,
+
+    #[serde(default = "defaults::metrics_local_delay_dead")]
+    pub local_delay_dead: u64,
 }
 
 #[derive(Deserialize)]
