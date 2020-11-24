@@ -210,7 +210,7 @@ pub struct ConfigNotifyWebHook {
 pub struct ConfigNotifyMailgun {
     pub api_url: SerdeUrl,
     pub api_key: String,
-    pub to: String,
+    pub to: Vec<String>,
     pub from: String,
 }
 

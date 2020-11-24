@@ -5,6 +5,7 @@
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
 use std::time::Duration;
+use std::collections::HashMap;
 
 use reqwest::blocking::Client;
 
@@ -66,22 +67,38 @@ impl GenericNotifier for MailgunNotifier {
                     "{}",
                     notification.status.as_str().to_uppercase()
                 ));
-            let response = MAILGUN_HTTP_CLIENT
+            let mut has_sub_delivery_failure = false;
+
+            for to_email in &mailgun.to {
+                // Build form parameters
+                let mut params = HashMap::new();
+                params.insert("from", &sender);
+                params.insert("to", to_email);
+                params.insert("subject", &subject);
+                params.insert("text", &message);     
+
+                let response = MAILGUN_HTTP_CLIENT
                 .post(mailgun.api_url.as_str())
                 .basic_auth("api", Some(&mailgun.api_key))
-                .query(&[("from", &sender), 
-                    ("to", &mailgun.to),
-                    ("subject", &subject),
-                    ("text", &message) ])
+                .form(&params)
                 .send();
 
-            if let Ok(response_inner) = response {
-                if response_inner.status().is_success() == true {
-                    return Ok(());
+                if let Ok(response_inner) = response {
+                    if response_inner.status().is_success() != true {
+                        has_sub_delivery_failure = true;
+                        
+                    }
+                } else {
+                    has_sub_delivery_failure = true;
                 }
             }
+            if has_sub_delivery_failure == true {
+                return Err(true);
+            }
+            return Ok(());
+            
 
-            return Err(true);
+            // return Err(true);
         }
 
         Err(false)
