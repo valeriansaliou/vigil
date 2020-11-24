@@ -109,6 +109,7 @@ pub struct ConfigNotify {
     pub pushover: Option<ConfigNotifyPushover>,
     pub xmpp: Option<ConfigNotifyXMPP>,
     pub webhook: Option<ConfigNotifyWebHook>,
+    pub mailgun: Option<ConfigNotifyMailgun>,
 }
 
 #[derive(Deserialize)]
@@ -203,6 +204,14 @@ pub struct ConfigNotifyXMPP {
 #[derive(Deserialize)]
 pub struct ConfigNotifyWebHook {
     pub hook_url: SerdeUrl,
+}
+
+#[derive(Deserialize)]
+pub struct ConfigNotifyMailgun {
+    pub api_url: SerdeUrl,
+    pub api_key: String,
+    pub to: Vec<String>,
+    pub from: String,
 }
 
 #[derive(Deserialize)]

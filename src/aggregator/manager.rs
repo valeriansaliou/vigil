@@ -36,6 +36,9 @@ use crate::notifier::xmpp::XMPPNotifier;
 #[cfg(feature = "notifier-webhook")]
 use crate::notifier::webhook::WebHookNotifier;
 
+#[cfg(feature = "notifier-mailgun")]
+use crate::notifier::mailgun::MailgunNotifier;
+
 const AGGREGATE_INTERVAL_SECONDS: u64 = 10;
 
 struct BumpedStates {
@@ -310,6 +313,9 @@ fn notify(bumped_states: &BumpedStates) {
 
         #[cfg(feature = "notifier-webhook")]
         Notification::dispatch::<WebHookNotifier>(notify, &notification).ok();
+
+        #[cfg(feature = "notifier-mailgun")]
+        Notification::dispatch::<MailgunNotifier>(notify, &notification).ok();
     }
 }
 
