@@ -243,7 +243,7 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 
 **[notify.mailgun]**
 * `api_key` (type: _string_, allowed: any string, no default) - Your api key
-* `api_url` (type: _string_, allowed: URL, no default) - Your api url (eg. `https://api.mailgun.net/v3/YOUR_DOMAIN_NAME/messages`)
+* `api_url` (type: _array[string]_, allowed: URL, no default) - Your api url (eg. `https://api.mailgun.net/v3/YOUR_DOMAIN_NAME/messages`)
 * `to` (type: _string_, allowed: email address, no default) — Email address to which to send emails
 * `from` (type: _string_, allowed: email address, no default) — Email address from which to send emails
 
