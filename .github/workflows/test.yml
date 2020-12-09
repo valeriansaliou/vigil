@@ -27,8 +27,10 @@ jobs:
             ~/.cargo/git
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-      - name: Cargo Test
-        if: steps.cache-cargo.outputs.cache-hit != 'true'
-        run: cargo test --verbose
       - name: Cargo Build Release
-        run: cargo clean && cargo build --verbose --release
+        if: steps.cache-cargo.outputs.cache-hit != 'true'
+        run: cargo build --verbose --release
+      - name: Cargo Test
+        run: cargo clean && cargo test --verbose
+      - name: rustfmt
+        run: cargo fmt -- --check
