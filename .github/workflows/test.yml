@@ -1,0 +1,34 @@
+on: [push, pull_request]
+
+name: Test and Build
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install Rust Toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly-2020-09-27
+          override: true
+      - name: Verify Versions
+        run: rustc --version && rustup --version && cargo --version
+      - name: Cache Cargo Dependencies
+        id: cache-cargo
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: Cargo Test
+        if: steps.cache-cargo.outputs.cache-hit != 'true'
+        run: cargo test --verbose
+      - name: Cargo Build Release
+        run: cargo clean && cargo build --verbose --release
