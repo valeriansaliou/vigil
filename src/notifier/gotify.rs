@@ -2,6 +2,7 @@
 //
 // Microservices Status Page
 // Copyright: 2019, Valerian Saliou <valerian@valeriansaliou.name>
+// Copyright: 2020, Rachel Chen <rachel@chens.email> - Modified based on pushover.rs
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
 use std::collections::HashMap;
@@ -11,7 +12,6 @@ use reqwest::blocking::Client;
 
 use super::generic::{GenericNotifier, Notification, DISPATCH_TIMEOUT_SECONDS};
 use crate::config::config::ConfigNotify;
-use crate::prober::status::Status;
 use crate::APP_CONF;
 
 lazy_static! {
@@ -31,31 +31,47 @@ impl GenericNotifier for GotifyNotifier {
             let mut message = String::new();
 
             if notification.startup == true {
-                message.push_str("<b><i>This is a startup alert.</i></b>\n\n");
+                message.push_str("This is a startup alert.\n\n");
             } else if notification.changed == false {
-                message.push_str("<b><i>This is a reminder.</i></b>\n\n");
+                message.push_str("This is a reminder.\n\n");
             }
 
             message.push_str(&format!(
-                "<u>Status:</u> <b><font color=\"{}\">{}</font></b>\n",
-                status_to_color(&notification.status),
+                "Status: {}\n",
                 notification.status.as_str().to_uppercase()
             ));
             message.push_str(&format!(
-                "<u>Nodes:</u> {}\n",
-                &notification.replicas.join(", ")
+                "Nodes:\n{}\n",
+                &notification.replicas.join("\n")
             ));
-            message.push_str(&format!("<u>Time:</u> {}", &notification.time));
+            message.push_str(&format!("Time: {}", &notification.time));
 
-            debug!("will send Pushover notification with message: {}", &message);
+            debug!("will send Gotify notification with message: {}", &message);
 
-            let mut has_sub_delivery_failure = false;
+            // https://gotify.net/docs/pushmsg
+            // TODO: render content as markdown
+            let url = format!("{}/message?token={}", gotify.app_url, gotify.app_token);
+            let mut params: HashMap<&str, &str> = HashMap::new();
+            params.insert("title", &APP_CONF.branding.page_title);
+            params.insert("message", &message);
 
-            if has_sub_delivery_failure == true {
-                return Err(true);
+            if notification.changed == false {
+                params.insert("priority", "10");
             }
 
-            return Ok(());
+            let response = GOTIFY_HTTP_CLIENT
+                .post(&url)
+                .form(&params)
+                .send();
+
+            if let Ok(response_inner) = response {
+                if response_inner.status().is_success() != true {
+                    return Err(true);
+                }
+            }else{
+                return Ok(());
+            }
+
         }
 
         Err(false)
@@ -71,13 +87,5 @@ impl GenericNotifier for GotifyNotifier {
 
     fn name() -> &'static str {
         "gotify"
-    }
-}
-
-fn status_to_color(status: &Status) -> &'static str {
-    match status {
-        &Status::Healthy => "#54A158",
-        &Status::Sick => "#D5A048",
-        &Status::Dead => "#C4291C",
     }
 }
