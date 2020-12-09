@@ -2358,7 +2358,7 @@ checksum = "b5a972e5669d67ba988ce3dc826706fb0a8b01471c088cb0b6110b805cc36aed"
 
 [[package]]
 name = "vigil-server"
-version = "1.18.0"
+version = "1.19.0"
 dependencies = [
  "base64 0.12.3",
  "clap",
