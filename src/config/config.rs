@@ -107,9 +107,9 @@ pub struct ConfigNotify {
     pub slack: Option<ConfigNotifySlack>,
     pub telegram: Option<ConfigNotifyTelegram>,
     pub pushover: Option<ConfigNotifyPushover>,
+    pub gotify: Option<ConfigNotifyGotify>,
     pub xmpp: Option<ConfigNotifyXMPP>,
     pub webhook: Option<ConfigNotifyWebHook>,
-    pub gotify: Option<ConfigNotifyGotify>,
 }
 
 #[derive(Deserialize)]
@@ -192,6 +192,15 @@ pub struct ConfigNotifyPushover {
 }
 
 #[derive(Deserialize)]
+pub struct ConfigNotifyGotify {
+    pub app_url: SerdeUrl,
+    pub app_token: String,
+
+    #[serde(default = "defaults::notify_gotify_reminders_only")]
+    pub reminders_only: bool,
+}
+
+#[derive(Deserialize)]
 pub struct ConfigNotifyXMPP {
     pub to: String,
     pub from: String,
@@ -204,15 +213,6 @@ pub struct ConfigNotifyXMPP {
 #[derive(Deserialize)]
 pub struct ConfigNotifyWebHook {
     pub hook_url: SerdeUrl,
-}
-
-#[derive(Deserialize)]
-pub struct ConfigNotifyGotify {
-    pub app_url: SerdeUrl,
-    pub app_token: String,
-
-    #[serde(default = "defaults::notify_gotify_reminders_only")]
-    pub reminders_only: bool,
 }
 
 #[derive(Deserialize)]

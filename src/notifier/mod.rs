@@ -21,11 +21,11 @@ pub mod telegram;
 #[cfg(feature = "notifier-pushover")]
 pub mod pushover;
 
+#[cfg(feature = "notifier-gotify")]
+pub mod gotify;
+
 #[cfg(feature = "notifier-xmpp")]
 pub mod xmpp;
 
 #[cfg(feature = "notifier-webhook")]
 pub mod webhook;
-
-#[cfg(feature = "notifier-gotify")]
-pub mod gotify;

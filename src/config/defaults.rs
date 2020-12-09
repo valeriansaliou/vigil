@@ -111,10 +111,10 @@ pub fn notify_pushover_reminders_only() -> bool {
     false
 }
 
-pub fn notify_xmpp_reminders_only() -> bool {
+pub fn notify_gotify_reminders_only() -> bool {
     false
 }
 
-pub fn notify_gotify_reminders_only() -> bool {
+pub fn notify_xmpp_reminders_only() -> bool {
     false
 }

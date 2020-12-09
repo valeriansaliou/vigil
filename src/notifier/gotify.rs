@@ -2,7 +2,7 @@
 //
 // Microservices Status Page
 // Copyright: 2019, Valerian Saliou <valerian@valeriansaliou.name>
-// Copyright: 2020, Rachel Chen <rachel@chens.email> - Modified based on pushover.rs
+// Copyright: 2020, Rachel Chen <rachel@chens.email>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
 use std::collections::HashMap;
@@ -40,17 +40,18 @@ impl GenericNotifier for GotifyNotifier {
                 "Status: {}\n",
                 notification.status.as_str().to_uppercase()
             ));
-            message.push_str(&format!(
-                "Nodes:\n{}\n",
-                &notification.replicas.join("\n")
-            ));
+            message.push_str(&format!("Nodes:\n{}\n", &notification.replicas.join("\n")));
             message.push_str(&format!("Time: {}", &notification.time));
 
             debug!("will send Gotify notification with message: {}", &message);
 
             // https://gotify.net/docs/pushmsg
             // TODO: render content as markdown
-            let url = format!("{}/message?token={}", gotify.app_url.as_str(), gotify.app_token);
+            let url = format!(
+                "{}/message?token={}",
+                gotify.app_url.as_str(),
+                gotify.app_token
+            );
             let mut params: HashMap<&str, &str> = HashMap::new();
             params.insert("title", &APP_CONF.branding.page_title);
             params.insert("message", &message);
@@ -59,21 +60,17 @@ impl GenericNotifier for GotifyNotifier {
                 params.insert("priority", "10");
             }
 
-            let response = GOTIFY_HTTP_CLIENT
-                .post(&url)
-                .form(&params)
-                .send();
+            let response = GOTIFY_HTTP_CLIENT.post(&url).form(&params).send();
 
             if let Ok(response_inner) = response {
                 if response_inner.status().is_success() != true {
                     return Err(true);
                 }
-            }else{
+            } else {
                 return Err(true);
             }
 
             return Ok(());
-
         }
 
         Err(false)

@@ -30,14 +30,14 @@ use crate::notifier::telegram::TelegramNotifier;
 #[cfg(feature = "notifier-pushover")]
 use crate::notifier::pushover::PushoverNotifier;
 
+#[cfg(feature = "notifier-gotify")]
+use crate::notifier::gotify::GotifyNotifier;
+
 #[cfg(feature = "notifier-xmpp")]
 use crate::notifier::xmpp::XMPPNotifier;
 
 #[cfg(feature = "notifier-webhook")]
 use crate::notifier::webhook::WebHookNotifier;
-
-#[cfg(feature = "notifier-gotify")]
-use crate::notifier::gotify::GotifyNotifier;
 
 const AGGREGATE_INTERVAL_SECONDS: u64 = 10;
 
@@ -308,14 +308,14 @@ fn notify(bumped_states: &BumpedStates) {
         #[cfg(feature = "notifier-pushover")]
         Notification::dispatch::<PushoverNotifier>(notify, &notification).ok();
 
+        #[cfg(feature = "notifier-gotify")]
+        Notification::dispatch::<GotifyNotifier>(notify, &notification).ok();
+
         #[cfg(feature = "notifier-xmpp")]
         Notification::dispatch::<XMPPNotifier>(notify, &notification).ok();
 
         #[cfg(feature = "notifier-webhook")]
         Notification::dispatch::<WebHookNotifier>(notify, &notification).ok();
-
-        #[cfg(feature = "notifier-gotify")]
-        Notification::dispatch::<GotifyNotifier>(notify, &notification).ok();
     }
 }
 
