@@ -50,7 +50,7 @@ impl GenericNotifier for GotifyNotifier {
 
             // https://gotify.net/docs/pushmsg
             // TODO: render content as markdown
-            let url = format!("{}/message?token={}", gotify.app_url, gotify.app_token);
+            let url = format!("{}/message?token={}", gotify.app_url.as_str(), gotify.app_token);
             let mut params: HashMap<&str, &str> = HashMap::new();
             params.insert("title", &APP_CONF.branding.page_title);
             params.insert("message", &message);

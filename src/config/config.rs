@@ -208,7 +208,7 @@ pub struct ConfigNotifyWebHook {
 
 #[derive(Deserialize)]
 pub struct ConfigNotifyGotify {
-    pub app_url: String,
+    pub app_url: SerdeUrl,
     pub app_token: String,
 
     #[serde(default = "defaults::notify_gotify_reminders_only")]
