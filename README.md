@@ -1,7 +1,7 @@
 Vigil
 =====
 
-[![Build Status](https://travis-ci.org/valeriansaliou/vigil.svg?branch=master)](https://travis-ci.org/valeriansaliou/vigil) [![Buy Me A Coffee](https://img.shields.io/badge/buy%20me%20a%20coffee-donate-yellow.svg)](https://www.buymeacoffee.com/valeriansaliou)
+[![Build Status](https://github.com/valeriansaliou/vigil/workflows/test/badge.svg)](https://github.com/valeriansaliou/vigil/actions) [![Buy Me A Coffee](https://img.shields.io/badge/buy%20me%20a%20coffee-donate-yellow.svg)](https://www.buymeacoffee.com/valeriansaliou)
 
 **Microservices Status Page. Monitors a distributed infrastructure and sends alerts (Slack, SMS, etc.).**
 
