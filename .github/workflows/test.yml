@@ -16,6 +16,8 @@ jobs:
         with:
           toolchain: nightly-2020-09-27
           override: true
+      - name: Install cargo-fmt
+        run: rustup component add rustfmt --toolchain nightly
       - name: Verify Versions
         run: rustc --version && rustup --version && cargo --version
       - name: Cache Cargo Dependencies
