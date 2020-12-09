@@ -20,6 +20,7 @@ jobs:
         with:
           toolchain: nightly
           components: rustfmt
+          override: true
 
       - name: Verify versions
         run: rustc --version && rustup --version && cargo --version
