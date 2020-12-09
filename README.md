@@ -51,6 +51,7 @@ _👋 You use Vigil and you want to be listed there? [Contact me](https://valeri
   * Pushover
   * XMPP
   * Webhook
+  * Gotify
 * **Generates a status page**, that you can host on your domain for your public users (eg. `https://status.example.com`)
 
 ## How does it work?
@@ -239,6 +240,12 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 **[notify.webhook]**
 
 * `hook_url` (type: _string_, allowed: URL, no default) — Web Hook URL (eg. `https://domain.com/webhooks/[..]`)
+
+**[notify.gotify]**
+
+* `app_url` (type: _string_, allowed: URL, no default) - Gotify endpoint without trailing slash (e.g. `https://push.gotify.net`)
+* `app_token` (type: _string_, allowed: any string, no default) — Gotify application token
+* `reminders_only` (type: _boolean_, allowed: `true`, `false`, default: `false`) — Whether to send Gotify notifications only for downtime reminders or everytime
 
 **[probe]**
 
