@@ -45,14 +45,17 @@ impl GenericNotifier for GotifyNotifier {
 
             debug!("will send Gotify notification with message: {}", &message);
 
-            // https://gotify.net/docs/pushmsg
-            // TODO: render content as markdown
+            // Generate URL
+            // See: https://gotify.net/docs/pushmsg
             let url = format!(
                 "{}/message?token={}",
                 gotify.app_url.as_str(),
                 gotify.app_token
             );
+
+            // Build message parameters
             let mut params: HashMap<&str, &str> = HashMap::new();
+
             params.insert("title", &APP_CONF.branding.page_title);
             params.insert("message", &message);
 
@@ -60,6 +63,7 @@ impl GenericNotifier for GotifyNotifier {
                 params.insert("priority", "10");
             }
 
+            // Submit message to Gotify
             let response = GOTIFY_HTTP_CLIENT.post(&url).form(&params).send();
 
             if let Ok(response_inner) = response {
