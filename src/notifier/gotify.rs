@@ -69,8 +69,10 @@ impl GenericNotifier for GotifyNotifier {
                     return Err(true);
                 }
             }else{
-                return Ok(());
+                return Err(true);
             }
+
+            return Ok(());
 
         }
 
