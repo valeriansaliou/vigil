@@ -6,7 +6,8 @@ jobs:
   test:
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        rust-toolchain: [stable]
       fail-fast: false
 
     runs-on: ${{ matrix.os }}
@@ -18,7 +19,7 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: nightly
+          toolchain: ${{ matrix.rust-toolchain }}
           components: rustfmt
           override: true
 
@@ -33,7 +34,7 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: ${{ runner.os }}-cargo
+          key: ${{ runner.os }}-cargo-${{ matrix.rust-toolchain }}
 
       - name: Build code
         run: cargo build
