@@ -4,6 +4,8 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
+use log::{debug, error, info, warn};
+use serde_derive::Deserialize;
 use std::cmp::min;
 use std::net::{SocketAddr, TcpStream, ToSocketAddrs};
 use std::sync::Arc;
@@ -35,7 +37,7 @@ use crate::APP_CONF;
 const PROBE_HOLD_MILLISECONDS: u64 = 250;
 const PROBE_ICMP_TIMEOUT_SECONDS: u64 = 1;
 
-lazy_static! {
+lazy_static::lazy_static! {
     pub static ref STORE: Arc<RwLock<Store>> = Arc::new(RwLock::new(Store {
         states: ServiceStates {
             status: Status::Healthy,

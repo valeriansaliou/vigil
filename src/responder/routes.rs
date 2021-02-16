@@ -4,10 +4,12 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
+use serde_derive::Deserialize;
 use std::path::PathBuf;
 
 use rocket::http::Status;
 use rocket::response::NamedFile;
+use rocket::{get, post};
 use rocket_contrib::json::Json;
 use rocket_contrib::templates::Template;
 

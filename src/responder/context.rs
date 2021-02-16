@@ -4,6 +4,7 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
+use serde_derive::Serialize;
 use time;
 use url_serde::SerdeUrl;
 
@@ -12,7 +13,7 @@ use crate::APP_CONF;
 
 const LOGO_EXTENSION_SPLIT_SPAN: usize = 4;
 
-lazy_static! {
+lazy_static::lazy_static! {
     pub static ref INDEX_CONFIG: IndexContextConfig = IndexContextConfig {
         runtime_version: env!("CARGO_PKG_VERSION").to_string(),
         page_title: APP_CONF.branding.page_title.to_owned(),

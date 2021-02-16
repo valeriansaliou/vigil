@@ -44,7 +44,7 @@ pub fn run() {
     rocket::custom(config)
         .mount(
             "/",
-            routes![
+            rocket::routes![
                 routes::index,
                 routes::reporter,
                 routes::robots,

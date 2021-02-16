@@ -4,6 +4,7 @@
 // Copyright: 2019, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
+use log::debug;
 use std::collections::HashMap;
 use std::time::Duration;
 
@@ -14,7 +15,7 @@ use crate::config::config::ConfigNotify;
 use crate::prober::status::Status;
 use crate::APP_CONF;
 
-lazy_static! {
+lazy_static::lazy_static! {
     static ref PUSHOVER_HTTP_CLIENT: Client = Client::builder()
         .timeout(Duration::from_secs(DISPATCH_TIMEOUT_SECONDS))
         .gzip(true)

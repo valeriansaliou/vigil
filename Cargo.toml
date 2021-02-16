@@ -18,7 +18,7 @@ path = "src/main.rs"
 doc = false
 
 [dependencies]
-log = "0.4"
+log = {version = "0.4" ,features = ["std"]}
 clap = { version = "2.33", default-features = false }
 lazy_static = "1.4"
 time = "0.1"

@@ -4,6 +4,7 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
+use log::debug;
 use std::collections::HashMap;
 use std::time::Duration;
 
@@ -17,7 +18,7 @@ static TEXT_MESSAGE_TRUNCATED_INDICATOR: &'static str = "[..]";
 
 const TEXT_MESSAGE_MAXIMUM_LENGTH: usize = 1000;
 
-lazy_static! {
+lazy_static::lazy_static! {
     static ref TWILIO_HTTP_CLIENT: Client = Client::builder()
         .timeout(Duration::from_secs(DISPATCH_TIMEOUT_SECONDS))
         .gzip(true)

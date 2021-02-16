@@ -6,45 +6,13 @@
 
 #![feature(proc_macro_hygiene, decl_macro)]
 
-#[macro_use]
-extern crate log;
-#[macro_use]
-extern crate clap;
-#[macro_use]
-extern crate lazy_static;
-#[macro_use]
-extern crate serde_derive;
-#[macro_use]
-extern crate rocket;
-extern crate base64;
-extern crate indexmap;
-extern crate native_tls;
-extern crate openssl_probe;
-extern crate ping;
-extern crate regex;
-extern crate reqwest;
-extern crate rocket_contrib;
-extern crate run_script;
-extern crate serde;
-extern crate time;
-extern crate toml;
-extern crate url;
-extern crate url_serde;
-
-#[cfg(feature = "notifier-email")]
-extern crate lettre;
-#[cfg(feature = "notifier-email")]
-extern crate lettre_email;
-
-#[cfg(feature = "notifier-xmpp")]
-extern crate libstrophe;
-
 mod aggregator;
 mod config;
 mod notifier;
 mod prober;
 mod responder;
 
+use log::{debug, error, info};
 use std::ops::Deref;
 use std::str::FromStr;
 use std::thread;
@@ -101,7 +69,7 @@ macro_rules! gen_spawn_managed {
     };
 }
 
-lazy_static! {
+lazy_static::lazy_static! {
     static ref APP_ARGS: AppArgs = make_app_args();
     static ref APP_CONF: Config = ConfigReader::make();
 }
@@ -132,10 +100,10 @@ gen_spawn_managed!(
 );
 
 fn make_app_args() -> AppArgs {
-    let matches = App::new(crate_name!())
-        .version(crate_version!())
-        .author(crate_authors!())
-        .about(crate_description!())
+    let matches = App::new(clap::crate_name!())
+        .version(clap::crate_version!())
+        .author(clap::crate_authors!())
+        .about(clap::crate_description!())
         .arg(
             Arg::with_name("config")
                 .short("c")
