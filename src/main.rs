@@ -10,9 +10,14 @@ mod aggregator;
 mod config;
 mod notifier;
 mod prober;
+#[cfg(feature = "web-rocket")]
 mod responder;
 
 use log::{debug, error, info};
+
+#[cfg(feature = "web-rocket")]
+use crate::responder::manager::run as run_responder;
+
 use std::ops::Deref;
 use std::str::FromStr;
 use std::thread;
@@ -29,7 +34,6 @@ use crate::prober::manager::{
     initialize_store as initialize_store_prober, run_poll as run_poll_prober,
     run_script as run_script_prober,
 };
-use crate::responder::manager::run as run_responder;
 
 struct AppArgs {
     config: String,
@@ -92,6 +96,8 @@ gen_spawn_managed!(
     THREAD_NAME_AGGREGATOR,
     run_aggregator
 );
+
+#[cfg(feature = "web-rocket")]
 gen_spawn_managed!(
     "responder",
     spawn_responder,
@@ -158,6 +164,7 @@ fn main() {
     thread::spawn(spawn_aggregator);
 
     // Spawn Web responder (foreground thread)
+    #[cfg(feature = "web-rocket")]
     spawn_responder();
 
     error!("could not start");
