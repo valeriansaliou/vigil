@@ -23,11 +23,11 @@ _Tested at Rust version: `rustc 1.48.0-nightly (7f7a1cbfd 2020-09-27)`_
 
 <table>
 <tr>
-<td align="center"><a href="https://crisp.chat/"><img src="https://valeriansaliou.github.io/vigil/images/crisp-icon.png" height="64" /></a></td>
-<td align="center"><a href="https://www.meilisearch.com/"><img src="https://valeriansaliou.github.io/vigil/images/meili-icon.png" height="64" /></a></td>
-<td align="center"><a href="https://miragespace.com/"><img src="https://valeriansaliou.github.io/vigil/images/miragespace-icon.png" height="64" /></a></td>
-<td align="center"><a href="https://www.redsmin.com/"><img src="https://valeriansaliou.github.io/vigil/images/redsmin-icon.png" height="64" /></a></td>
-<td align="center"><a href="https://www.image-charts.com/"><img src="https://valeriansaliou.github.io/vigil/images/imagecharts-icon.png" height="64" /></a></td>
+<td align="center"><a href="https://crisp.chat/"><img src="https://valeriansaliou.github.io/vigil/images/crisp-icon.png" width="64" /></a></td>
+<td align="center"><a href="https://www.meilisearch.com/"><img src="https://valeriansaliou.github.io/vigil/images/meili-icon.png" width="64" /></a></td>
+<td align="center"><a href="https://miragespace.com/"><img src="https://valeriansaliou.github.io/vigil/images/miragespace-icon.png" width="64" /></a></td>
+<td align="center"><a href="https://www.redsmin.com/"><img src="https://valeriansaliou.github.io/vigil/images/redsmin-icon.png" width="64" /></a></td>
+<td align="center"><a href="https://www.image-charts.com/"><img src="https://valeriansaliou.github.io/vigil/images/imagecharts-icon.png" width="64" /></a></td>
 </tr>
 <tr>
 <td align="center">Crisp</td>
@@ -302,9 +302,9 @@ When a monitored backend or app goes down in your infrastructure, Vigil can let 
 You can also get nice realtime `down` and `up` alerts on your eg. iPhone and Apple Watch:
 
 <p align="center">
-  <img src="https://valeriansaliou.github.io/vigil/images/alert-slack-iphone.png" height="400" alt="Vigil down alert on iPhone (Slack)" />
-  <img src="https://valeriansaliou.github.io/vigil/images/alert-slack-watch.jpg" height="400" alt="Vigil up alert on Apple Watch (Slack)" />
-  <img src="https://valeriansaliou.github.io/vigil/images/alert-twilio-iphone.png" height="400" alt="Vigil alerts on iPhone (Twilio SMS)" />
+  <img src="https://valeriansaliou.github.io/vigil/images/alert-slack-iphone.png" width="225" alt="Vigil down alert on iPhone (Slack)" />
+  <img src="https://valeriansaliou.github.io/vigil/images/alert-slack-watch.jpg" width="426" alt="Vigil up alert on Apple Watch (Slack)" />
+  <img src="https://valeriansaliou.github.io/vigil/images/alert-twilio-iphone.png" width="225" alt="Vigil alerts on iPhone (Twilio SMS)" />
 <p>
 
 ## What do Webhook payloads look like?
