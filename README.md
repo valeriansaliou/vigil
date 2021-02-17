@@ -302,9 +302,9 @@ When a monitored backend or app goes down in your infrastructure, Vigil can let 
 You can also get nice realtime `down` and `up` alerts on your eg. iPhone and Apple Watch:
 
 <p align="center">
-  <img src="https://valeriansaliou.github.io/vigil/images/alert-slack-iphone.png" width="225" alt="Vigil down alert on iPhone (Slack)" />
-  <img src="https://valeriansaliou.github.io/vigil/images/alert-slack-watch.jpg" width="426" alt="Vigil up alert on Apple Watch (Slack)" />
-  <img src="https://valeriansaliou.github.io/vigil/images/alert-twilio-iphone.png" width="225" alt="Vigil alerts on iPhone (Twilio SMS)" />
+  <img src="https://valeriansaliou.github.io/vigil/images/alert-slack-iphone.png" width="210" alt="Vigil down alert on iPhone (Slack)" />
+  <img src="https://valeriansaliou.github.io/vigil/images/alert-slack-watch.jpg" width="398" alt="Vigil up alert on Apple Watch (Slack)" />
+  <img src="https://valeriansaliou.github.io/vigil/images/alert-twilio-iphone.png" width="210" alt="Vigil alerts on iPhone (Twilio SMS)" />
 <p>
 
 ## What do Webhook payloads look like?
