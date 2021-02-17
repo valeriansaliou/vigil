@@ -4,13 +4,12 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
-#![feature(proc_macro_hygiene, decl_macro)]
+//#![feature(proc_macro_hygiene, decl_macro)]
 
 mod aggregator;
 mod config;
 mod notifier;
 mod prober;
-#[cfg(feature = "web-rocket")]
 mod responder;
 
 use log::{debug, error, info};
