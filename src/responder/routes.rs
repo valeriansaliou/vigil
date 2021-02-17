@@ -16,27 +16,13 @@ use rocket_contrib::templates::Template;
 use super::asset_file::AssetFile;
 use super::context::{IndexContext, INDEX_CONFIG, INDEX_ENVIRONMENT};
 use super::reporter_guard::ReporterGuard;
+use super::request_payload::ReporterData;
 use crate::prober::manager::{run_dispatch_plugins, STORE as PROBER_STORE};
 use crate::prober::report::{
     handle_health as handle_health_report, handle_load as handle_load_report, HandleHealthError,
     HandleLoadError,
 };
-use crate::prober::status::Status as HealthStatus;
 use crate::APP_CONF;
-
-#[derive(Deserialize)]
-pub struct ReporterData {
-    replica: String,
-    interval: u64,
-    health: Option<HealthStatus>,
-    load: Option<ReporterDataLoad>,
-}
-
-#[derive(Deserialize)]
-pub struct ReporterDataLoad {
-    cpu: f32,
-    ram: f32,
-}
 
 #[get("/")]
 pub fn index() -> Template {

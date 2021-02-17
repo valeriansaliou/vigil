@@ -4,6 +4,8 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
+mod request_payload;
+
 #[cfg(feature = "web-rocket")]
 mod asset_file;
 mod context;
@@ -14,3 +16,6 @@ mod routes;
 
 #[cfg(feature = "web-rocket")]
 pub mod manager;
+
+#[cfg(feature = "web-actix")]
+pub mod server;
