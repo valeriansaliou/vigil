@@ -42,6 +42,7 @@ lettre_email = { version = "0.9", optional = true }
 libstrophe = { version = "0.13", default-features = false, optional = true }
 actix-web = { version = "3.3", optional = true }
 actix-files = { version = "0.5", optional = true }
+tera = { version = "1.6", optional = true }
 
 [features]
 default = ["notifier-email", "notifier-twilio", "notifier-slack", "notifier-telegram", "notifier-pushover", "notifier-gotify", "notifier-webhook"]
@@ -54,7 +55,7 @@ notifier-gotify = []
 notifier-webhook = []
 notifier-xmpp = ["libstrophe"]
 web-rocket = ["rocket", "rocket_contrib"]
-web-actix = ["actix-web", "actix-files"]
+web-actix = ["actix-web", "actix-files", "tera"]
 
 [profile.dev]
 opt-level = 0

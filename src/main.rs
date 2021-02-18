@@ -16,6 +16,8 @@ use log::{debug, error, info};
 
 #[cfg(feature = "web-rocket")]
 use crate::responder::manager::run as run_responder;
+#[cfg(feature = "web-actix")]
+use crate::responder::server::run as run_actix;
 
 use std::ops::Deref;
 use std::str::FromStr;
@@ -42,6 +44,7 @@ pub static THREAD_NAME_PROBER_POLL: &'static str = "vigil-prober-poll";
 pub static THREAD_NAME_PROBER_SCRIPT: &'static str = "vigil-prober-script";
 pub static THREAD_NAME_AGGREGATOR: &'static str = "vigil-aggregator";
 pub static THREAD_NAME_RESPONDER: &'static str = "vigil-responder";
+pub static THREAD_NAME_ACTIX_RESPONDER: &'static str = "vigil-actix-responder";
 
 macro_rules! gen_spawn_managed {
     ($name:expr, $method:ident, $thread_name:ident, $managed_fn:ident) => {
@@ -102,6 +105,14 @@ gen_spawn_managed!(
     spawn_responder,
     THREAD_NAME_RESPONDER,
     run_responder
+);
+
+#[cfg(feature = "web-actix")]
+gen_spawn_managed!(
+    "responder_axtix",
+    spawn_actix_responder,
+    THREAD_NAME_ACTIX_RESPONDER,
+    run_actix
 );
 
 fn make_app_args() -> AppArgs {
@@ -165,6 +176,9 @@ fn main() {
     // Spawn Web responder (foreground thread)
     #[cfg(feature = "web-rocket")]
     spawn_responder();
+
+    #[cfg(feature = "web-actix")]
+    spawn_actix_responder();
 
     error!("could not start");
 }

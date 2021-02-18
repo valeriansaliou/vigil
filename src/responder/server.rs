@@ -1,3 +1,4 @@
+use super::context::{IndexContext, INDEX_CONFIG, INDEX_ENVIRONMENT};
 use super::request_payload::ReporterData;
 use crate::prober::manager::{run_dispatch_plugins, STORE as PROBER_STORE};
 use crate::prober::report::{
@@ -5,9 +6,10 @@ use crate::prober::report::{
     HandleLoadError,
 };
 use actix_files::NamedFile;
-use actix_web::{get, post, web, web::Json, App, HttpResponse, HttpServer, Responder};
+use actix_web::{get, post, rt, web, web::Data, web::Json, App, HttpResponse, HttpServer};
 
 use crate::APP_CONF;
+use tera::Tera;
 
 #[post("/reporter/{probe_id}/{node_id}")]
 pub async fn reporter(
@@ -50,7 +52,7 @@ pub async fn reporter(
 
 #[get("/robots.txt")]
 pub async fn robots() -> Option<NamedFile> {
-    NamedFile::open(APP_CONF.assets.path.join("./public/robots.txt")).ok()
+    NamedFile::open(APP_CONF.assets.path.join("public").join("robots.txt")).ok()
 }
 
 #[get("/status/text")]
@@ -67,34 +69,76 @@ pub async fn badge(web::Path(kind): web::Path<String>) -> Option<NamedFile> {
         APP_CONF
             .assets
             .path
-            .join(format!("./images/badges/{}-{}-default.svg", kind, status)),
+            .join("images")
+            .join("badges")
+            .join(format!("{}-{}-default.svg", kind, status)),
     )
     .ok()
 }
 
-#[get("/assets/fonts/{file}")]
-pub async fn assets_fonts(web::Path(file): web::Path<String>) -> Option<NamedFile> {
-    NamedFile::open(APP_CONF.assets.path.join("./fonts").join(file)).ok()
+#[get("/assets/fonts/{folder}/{file}")]
+pub async fn assets_fonts(
+    web::Path((folder, file)): web::Path<(String, String)>,
+) -> Option<NamedFile> {
+    NamedFile::open(APP_CONF.assets.path.join("fonts").join(folder).join(file)).ok()
 }
 
-#[get("/assets/images/{file}")]
-pub async fn assets_images(web::Path(file): web::Path<String>) -> Option<NamedFile> {
-    NamedFile::open(APP_CONF.assets.path.join("./images").join(file)).ok()
+#[get("/assets/images/{folder}/{file}")]
+pub async fn assets_images(
+    web::Path((folder, file)): web::Path<(String, String)>,
+) -> Option<NamedFile> {
+    NamedFile::open(APP_CONF.assets.path.join("images").join(folder).join(file)).ok()
 }
 
 #[get("/assets/stylesheets/{file}")]
 pub async fn assets_stylesheets(web::Path(file): web::Path<String>) -> Option<NamedFile> {
-    NamedFile::open(APP_CONF.assets.path.join("./stylesheets").join(file)).ok()
+    NamedFile::open(APP_CONF.assets.path.join("stylesheets").join(file)).ok()
 }
 
 #[get("/assets/javascripts/{file}")]
 pub async fn assets_javascripts(web::Path(file): web::Path<String>) -> Option<NamedFile> {
-    NamedFile::open(APP_CONF.assets.path.join("./javascripts").join(file)).ok()
+    NamedFile::open(APP_CONF.assets.path.join("javascripts").join(file)).ok()
 }
 
-pub async fn run() {
-    HttpServer::new(|| {
+#[get("/")]
+pub fn index(tera: Data<Tera>) -> HttpResponse {
+    // Notice acquire lock in a block to release it ASAP (ie. before template renders)
+    let context = {
+        IndexContext {
+            states: &PROBER_STORE.read().unwrap().states,
+            environment: &*INDEX_ENVIRONMENT,
+            config: &*INDEX_CONFIG,
+        }
+    };
+    let render = tera.render(
+        "index.tera",
+        &tera::Context::from_serialize(context).unwrap(),
+    );
+    if let Ok(s) = render {
+        HttpResponse::Ok().content_type("text/html").body(s)
+    } else {
+        HttpResponse::InternalServerError().body(format!("Template Error {:?}", render))
+    }
+}
+
+pub fn run() {
+    let mut runtime = rt::System::new("test");
+
+    let templates: String = APP_CONF
+        .assets
+        .path
+        .canonicalize()
+        .unwrap()
+        .join("templates")
+        .join("*")
+        .to_str()
+        .unwrap()
+        .into();
+    let tera = Tera::new(&templates).unwrap();
+
+    let server = HttpServer::new(move || {
         App::new()
+            .data(tera.clone())
             .service(assets_javascripts)
             .service(assets_stylesheets)
             .service(assets_images)
@@ -103,10 +147,11 @@ pub async fn run() {
             .service(status_text)
             .service(robots)
             .service(reporter)
+            .service(index)
     })
     .bind(APP_CONF.server.inet)
     .unwrap()
-    .run()
-    .await
-    .unwrap();
+    .run();
+
+    runtime.block_on(server).unwrap()
 }
