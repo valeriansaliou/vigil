@@ -6,16 +6,6 @@
 
 mod request_payload;
 
-#[cfg(feature = "web-rocket")]
-mod asset_file;
 mod context;
-#[cfg(feature = "web-rocket")]
-mod reporter_guard;
-#[cfg(feature = "web-rocket")]
-mod routes;
 
-#[cfg(feature = "web-rocket")]
-pub mod manager;
-
-#[cfg(feature = "web-actix")]
 pub mod server;

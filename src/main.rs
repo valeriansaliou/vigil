@@ -14,9 +14,6 @@ mod responder;
 
 use log::{debug, error, info};
 
-#[cfg(feature = "web-rocket")]
-use crate::responder::manager::run as run_responder;
-#[cfg(feature = "web-actix")]
 use crate::responder::server::run as run_actix;
 
 use std::ops::Deref;
@@ -99,19 +96,10 @@ gen_spawn_managed!(
     run_aggregator
 );
 
-#[cfg(feature = "web-rocket")]
 gen_spawn_managed!(
     "responder",
     spawn_responder,
     THREAD_NAME_RESPONDER,
-    run_responder
-);
-
-#[cfg(feature = "web-actix")]
-gen_spawn_managed!(
-    "responder_axtix",
-    spawn_actix_responder,
-    THREAD_NAME_ACTIX_RESPONDER,
     run_actix
 );
 
@@ -174,11 +162,7 @@ fn main() {
     thread::spawn(spawn_aggregator);
 
     // Spawn Web responder (foreground thread)
-    #[cfg(feature = "web-rocket")]
     spawn_responder();
-
-    #[cfg(feature = "web-actix")]
-    spawn_actix_responder();
 
     error!("could not start");
 }

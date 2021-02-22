@@ -143,7 +143,9 @@ async fn authenticate(
         if *password == APP_CONF.server.reporter_token {
             Ok(req)
         } else {
-            Err(AuthenticationError::from(config).into())
+            let mut error = AuthenticationError::from(config);
+            *error.status_code_mut() = actix_web::http::StatusCode::FORBIDDEN;
+            Err(error.into())
         }
     } else {
         Err(AuthenticationError::from(config).into())
