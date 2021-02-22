@@ -7,7 +7,7 @@ use crate::prober::report::{
 };
 use actix_files::NamedFile;
 use actix_web::{
-    dev::ServiceRequest, get, post, rt, web, web::Data, web::Json, App, Error as ActixError,
+    dev::ServiceRequest, get, guard, rt, web, web::Data, web::Json, App, Error as ActixError,
     HttpResponse, HttpServer,
 };
 
@@ -21,7 +21,8 @@ use actix_web_httpauth::{
 };
 use tera::Tera;
 
-#[post("/reporter/{probe_id}/{node_id}")]
+//The path is defined on the install of the service
+//#[post("/reporter/{probe_id}/{node_id}")]
 pub async fn reporter(
     web::Path((probe_id, node_id)): web::Path<(String, String)>,
     data: Json<ReporterData>,
@@ -178,11 +179,14 @@ pub fn run() {
             .service(badge)
             .service(status_text)
             .service(robots)
-            .service(reporter)
             .service(index)
-            .wrap(middleware_auth.clone())
             .data(ConfigAuth::default().realm("Reporter Token"))
-            .service(reporter)
+            .service(
+                web::resource("/reporter/{probe_id}/{node_id}")
+                    .wrap(middleware_auth.clone())
+                    .guard(guard::Post())
+                    .to(reporter),
+            )
     })
     .bind(APP_CONF.server.inet)
     .unwrap()
