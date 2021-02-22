@@ -6,9 +6,19 @@ use crate::prober::report::{
     HandleLoadError,
 };
 use actix_files::NamedFile;
-use actix_web::{get, post, rt, web, web::Data, web::Json, App, HttpResponse, HttpServer};
+use actix_web::{
+    dev::ServiceRequest, get, post, rt, web, web::Data, web::Json, App, Error as ActixError,
+    HttpResponse, HttpServer,
+};
 
 use crate::APP_CONF;
+use actix_web_httpauth::{
+    extractors::{
+        basic::{BasicAuth, Config as ConfigAuth},
+        AuthenticationError,
+    },
+    middleware::HttpAuthentication,
+};
 use tera::Tera;
 
 #[post("/reporter/{probe_id}/{node_id}")]
@@ -121,6 +131,25 @@ pub fn index(tera: Data<Tera>) -> HttpResponse {
     }
 }
 
+async fn authenticate(
+    req: ServiceRequest,
+    credentials: BasicAuth,
+) -> Result<ServiceRequest, ActixError> {
+    let config = req
+        .app_data::<ConfigAuth>()
+        .map(|data| data.clone())
+        .unwrap_or_else(ConfigAuth::default);
+    if let Some(password) = credentials.password() {
+        if *password == APP_CONF.server.reporter_token {
+            Ok(req)
+        } else {
+            Err(AuthenticationError::from(config).into())
+        }
+    } else {
+        Err(AuthenticationError::from(config).into())
+    }
+}
+
 pub fn run() {
     let mut runtime = rt::System::new("test");
 
@@ -135,6 +164,7 @@ pub fn run() {
         .unwrap()
         .into();
     let tera = Tera::new(&templates).unwrap();
+    let middleware_auth = HttpAuthentication::basic(authenticate);
 
     let server = HttpServer::new(move || {
         App::new()
@@ -148,6 +178,9 @@ pub fn run() {
             .service(robots)
             .service(reporter)
             .service(index)
+            .wrap(middleware_auth.clone())
+            .data(ConfigAuth::default().realm("Reporter Token"))
+            .service(reporter)
     })
     .bind(APP_CONF.server.inet)
     .unwrap()

@@ -42,6 +42,7 @@ lettre_email = { version = "0.9", optional = true }
 libstrophe = { version = "0.13", default-features = false, optional = true }
 actix-web = { version = "3.3", optional = true }
 actix-files = { version = "0.5", optional = true }
+actix-web-httpauth = "0.5"
 tera = { version = "1.6", optional = true }
 
 [features]
