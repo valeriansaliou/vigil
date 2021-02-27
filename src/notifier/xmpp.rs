@@ -4,6 +4,7 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
+use log::debug;
 use std::sync::RwLock;
 use std::time::Duration;
 use time;

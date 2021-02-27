@@ -4,46 +4,17 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
-#![feature(proc_macro_hygiene, decl_macro)]
-
-#[macro_use]
-extern crate log;
-#[macro_use]
-extern crate clap;
-#[macro_use]
-extern crate lazy_static;
-#[macro_use]
-extern crate serde_derive;
-#[macro_use]
-extern crate rocket;
-extern crate base64;
-extern crate indexmap;
-extern crate native_tls;
-extern crate openssl_probe;
-extern crate ping;
-extern crate regex;
-extern crate reqwest;
-extern crate rocket_contrib;
-extern crate run_script;
-extern crate serde;
-extern crate time;
-extern crate toml;
-extern crate url;
-extern crate url_serde;
-
-#[cfg(feature = "notifier-email")]
-extern crate lettre;
-#[cfg(feature = "notifier-email")]
-extern crate lettre_email;
-
-#[cfg(feature = "notifier-xmpp")]
-extern crate libstrophe;
+//#![feature(proc_macro_hygiene, decl_macro)]
 
 mod aggregator;
 mod config;
 mod notifier;
 mod prober;
 mod responder;
+
+use log::{debug, error, info};
+
+use crate::responder::server::run as run_actix;
 
 use std::ops::Deref;
 use std::str::FromStr;
@@ -61,7 +32,6 @@ use crate::prober::manager::{
     initialize_store as initialize_store_prober, run_poll as run_poll_prober,
     run_script as run_script_prober,
 };
-use crate::responder::manager::run as run_responder;
 
 struct AppArgs {
     config: String,
@@ -71,6 +41,7 @@ pub static THREAD_NAME_PROBER_POLL: &'static str = "vigil-prober-poll";
 pub static THREAD_NAME_PROBER_SCRIPT: &'static str = "vigil-prober-script";
 pub static THREAD_NAME_AGGREGATOR: &'static str = "vigil-aggregator";
 pub static THREAD_NAME_RESPONDER: &'static str = "vigil-responder";
+pub static THREAD_NAME_ACTIX_RESPONDER: &'static str = "vigil-actix-responder";
 
 macro_rules! gen_spawn_managed {
     ($name:expr, $method:ident, $thread_name:ident, $managed_fn:ident) => {
@@ -101,7 +72,7 @@ macro_rules! gen_spawn_managed {
     };
 }
 
-lazy_static! {
+lazy_static::lazy_static! {
     static ref APP_ARGS: AppArgs = make_app_args();
     static ref APP_CONF: Config = ConfigReader::make();
 }
@@ -124,18 +95,19 @@ gen_spawn_managed!(
     THREAD_NAME_AGGREGATOR,
     run_aggregator
 );
+
 gen_spawn_managed!(
     "responder",
     spawn_responder,
     THREAD_NAME_RESPONDER,
-    run_responder
+    run_actix
 );
 
 fn make_app_args() -> AppArgs {
-    let matches = App::new(crate_name!())
-        .version(crate_version!())
-        .author(crate_authors!())
-        .about(crate_description!())
+    let matches = App::new(clap::crate_name!())
+        .version(clap::crate_version!())
+        .author(clap::crate_authors!())
+        .about(clap::crate_description!())
         .arg(
             Arg::with_name("config")
                 .short("c")
