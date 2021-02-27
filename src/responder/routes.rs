@@ -1,17 +1,14 @@
-use super::context::{IndexContext, INDEX_CONFIG, INDEX_ENVIRONMENT};
-use super::request_payload::ReporterData;
-use crate::prober::manager::{run_dispatch_plugins, STORE as PROBER_STORE};
-use crate::prober::report::{
-    handle_health as handle_health_report, handle_load as handle_load_report, HandleHealthError,
-    HandleLoadError,
-};
+// Vigil
+//
+// Microservices Status Page
+// Copyright: 2021, Valerian Saliou <valerian@valeriansaliou.name>
+// License: Mozilla Public License v2.0 (MPL v2.0)
+
 use actix_files::NamedFile;
 use actix_web::{
     dev::ServiceRequest, get, guard, rt, web, web::Data, web::Json, App, Error as ActixError,
     HttpResponse, HttpServer,
 };
-
-use crate::APP_CONF;
 use actix_web_httpauth::{
     extractors::{
         basic::{BasicAuth, Config as ConfigAuth},
@@ -21,11 +18,18 @@ use actix_web_httpauth::{
 };
 use tera::Tera;
 
-//The path is defined on the install of the service
-//#[post("/reporter/{probe_id}/{node_id}")]
+use super::context::{IndexContext, INDEX_CONFIG, INDEX_ENVIRONMENT};
+use super::payload::ReporterPayload;
+use crate::prober::manager::{run_dispatch_plugins, STORE as PROBER_STORE};
+use crate::prober::report::{
+    handle_health as handle_health_report, handle_load as handle_load_report, HandleHealthError,
+    HandleLoadError,
+};
+use crate::APP_CONF;
+
 pub async fn reporter(
     web::Path((probe_id, node_id)): web::Path<(String, String)>,
-    data: Json<ReporterData>,
+    data: Json<ReporterPayload>,
 ) -> HttpResponse {
     // Route report to handler (depending on its contents)
     if let Some(ref load) = data.load {

@@ -4,9 +4,9 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
-use serde_derive::Serialize;
 use std::time::{Duration, SystemTime};
 
+use serde_derive::Serialize;
 use indexmap::IndexMap;
 
 use super::mode::Mode;

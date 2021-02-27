@@ -4,9 +4,10 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
-use log::{debug, error, info};
 use std::thread;
 use std::time::Duration;
+
+use log::{debug, error, info};
 
 use crate::config::config::ConfigNotify;
 use crate::prober::status::Status;

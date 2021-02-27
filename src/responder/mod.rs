@@ -4,8 +4,7 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
-mod request_payload;
-
+mod payload;
 mod context;
 
-pub mod server;
+pub mod routes;

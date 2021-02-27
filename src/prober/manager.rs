@@ -4,8 +4,6 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
-use log::{debug, error, info, warn};
-use serde_derive::Deserialize;
 use std::cmp::min;
 use std::net::{SocketAddr, TcpStream, ToSocketAddrs};
 use std::sync::Arc;
@@ -14,6 +12,8 @@ use std::thread;
 use std::time::{Duration, SystemTime};
 use time;
 
+use log::{debug, error, info, warn};
+use serde_derive::Deserialize;
 use indexmap::IndexMap;
 use ping::ping;
 use reqwest::blocking::Client;

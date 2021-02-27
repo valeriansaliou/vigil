@@ -4,12 +4,11 @@
 // Copyright: 2019, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
-use log::debug;
 use std::collections::HashMap;
 use std::time::Duration;
 
+use log::debug;
 use serde_derive::Serialize;
-
 use reqwest::blocking::Client;
 
 use super::generic::{GenericNotifier, Notification, DISPATCH_TIMEOUT_SECONDS};

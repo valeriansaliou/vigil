@@ -4,9 +4,9 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
-use log::{debug, error};
 use std::time::Duration;
 
+use log::{debug, error};
 use lettre::smtp::authentication::Credentials;
 use lettre::smtp::client::net::ClientTlsParameters;
 use lettre::smtp::{ClientSecurity, ConnectionReuseParameters, SmtpClient, SmtpTransport};

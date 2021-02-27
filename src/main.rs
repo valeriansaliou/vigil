@@ -4,17 +4,11 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
-//#![feature(proc_macro_hygiene, decl_macro)]
-
 mod aggregator;
 mod config;
 mod notifier;
 mod prober;
 mod responder;
-
-use log::{debug, error, info};
-
-use crate::responder::server::run as run_actix;
 
 use std::ops::Deref;
 use std::str::FromStr;
@@ -22,8 +16,9 @@ use std::thread;
 use std::time::Duration;
 
 use clap::{App, Arg};
-use log::LevelFilter;
+use log::{LevelFilter, debug, error, info};
 
+use crate::responder::routes::run as run_responder;
 use crate::aggregator::manager::run as run_aggregator;
 use crate::config::config::Config;
 use crate::config::logger::ConfigLogger;
@@ -41,7 +36,6 @@ pub static THREAD_NAME_PROBER_POLL: &'static str = "vigil-prober-poll";
 pub static THREAD_NAME_PROBER_SCRIPT: &'static str = "vigil-prober-script";
 pub static THREAD_NAME_AGGREGATOR: &'static str = "vigil-aggregator";
 pub static THREAD_NAME_RESPONDER: &'static str = "vigil-responder";
-pub static THREAD_NAME_ACTIX_RESPONDER: &'static str = "vigil-actix-responder";
 
 macro_rules! gen_spawn_managed {
     ($name:expr, $method:ident, $thread_name:ident, $managed_fn:ident) => {
@@ -100,7 +94,7 @@ gen_spawn_managed!(
     "responder",
     spawn_responder,
     THREAD_NAME_RESPONDER,
-    run_actix
+    run_responder
 );
 
 fn make_app_args() -> AppArgs {
