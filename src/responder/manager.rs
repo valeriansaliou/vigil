@@ -30,6 +30,7 @@ pub fn run() {
         .to_str()
         .unwrap()
         .into();
+
     let tera = Tera::new(&templates).unwrap();
     let middleware_auth = HttpAuthentication::basic(authenticate);
 

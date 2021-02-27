@@ -17,41 +17,24 @@ use crate::prober::report::{
 };
 use crate::APP_CONF;
 
-pub async fn reporter(
-    web::Path((probe_id, node_id)): web::Path<(String, String)>,
-    data: Json<ReporterPayload>,
-) -> HttpResponse {
-    // Route report to handler (depending on its contents)
-    if let Some(ref load) = data.load {
-        // Load reports should come for 'push' nodes only
-        match handle_load_report(
-            &probe_id,
-            &node_id,
-            &data.replica,
-            data.interval,
-            load.cpu,
-            load.ram,
-        ) {
-            Ok(forward) => {
-                // Trigger a plugins check
-                run_dispatch_plugins(&probe_id, &node_id, forward);
-
-                HttpResponse::Ok().finish()
-            }
-            Err(HandleLoadError::InvalidLoad) => HttpResponse::BadRequest().finish(),
-            Err(HandleLoadError::WrongMode) => HttpResponse::PreconditionFailed().finish(),
-            Err(HandleLoadError::NotFound) => HttpResponse::NotFound().finish(),
+#[get("/")]
+pub fn index(tera: Data<Tera>) -> HttpResponse {
+    // Notice acquire lock in a block to release it ASAP (ie. before template renders)
+    let context = {
+        IndexContext {
+            states: &PROBER_STORE.read().unwrap().states,
+            environment: &*INDEX_ENVIRONMENT,
+            config: &*INDEX_CONFIG,
         }
-    } else if let Some(ref health) = data.health {
-        // Health reports should come for 'local' nodes only
-        match handle_health_report(&probe_id, &node_id, &data.replica, data.interval, health) {
-            Ok(_) => HttpResponse::Ok().finish(),
-            Err(HandleHealthError::WrongMode) => HttpResponse::PreconditionFailed().finish(),
-            Err(HandleHealthError::NotFound) => HttpResponse::NotFound().finish(),
-        }
+    };
+    let render = tera.render(
+        "index.tera",
+        &tera::Context::from_serialize(context).unwrap(),
+    );
+    if let Ok(s) = render {
+        HttpResponse::Ok().content_type("text/html").body(s)
     } else {
-        // Report contents is invalid
-        HttpResponse::BadRequest().finish()
+        HttpResponse::InternalServerError().body(format!("Template Error {:?}", render))
     }
 }
 
@@ -105,23 +88,41 @@ pub async fn assets_javascripts(web::Path(file): web::Path<String>) -> Option<Na
     NamedFile::open(APP_CONF.assets.path.join("javascripts").join(file)).ok()
 }
 
-#[get("/")]
-pub fn index(tera: Data<Tera>) -> HttpResponse {
-    // Notice acquire lock in a block to release it ASAP (ie. before template renders)
-    let context = {
-        IndexContext {
-            states: &PROBER_STORE.read().unwrap().states,
-            environment: &*INDEX_ENVIRONMENT,
-            config: &*INDEX_CONFIG,
+// Notice: reporter route is managed in manager due to authentication needs
+pub async fn reporter(
+    web::Path((probe_id, node_id)): web::Path<(String, String)>,
+    data: Json<ReporterPayload>,
+) -> HttpResponse {
+    // Route report to handler (depending on its contents)
+    if let Some(ref load) = data.load {
+        // Load reports should come for 'push' nodes only
+        match handle_load_report(
+            &probe_id,
+            &node_id,
+            &data.replica,
+            data.interval,
+            load.cpu,
+            load.ram,
+        ) {
+            Ok(forward) => {
+                // Trigger a plugins check
+                run_dispatch_plugins(&probe_id, &node_id, forward);
+
+                HttpResponse::Ok().finish()
+            }
+            Err(HandleLoadError::InvalidLoad) => HttpResponse::BadRequest().finish(),
+            Err(HandleLoadError::WrongMode) => HttpResponse::PreconditionFailed().finish(),
+            Err(HandleLoadError::NotFound) => HttpResponse::NotFound().finish(),
         }
-    };
-    let render = tera.render(
-        "index.tera",
-        &tera::Context::from_serialize(context).unwrap(),
-    );
-    if let Ok(s) = render {
-        HttpResponse::Ok().content_type("text/html").body(s)
+    } else if let Some(ref health) = data.health {
+        // Health reports should come for 'local' nodes only
+        match handle_health_report(&probe_id, &node_id, &data.replica, data.interval, health) {
+            Ok(_) => HttpResponse::Ok().finish(),
+            Err(HandleHealthError::WrongMode) => HttpResponse::PreconditionFailed().finish(),
+            Err(HandleHealthError::NotFound) => HttpResponse::NotFound().finish(),
+        }
     } else {
-        HttpResponse::InternalServerError().body(format!("Template Error {:?}", render))
+        // Report contents is invalid
+        HttpResponse::BadRequest().finish()
     }
 }
