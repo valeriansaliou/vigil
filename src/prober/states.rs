@@ -6,8 +6,8 @@
 
 use std::time::{Duration, SystemTime};
 
-use serde_derive::Serialize;
 use indexmap::IndexMap;
+use serde_derive::Serialize;
 
 use super::mode::Mode;
 use super::replica::ReplicaURL;

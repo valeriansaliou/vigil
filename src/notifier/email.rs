@@ -6,12 +6,12 @@
 
 use std::time::Duration;
 
-use log::{debug, error};
 use lettre::smtp::authentication::Credentials;
 use lettre::smtp::client::net::ClientTlsParameters;
 use lettre::smtp::{ClientSecurity, ConnectionReuseParameters, SmtpClient, SmtpTransport};
 use lettre::Transport;
 use lettre_email::EmailBuilder;
+use log::{debug, error};
 use native_tls::TlsConnector;
 
 use super::generic::{GenericNotifier, Notification, DISPATCH_TIMEOUT_SECONDS};

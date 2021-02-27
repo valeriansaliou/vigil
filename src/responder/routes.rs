@@ -5,17 +5,7 @@
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
 use actix_files::NamedFile;
-use actix_web::{
-    dev::ServiceRequest, get, guard, rt, web, web::Data, web::Json, App, Error as ActixError,
-    HttpResponse, HttpServer,
-};
-use actix_web_httpauth::{
-    extractors::{
-        basic::{BasicAuth, Config as ConfigAuth},
-        AuthenticationError,
-    },
-    middleware::HttpAuthentication,
-};
+use actix_web::{get, web, web::Data, web::Json, HttpResponse};
 use tera::Tera;
 
 use super::context::{IndexContext, INDEX_CONFIG, INDEX_ENVIRONMENT};
@@ -134,67 +124,4 @@ pub fn index(tera: Data<Tera>) -> HttpResponse {
     } else {
         HttpResponse::InternalServerError().body(format!("Template Error {:?}", render))
     }
-}
-
-async fn authenticate(
-    req: ServiceRequest,
-    credentials: BasicAuth,
-) -> Result<ServiceRequest, ActixError> {
-    let config = req
-        .app_data::<ConfigAuth>()
-        .map(|data| data.clone())
-        .unwrap_or_else(ConfigAuth::default);
-    if let Some(password) = credentials.password() {
-        if *password == APP_CONF.server.reporter_token {
-            Ok(req)
-        } else {
-            let mut error = AuthenticationError::from(config);
-            *error.status_code_mut() = actix_web::http::StatusCode::FORBIDDEN;
-            Err(error.into())
-        }
-    } else {
-        Err(AuthenticationError::from(config).into())
-    }
-}
-
-pub fn run() {
-    let mut runtime = rt::System::new("test");
-
-    let templates: String = APP_CONF
-        .assets
-        .path
-        .canonicalize()
-        .unwrap()
-        .join("templates")
-        .join("*")
-        .to_str()
-        .unwrap()
-        .into();
-    let tera = Tera::new(&templates).unwrap();
-    let middleware_auth = HttpAuthentication::basic(authenticate);
-
-    let server = HttpServer::new(move || {
-        App::new()
-            .data(tera.clone())
-            .service(assets_javascripts)
-            .service(assets_stylesheets)
-            .service(assets_images)
-            .service(assets_fonts)
-            .service(badge)
-            .service(status_text)
-            .service(robots)
-            .service(index)
-            .data(ConfigAuth::default().realm("Reporter Token"))
-            .service(
-                web::resource("/reporter/{probe_id}/{node_id}")
-                    .wrap(middleware_auth.clone())
-                    .guard(guard::Post())
-                    .to(reporter),
-            )
-    })
-    .bind(APP_CONF.server.inet)
-    .unwrap()
-    .run();
-
-    runtime.block_on(server).unwrap()
 }

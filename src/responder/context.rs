@@ -6,8 +6,8 @@
 
 use time;
 
-use url_serde::SerdeUrl;
 use serde_derive::Serialize;
+use url_serde::SerdeUrl;
 
 use crate::prober::states::ServiceStates;
 use crate::APP_CONF;

@@ -16,9 +16,8 @@ use std::thread;
 use std::time::Duration;
 
 use clap::{App, Arg};
-use log::{LevelFilter, debug, error, info};
+use log::{debug, error, info, LevelFilter};
 
-use crate::responder::routes::run as run_responder;
 use crate::aggregator::manager::run as run_aggregator;
 use crate::config::config::Config;
 use crate::config::logger::ConfigLogger;
@@ -27,6 +26,7 @@ use crate::prober::manager::{
     initialize_store as initialize_store_prober, run_poll as run_poll_prober,
     run_script as run_script_prober,
 };
+use crate::responder::manager::run as run_responder;
 
 struct AppArgs {
     config: String,

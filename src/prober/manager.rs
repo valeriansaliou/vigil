@@ -12,15 +12,15 @@ use std::thread;
 use std::time::{Duration, SystemTime};
 use time;
 
-use log::{debug, error, info, warn};
-use serde_derive::Deserialize;
 use indexmap::IndexMap;
+use log::{debug, error, info, warn};
 use ping::ping;
 use reqwest::blocking::Client;
 use reqwest::header::{HeaderMap, USER_AGENT};
 use reqwest::redirect::Policy as RedirectPolicy;
 use reqwest::StatusCode;
 use run_script::{self, ScriptOptions};
+use serde_derive::Deserialize;
 
 use super::replica::ReplicaURL;
 use super::states::{

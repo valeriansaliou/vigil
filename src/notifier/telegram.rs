@@ -8,8 +8,8 @@ use std::collections::HashMap;
 use std::time::Duration;
 
 use log::debug;
-use serde_derive::Serialize;
 use reqwest::blocking::Client;
+use serde_derive::Serialize;
 
 use super::generic::{GenericNotifier, Notification, DISPATCH_TIMEOUT_SECONDS};
 use crate::config::config::ConfigNotify;
