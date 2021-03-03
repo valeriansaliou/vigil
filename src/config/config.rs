@@ -111,6 +111,7 @@ pub struct ConfigNotify {
     pub gotify: Option<ConfigNotifyGotify>,
     pub xmpp: Option<ConfigNotifyXMPP>,
     pub webhook: Option<ConfigNotifyWebHook>,
+    pub matrix: Option<ConfigNotifyMatrix>,
 }
 
 #[derive(Deserialize)]
@@ -214,6 +215,18 @@ pub struct ConfigNotifyXMPP {
 #[derive(Deserialize)]
 pub struct ConfigNotifyWebHook {
     pub hook_url: SerdeUrl,
+}
+
+#[derive(Deserialize)]
+pub struct ConfigNotifyMatrix {
+    pub homeserver_url: SerdeUrl,
+    pub username: String,
+    pub password: Option<String>,
+    pub access_token: Option<String>,
+    pub room_id: String,
+    pub device_id: String,
+    #[serde(default = "defaults::notify_matrix_reminders_only")]
+    pub reminders_only: bool,
 }
 
 #[derive(Deserialize)]
