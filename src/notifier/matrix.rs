@@ -8,7 +8,7 @@
 use std::{collections::HashMap, convert::TryFrom};
 
 use lazy_static::lazy_static;
-use log::{debug, error};
+use log::debug;
 use matrix_sdk::{
     events::{room::message::MessageEventContent, AnyMessageEventContent},
     identifiers::{RoomId, UserId},
@@ -16,8 +16,8 @@ use matrix_sdk::{
 };
 
 use super::generic::{GenericNotifier, Notification};
+use crate::config::config::{ConfigNotify, ConfigNotifyMatrix};
 use crate::APP_CONF;
-use crate::{config::config::{ConfigNotifyMatrix, ConfigNotify}};
 
 lazy_static! {
     static ref TOKIO_RUNTIME: tokio::runtime::Runtime = tokio::runtime::Runtime::new().unwrap();
@@ -28,21 +28,22 @@ lazy_static! {
         format_time
     ];
 }
-pub struct MatrixNotifier {}
+
+pub struct MatrixNotifier;
+
+#[derive(Debug)]
+pub struct MatrixNotifierError(String);
 
 impl GenericNotifier for MatrixNotifier {
     fn attempt(notify: &ConfigNotify, notification: &Notification) -> Result<(), bool> {
         if let Some(matrix) = &notify.matrix {
             let response: Result<(), Box<dyn std::error::Error>> = TOKIO_RUNTIME.block_on(async {
                 let client = setup_client(matrix).await?;
+
                 send_message(client, matrix, format_message(notification)).await?;
 
                 Ok(())
             });
-
-            if let Err(ref err) = response {
-                error!("{}", err);
-            }
 
             return response.map_err(|_| true);
         }
@@ -51,11 +52,11 @@ impl GenericNotifier for MatrixNotifier {
     }
 
     fn can_notify(notify: &ConfigNotify, notification: &Notification) -> bool {
-        notify
-            .matrix
-            .as_ref()
-            .map(|matrix_cfg| notification.expected(matrix_cfg.reminders_only))
-            .unwrap_or_default()
+        if let Some(ref matrix_cfg) = notify.matrix {
+            notification.expected(matrix_cfg.reminders_only)
+        } else {
+            false
+        }
     }
 
     fn name() -> &'static str {
@@ -122,7 +123,6 @@ fn format_message(notification: &Notification) -> String {
     })
 }
 
-// Build up matrix client
 async fn setup_client(matrix: &ConfigNotifyMatrix) -> Result<Client, Box<dyn std::error::Error>> {
     let client_config = ClientConfig::default();
 
@@ -161,7 +161,6 @@ async fn setup_client(matrix: &ConfigNotifyMatrix) -> Result<Client, Box<dyn std
     Ok(client)
 }
 
-// Send the message to the configured room
 async fn send_message(
     client: Client,
     matrix: &ConfigNotifyMatrix,
@@ -180,9 +179,6 @@ async fn send_message(
 
     Ok(())
 }
-
-#[derive(Debug)]
-pub struct MatrixNotifierError(String);
 
 impl std::fmt::Display for MatrixNotifierError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
