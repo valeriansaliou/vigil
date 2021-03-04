@@ -42,13 +42,8 @@ run_script = "0.6"
 lettre = { version = "0.9", features = ["smtp-transport"], optional = true }
 lettre_email = { version = "0.9", optional = true }
 libstrophe = { version = "0.13", default-features = false, optional = true }
-tokio = {version= "1",  features= ["rt-multi-thread"],  optional= true }
-
-[dependencies.matrix-sdk]
-git = "https://github.com/matrix-org/matrix-rust-sdk.git"
-default-features = false
-optional=true
-features = ["encryption", "rustls-tls", "markdown","sled_cryptostore", "sled_state_store"]
+matrix-sdk = { version = "0.2", features = ["encryption", "rustls-tls", "markdown", "sled_cryptostore", "sled_state_store"], optional = true }
+tokio = { version = "1.2", features = ["rt-multi-thread"], optional = true }
 
 [features]
 default = ["notifier-email", "notifier-twilio", "notifier-slack", "notifier-telegram", "notifier-pushover", "notifier-gotify", "notifier-webhook"]
