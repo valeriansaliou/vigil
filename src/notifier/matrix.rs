@@ -20,8 +20,9 @@ use crate::config::config::{ConfigNotify, ConfigNotifyMatrix};
 use crate::APP_CONF;
 
 lazy_static! {
-    static ref TOKIO_RUNTIME: tokio::runtime::Runtime = tokio::runtime::Runtime::new().unwrap();
-    static ref FORMATTERS: Vec<fn(&Notification) -> String> = vec![
+    static ref MATRIX_TOKIO_RUNTIME: tokio::runtime::Runtime =
+        tokio::runtime::Runtime::new().unwrap();
+    static ref MATRIX_FORMATTERS: Vec<fn(&Notification) -> String> = vec![
         format_status,
         format_replicas,
         format_status_page,
@@ -37,13 +38,14 @@ pub struct MatrixNotifierError(String);
 impl GenericNotifier for MatrixNotifier {
     fn attempt(notify: &ConfigNotify, notification: &Notification) -> Result<(), bool> {
         if let Some(matrix) = &notify.matrix {
-            let response: Result<(), Box<dyn std::error::Error>> = TOKIO_RUNTIME.block_on(async {
-                let client = setup_client(matrix).await?;
+            let response: Result<(), Box<dyn std::error::Error>> =
+                MATRIX_TOKIO_RUNTIME.block_on(async {
+                    let client = setup_client(matrix).await?;
 
-                send_message(client, matrix, format_message(notification)).await?;
+                    send_message(client, matrix, format_message(notification)).await?;
 
-                Ok(())
-            });
+                    Ok(())
+                });
 
             return response.map_err(|_| true);
         }
@@ -93,7 +95,7 @@ fn format_replicas(notification: &Notification) -> String {
         .iter()
         .map(|(service_and_node, count)| {
             format!(
-                "<li> <code>{}</code>: {} {}</li>",
+                "<li><code>{}</code>: {} {}</li>",
                 service_and_node,
                 count,
                 notification.status.as_str()
@@ -117,17 +119,18 @@ fn format_time(notification: &Notification) -> String {
 }
 
 fn format_message(notification: &Notification) -> String {
-    FORMATTERS.iter().fold(String::new(), |mut acc, formatter| {
-        acc.push_str(formatter(notification).as_str());
-        acc
-    })
+    MATRIX_FORMATTERS
+        .iter()
+        .fold(String::new(), |mut accumulator, formatter| {
+            accumulator.push_str(formatter(notification).as_str());
+            accumulator
+        })
 }
 
 async fn setup_client(matrix: &ConfigNotifyMatrix) -> Result<Client, Box<dyn std::error::Error>> {
     let client_config = ClientConfig::default();
 
     let domain = matrix.homeserver_url.domain().unwrap_or_default();
-
     let client = Client::new_with_config(matrix.homeserver_url.0.as_str(), client_config)?;
 
     match (matrix.password.as_ref(), matrix.access_token.as_ref()) {
@@ -182,7 +185,7 @@ async fn send_message(
 
 impl std::fmt::Display for MatrixNotifierError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "MatrixNotifier error : {}", self.0)
+        write!(f, "matrix notifier error : {}", self.0)
     }
 }
 
