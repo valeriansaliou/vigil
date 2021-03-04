@@ -29,3 +29,6 @@ pub mod xmpp;
 
 #[cfg(feature = "notifier-webhook")]
 pub mod webhook;
+
+#[cfg(feature = "notifier-matrix")]
+pub mod matrix;
