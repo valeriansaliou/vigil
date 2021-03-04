@@ -42,7 +42,7 @@ run_script = "0.6"
 lettre = { version = "0.9", features = ["smtp-transport"], optional = true }
 lettre_email = { version = "0.9", optional = true }
 libstrophe = { version = "0.13", default-features = false, optional = true }
-matrix-sdk = { version = "0.2", features = ["encryption", "rustls-tls", "markdown", "sled_cryptostore", "sled_state_store"], optional = true }
+matrix-sdk = { version = "0.2", features = ["encryption"], optional = true }
 tokio = { version = "1.2", features = ["rt-multi-thread"], optional = true }
 
 [features]
