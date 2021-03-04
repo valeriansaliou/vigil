@@ -110,8 +110,8 @@ pub struct ConfigNotify {
     pub pushover: Option<ConfigNotifyPushover>,
     pub gotify: Option<ConfigNotifyGotify>,
     pub xmpp: Option<ConfigNotifyXMPP>,
-    pub webhook: Option<ConfigNotifyWebHook>,
     pub matrix: Option<ConfigNotifyMatrix>,
+    pub webhook: Option<ConfigNotifyWebHook>,
 }
 
 #[derive(Deserialize)]

@@ -17,7 +17,7 @@ use matrix_sdk::{
 
 use super::generic::{GenericNotifier, Notification};
 use crate::APP_CONF;
-use crate::{config::config::ConfigNotifyMatrix, ConfigNotify};
+use crate::{config::config::{ConfigNotifyMatrix, ConfigNotify}};
 
 lazy_static! {
     static ref TOKIO_RUNTIME: tokio::runtime::Runtime = tokio::runtime::Runtime::new().unwrap();
