@@ -38,11 +38,11 @@ use crate::notifier::gotify::GotifyNotifier;
 #[cfg(feature = "notifier-xmpp")]
 use crate::notifier::xmpp::XMPPNotifier;
 
-#[cfg(feature = "notifier-webhook")]
-use crate::notifier::webhook::WebHookNotifier;
-
 #[cfg(feature = "notifier-matrix")]
 use crate::notifier::matrix::MatrixNotifier;
+
+#[cfg(feature = "notifier-webhook")]
+use crate::notifier::webhook::WebHookNotifier;
 
 const AGGREGATE_INTERVAL_SECONDS: u64 = 10;
 
@@ -319,11 +319,11 @@ fn notify(bumped_states: &BumpedStates) {
         #[cfg(feature = "notifier-xmpp")]
         Notification::dispatch::<XMPPNotifier>(notify, &notification).ok();
 
-        #[cfg(feature = "notifier-webhook")]
-        Notification::dispatch::<WebHookNotifier>(notify, &notification).ok();
-
         #[cfg(feature = "notifier-matrix")]
         Notification::dispatch::<MatrixNotifier>(notify, &notification).ok();
+
+        #[cfg(feature = "notifier-webhook")]
+        Notification::dispatch::<WebHookNotifier>(notify, &notification).ok();
     }
 }
 

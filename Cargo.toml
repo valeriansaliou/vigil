@@ -60,7 +60,7 @@ notifier-pushover = []
 notifier-gotify = []
 notifier-webhook = []
 notifier-xmpp = ["libstrophe"]
-notifier-matrix=["matrix-sdk","tokio"]
+notifier-matrix = ["matrix-sdk", "tokio"]
 
 [profile.dev]
 opt-level = 0

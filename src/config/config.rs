@@ -225,6 +225,7 @@ pub struct ConfigNotifyMatrix {
     pub access_token: Option<String>,
     pub room_id: String,
     pub device_id: String,
+
     #[serde(default = "defaults::notify_matrix_reminders_only")]
     pub reminders_only: bool,
 }

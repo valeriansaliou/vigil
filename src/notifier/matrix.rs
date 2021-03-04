@@ -1,6 +1,12 @@
+// Vigil
+//
+// Microservices Status Page
+// Copyright: 2021, Valerian Saliou <valerian@valeriansaliou.name>
+// Copyright: 2021, Enrico Risa https://github.com/wolf4ood
+// License: Mozilla Public License v2.0 (MPL v2.0)
+
 use std::{collections::HashMap, convert::TryFrom};
 
-use crate::{config::config::ConfigNotifyMatrix, APP_CONF};
 use lazy_static::lazy_static;
 use log::{debug, error};
 use matrix_sdk::{
@@ -10,7 +16,8 @@ use matrix_sdk::{
 };
 
 use super::generic::{GenericNotifier, Notification};
-use crate::config::config::ConfigNotify;
+use crate::APP_CONF;
+use crate::{config::config::ConfigNotifyMatrix, ConfigNotify};
 
 lazy_static! {
     static ref TOKIO_RUNTIME: tokio::runtime::Runtime = tokio::runtime::Runtime::new().unwrap();

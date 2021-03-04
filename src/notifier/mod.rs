@@ -27,8 +27,8 @@ pub mod gotify;
 #[cfg(feature = "notifier-xmpp")]
 pub mod xmpp;
 
-#[cfg(feature = "notifier-webhook")]
-pub mod webhook;
-
 #[cfg(feature = "notifier-matrix")]
 pub mod matrix;
+
+#[cfg(feature = "notifier-webhook")]
+pub mod webhook;
