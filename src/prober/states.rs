@@ -25,6 +25,7 @@ pub struct ServiceStates {
 pub struct ServiceStatesProbe {
     pub status: Status,
     pub label: String,
+    pub id: String,
     pub nodes: IndexMap<String, ServiceStatesProbeNode>,
 }
 

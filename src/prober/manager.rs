@@ -677,6 +677,7 @@ pub fn initialize_store() {
     for service in &APP_CONF.probe.service {
         let mut probe = ServiceStatesProbe {
             status: Status::Healthy,
+            id: service.id.to_owned(),
             label: service.label.to_owned(),
             nodes: IndexMap::new(),
         };
