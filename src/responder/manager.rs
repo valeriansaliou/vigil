@@ -67,22 +67,27 @@ pub fn run() {
 }
 
 async fn authenticate(
-    req: ServiceRequest,
+    request: ServiceRequest,
     credentials: BasicAuth,
 ) -> Result<ServiceRequest, ActixError> {
-    let config = req
-        .app_data::<ConfigAuth>()
-        .map(|data| data.clone())
-        .unwrap_or_else(ConfigAuth::default);
-    if let Some(password) = credentials.password() {
-        if *password == APP_CONF.server.reporter_token {
-            Ok(req)
-        } else {
-            let mut error = AuthenticationError::from(config);
-            *error.status_code_mut() = actix_web::http::StatusCode::FORBIDDEN;
-            Err(error.into())
-        }
+    let password = if let Some(password) = credentials.password() {
+        &*password
     } else {
-        Err(AuthenticationError::from(config).into())
+        ""
+    };
+
+    if password == APP_CONF.server.reporter_token {
+        Ok(request)
+    } else {
+        let mut error = AuthenticationError::from(
+            request
+                .app_data::<ConfigAuth>()
+                .map(|data| data.clone())
+                .unwrap_or_else(ConfigAuth::default),
+        );
+
+        *error.status_code_mut() = actix_web::http::StatusCode::FORBIDDEN;
+
+        Err(error.into())
     }
 }
