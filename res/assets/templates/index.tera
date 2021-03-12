@@ -117,7 +117,9 @@
           <div class="title">
             <div class="badge badge-default badge-status-{{ probe.status | escape }}"></div>
 
-            <a href="#{{probe.id}}" id="{{probe.id}}" class="font-sans-bold">{{ probe.label | escape }}</a>
+            <h3 class="font-sans-bold">
+              <a href="#probe-{{ probe.id }}" id="probe-{{ probe.id }}">{{ probe.label | escape }}</a>
+            </h3>
           </div>
 
           <ul>

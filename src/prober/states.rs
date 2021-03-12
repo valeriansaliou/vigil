@@ -23,9 +23,9 @@ pub struct ServiceStates {
 
 #[derive(Serialize)]
 pub struct ServiceStatesProbe {
-    pub status: Status,
-    pub label: String,
     pub id: String,
+    pub label: String,
+    pub status: Status,
     pub nodes: IndexMap<String, ServiceStatesProbeNode>,
 }
 

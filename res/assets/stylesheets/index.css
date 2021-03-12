@@ -214,12 +214,6 @@ main section.probe .title h3 {
   display: inline-block;
 }
 
-main section.probe .title a {
-  vertical-align: middle;
-  display: inline-block;
-  color: rgba(0, 0, 0, 0.85);
-}
-
 main section.probe .title .badge {
   margin-right: 8px;
 }
@@ -227,6 +221,16 @@ main section.probe .title .badge {
 main section.probe .title h3 {
   font-size: 15px;
   line-height: 20px;
+}
+
+main section.probe .title h3 a {
+  color: inherit;
+}
+
+main section.probe .title h3 a:hover {
+  text-decoration: underline;
+  text-decoration-color: rgba(0, 0, 0, 0.2);
+  cursor: alias;
 }
 
 main section.probe ul {
