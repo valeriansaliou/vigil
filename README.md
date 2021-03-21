@@ -428,6 +428,40 @@ Where:
 * `load.cpu`: The general CPU load, from `0.00` to `1.00` (can be more than `1.00` if the CPU is overloaded)
 * `load.ram`: The general RAM load, from `0.00` to `1.00`
 
+### Deleting replica
+
+In some cases replica is required to be removed to avoid false-positives. 
+[Example case](https://github.com/valeriansaliou/vigil/issues/77).
+
+
+**Endpoint URL:**
+
+`HTTP DELETE https://status.example.com/reporter/<probe_id>/<node_id>/`
+
+Where:
+
+* `node_id`: The parent node of the reporting replica
+* `probe_id`: The parent probe of the node
+
+**Request headers:**
+
+* Add an `Authorization` header with a `Basic` authentication where the password is your configured `reporter_token`.
+* Set the `Content-Type` to `application/json; charset=utf-8`, and ensure you submit the request data as UTF-8.
+
+**Request data:**
+
+Adjust the request data to your replica context and send it as `HTTP DELETE`:
+
+```json
+{
+  "replica": "<replica_id>"
+}
+```
+
+Where:
+
+* `replica`: The replica unique identifier (eg. the server LAN IP)
+
 ## How can I monitor services on a different LAN using Vigil Local?
 
 Vigil Local is an (optional) slave daemon that you can use to report internal service health to your Vigil-powered status page master server. It is designed to be used behind a firewall, and to monitor hosts bound to a local loop or LAN network, that are not available to your main Vigil status page.

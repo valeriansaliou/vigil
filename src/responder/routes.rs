@@ -9,11 +9,12 @@ use actix_web::{get, web, web::Data, web::Json, HttpResponse};
 use tera::Tera;
 
 use super::context::{IndexContext, INDEX_CONFIG, INDEX_ENVIRONMENT};
+use super::payload::DeleteReplicaPayload;
 use super::payload::ReporterPayload;
 use crate::prober::manager::{run_dispatch_plugins, STORE as PROBER_STORE};
 use crate::prober::report::{
-    handle_health as handle_health_report, handle_load as handle_load_report, HandleHealthError,
-    HandleLoadError,
+    handle_delete as handle_delete_report, handle_health as handle_health_report,
+    handle_load as handle_load_report, HandleDeleteError, HandleHealthError, HandleLoadError,
 };
 use crate::APP_CONF;
 
@@ -124,5 +125,17 @@ pub async fn reporter(
     } else {
         // Report contents is invalid
         HttpResponse::BadRequest().finish()
+    }
+}
+
+// Notice: delete route is managed in manager due to authentication needs
+pub async fn delete_replica(
+    web::Path((probe_id, node_id)): web::Path<(String, String)>,
+    data: Json<DeleteReplicaPayload>,
+) -> HttpResponse {
+    match handle_delete_report(&probe_id, &node_id, &data.replica) {
+        Ok(()) => HttpResponse::Ok().finish(),
+        Err(HandleDeleteError::WrongMode) => HttpResponse::PreconditionFailed().finish(),
+        Err(HandleDeleteError::NotFound) => HttpResponse::NotFound().finish(),
     }
 }

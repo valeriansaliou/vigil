@@ -17,6 +17,11 @@ use crate::prober::manager::STORE as PROBER_STORE;
 use crate::prober::mode::Mode;
 use crate::prober::status::Status;
 
+pub enum HandleDeleteError {
+    NotFound,
+    WrongMode,
+}
+
 pub enum HandleLoadError {
     InvalidLoad,
     WrongMode,
@@ -26,6 +31,41 @@ pub enum HandleLoadError {
 pub enum HandleHealthError {
     WrongMode,
     NotFound,
+}
+
+pub fn handle_delete(
+    probe_id: &str,
+    node_id: &str,
+    replica_id: &str,
+) -> Result<(), HandleDeleteError> {
+    debug!(
+        "delete report handle: {}:{}:{}",
+        probe_id, node_id, replica_id
+    );
+
+    let mut store = PROBER_STORE.write().unwrap();
+
+    if let Some(ref mut probe) = store.states.probes.get_mut(probe_id) {
+        if let Some(ref mut node) = probe.nodes.get_mut(node_id) {
+            // Mode isn't push? Dont accept request.
+            if node.mode != Mode::Push {
+                return Err(HandleDeleteError::WrongMode);
+            }
+
+            return if node.replicas.shift_remove(replica_id).is_none() {
+                Err(HandleDeleteError::NotFound)
+            } else {
+                Ok(())
+            };
+        }
+    }
+
+    warn!(
+        "load report could not be deleted: {}:{}:{}",
+        probe_id, node_id, replica_id
+    );
+
+    Err(HandleDeleteError::NotFound)
 }
 
 pub fn handle_load(

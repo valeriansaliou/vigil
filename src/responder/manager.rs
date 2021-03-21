@@ -58,6 +58,12 @@ pub fn run() {
                     .guard(guard::Post())
                     .to(routes::reporter),
             )
+            .service(
+                web::resource("/reporter/{probe_id}/{node_id}")
+                    .wrap(middleware_auth.clone())
+                    .guard(guard::Delete())
+                    .to(routes::delete_replica),
+            )
     })
     .bind(APP_CONF.server.inet)
     .unwrap()
