@@ -387,9 +387,11 @@ Vigil Reporter is used to actively submit health information to Vigil from your 
 
 👉 Cannot find the library for your programming language? Build your own and be referenced here! ([contact me](https://valeriansaliou.name/))
 
-### Manual reporting
+### Vigil Reporter HTTP API
 
 In case you need to manually report node metrics to the Vigil endpoint, use the following HTTP configuration (adjust it to yours):
+
+#### 1. Report a replica
 
 **Endpoint URL:**
 
@@ -428,9 +430,7 @@ Where:
 * `load.cpu`: The general CPU load, from `0.00` to `1.00` (can be more than `1.00` if the CPU is overloaded)
 * `load.ram`: The general RAM load, from `0.00` to `1.00`
 
-### Flush a replica
-
-If a replica needs to be flushed (ie. removed from Vigil), use the following HTTP endpoint:
+#### 2. Flush a replica
 
 **Endpoint URL:**
 
