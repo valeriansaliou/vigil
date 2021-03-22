@@ -9,12 +9,11 @@ use actix_web::{get, web, web::Data, web::Json, HttpResponse};
 use tera::Tera;
 
 use super::context::{IndexContext, INDEX_CONFIG, INDEX_ENVIRONMENT};
-use super::payload::DeleteReplicaPayload;
 use super::payload::ReporterPayload;
 use crate::prober::manager::{run_dispatch_plugins, STORE as PROBER_STORE};
 use crate::prober::report::{
-    handle_delete as handle_delete_report, handle_health as handle_health_report,
-    handle_load as handle_load_report, HandleDeleteError, HandleHealthError, HandleLoadError,
+    handle_flush as handle_flush_report, handle_health as handle_health_report,
+    handle_load as handle_load_report, HandleFlushError, HandleHealthError, HandleLoadError,
 };
 use crate::APP_CONF;
 
@@ -89,8 +88,8 @@ pub async fn assets_javascripts(web::Path(file): web::Path<String>) -> Option<Na
     NamedFile::open(APP_CONF.assets.path.join("javascripts").join(file)).ok()
 }
 
-// Notice: reporter route is managed in manager due to authentication needs
-pub async fn reporter(
+// Notice: reporter report route is managed in manager due to authentication needs
+pub async fn reporter_report(
     web::Path((probe_id, node_id)): web::Path<(String, String)>,
     data: Json<ReporterPayload>,
 ) -> HttpResponse {
@@ -128,14 +127,14 @@ pub async fn reporter(
     }
 }
 
-// Notice: delete route is managed in manager due to authentication needs
-pub async fn delete_replica(
-    web::Path((probe_id, node_id)): web::Path<(String, String)>,
-    data: Json<DeleteReplicaPayload>,
+// Notice: reporter flush route is managed in manager due to authentication needs
+pub async fn reporter_flush(
+    web::Path((probe_id, node_id, replica_id)): web::Path<(String, String, String)>,
 ) -> HttpResponse {
-    match handle_delete_report(&probe_id, &node_id, &data.replica) {
+    // Flush reports should come for 'push' and 'local' nodes only
+    match handle_flush_report(&probe_id, &node_id, &replica_id) {
         Ok(()) => HttpResponse::Ok().finish(),
-        Err(HandleDeleteError::WrongMode) => HttpResponse::PreconditionFailed().finish(),
-        Err(HandleDeleteError::NotFound) => HttpResponse::NotFound().finish(),
+        Err(HandleFlushError::WrongMode) => HttpResponse::PreconditionFailed().finish(),
+        Err(HandleFlushError::NotFound) => HttpResponse::NotFound().finish(),
     }
 }

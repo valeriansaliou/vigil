@@ -428,39 +428,23 @@ Where:
 * `load.cpu`: The general CPU load, from `0.00` to `1.00` (can be more than `1.00` if the CPU is overloaded)
 * `load.ram`: The general RAM load, from `0.00` to `1.00`
 
-### Deleting replica
+### Flush a replica
 
-In some cases replica is required to be removed to avoid false-positives. 
-[Example case](https://github.com/valeriansaliou/vigil/issues/77).
-
+If a replica needs to be flushed (ie. removed from Vigil), use the following HTTP endpoint:
 
 **Endpoint URL:**
 
-`HTTP DELETE https://status.example.com/reporter/<probe_id>/<node_id>/`
+`HTTP DELETE https://status.example.com/reporter/<probe_id>/<node_id>/<replica_id>/`
 
 Where:
 
 * `node_id`: The parent node of the reporting replica
 * `probe_id`: The parent probe of the node
+* `replica_id`: The replica unique identifier (eg. the server LAN IP)
 
 **Request headers:**
 
 * Add an `Authorization` header with a `Basic` authentication where the password is your configured `reporter_token`.
-* Set the `Content-Type` to `application/json; charset=utf-8`, and ensure you submit the request data as UTF-8.
-
-**Request data:**
-
-Adjust the request data to your replica context and send it as `HTTP DELETE`:
-
-```json
-{
-  "replica": "<replica_id>"
-}
-```
-
-Where:
-
-* `replica`: The replica unique identifier (eg. the server LAN IP)
 
 ## How can I monitor services on a different LAN using Vigil Local?
 

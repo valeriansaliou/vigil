@@ -17,11 +17,6 @@ pub struct ReporterPayload {
 }
 
 #[derive(Deserialize)]
-pub struct DeleteReplicaPayload {
-    pub replica: String,
-}
-
-#[derive(Deserialize)]
 pub struct ReporterPayloadLoad {
     pub cpu: f32,
     pub ram: f32,
