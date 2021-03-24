@@ -42,20 +42,18 @@ run_script = "0.6"
 lettre = { version = "0.9", features = ["smtp-transport"], optional = true }
 lettre_email = { version = "0.9", optional = true }
 libstrophe = { version = "0.13", default-features = false, optional = true }
-matrix-sdk = { version = "0.2", features = ["encryption"], optional = true }
-tokio = { version = "1.2", features = ["rt-multi-thread"], optional = true }
 
 [features]
-default = ["notifier-email", "notifier-twilio", "notifier-slack", "notifier-telegram", "notifier-pushover", "notifier-gotify", "notifier-webhook"]
+default = ["notifier-email", "notifier-twilio", "notifier-slack", "notifier-telegram", "notifier-pushover", "notifier-gotify", "notifier-matrix", "notifier-webhook"]
 notifier-email = ["lettre", "lettre_email"]
 notifier-twilio = []
 notifier-slack = []
 notifier-telegram = []
 notifier-pushover = []
 notifier-gotify = []
+notifier-matrix = []
 notifier-webhook = []
 notifier-xmpp = ["libstrophe"]
-notifier-matrix = ["matrix-sdk", "tokio"]
 
 [profile.dev]
 opt-level = 0

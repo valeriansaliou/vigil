@@ -5,23 +5,22 @@
 // Copyright: 2021, Enrico Risa https://github.com/wolf4ood
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
-use std::{collections::HashMap, convert::TryFrom};
-
-use lazy_static::lazy_static;
 use log::debug;
-use matrix_sdk::{
-    events::{room::message::MessageEventContent, AnyMessageEventContent},
-    identifiers::{RoomId, UserId},
-    Client, ClientConfig, Session,
-};
+use std::collections::HashMap;
+use std::time::Duration;
 
-use super::generic::{GenericNotifier, Notification};
-use crate::config::config::{ConfigNotify, ConfigNotifyMatrix};
+use reqwest::blocking::Client;
+
+use super::generic::{GenericNotifier, Notification, DISPATCH_TIMEOUT_SECONDS};
+use crate::config::config::ConfigNotify;
 use crate::APP_CONF;
 
-lazy_static! {
-    static ref MATRIX_TOKIO_RUNTIME: tokio::runtime::Runtime =
-        tokio::runtime::Runtime::new().unwrap();
+lazy_static::lazy_static! {
+    static ref MATRIX_HTTP_CLIENT: Client = Client::builder()
+        .timeout(Duration::from_secs(DISPATCH_TIMEOUT_SECONDS))
+        .gzip(true)
+        .build()
+        .unwrap();
     static ref MATRIX_FORMATTERS: Vec<fn(&Notification) -> String> = vec![
         format_status,
         format_replicas,
@@ -30,32 +29,57 @@ lazy_static! {
     ];
 }
 
-pub struct MatrixNotifier;
+static MATRIX_MESSAGE_BODY: &'static str = "You received a Vigil alert.";
+static MATRIX_MESSAGE_TYPE: &'static str = "m.text";
+static MATRIX_MESSAGE_FORMAT: &'static str = "org.matrix.custom.html";
 
-#[derive(Debug)]
-pub struct MatrixNotifierError(String);
+pub struct MatrixNotifier;
 
 impl GenericNotifier for MatrixNotifier {
     fn attempt(notify: &ConfigNotify, notification: &Notification) -> Result<(), bool> {
-        if let Some(matrix) = &notify.matrix {
-            let response: Result<(), Box<dyn std::error::Error>> =
-                MATRIX_TOKIO_RUNTIME.block_on(async {
-                    let client = setup_client(matrix).await?;
+        if let Some(ref matrix) = notify.matrix {
+            // Build up the message text
+            let message = format_message(notification);
 
-                    send_message(client, matrix, format_message(notification)).await?;
+            debug!("will send Matrix notification with message: {}", &message);
 
-                    Ok(())
-                });
+            // Generate URL
+            // See: https://matrix.org/docs/guides/client-server-api#sending-messages
+            let url = format!(
+                "{}_matrix/client/r0/rooms/{}/send/m.room.message?access_token={}",
+                matrix.homeserver_url.as_str(),
+                matrix.room_id.as_str(),
+                matrix.access_token.as_str()
+            );
 
-            return response.map_err(|_| true);
+            // Build message parameters
+            let mut params: HashMap<&str, &str> = HashMap::new();
+
+            params.insert("body", MATRIX_MESSAGE_BODY);
+            params.insert("msgtype", MATRIX_MESSAGE_TYPE);
+            params.insert("format", MATRIX_MESSAGE_FORMAT);
+            params.insert("formatted_body", &message);
+
+            // Submit message to Matrix
+            let response = MATRIX_HTTP_CLIENT.post(&url).json(&params).send();
+
+            if let Ok(response_inner) = response {
+                if response_inner.status().is_success() != true {
+                    return Err(true);
+                }
+            } else {
+                return Err(true);
+            }
+
+            return Ok(());
         }
 
-        Ok(())
+        Err(false)
     }
 
     fn can_notify(notify: &ConfigNotify, notification: &Notification) -> bool {
-        if let Some(ref matrix_cfg) = notify.matrix {
-            notification.expected(matrix_cfg.reminders_only)
+        if let Some(ref matrix_config) = notify.matrix {
+            notification.expected(matrix_config.reminders_only)
         } else {
             false
         }
@@ -101,10 +125,13 @@ fn format_replicas(notification: &Notification) -> String {
                 notification.status.as_str()
             )
         })
-        .collect::<Vec<String>>()
-        .join("");
+        .collect::<Vec<String>>();
 
-    format!("<ul>{}</ul>", replicas)
+    if replicas.is_empty() {
+        "".to_string()
+    } else {
+        format!("<ul>{}</ul>", replicas.join(""))
+    }
 }
 
 fn format_status_page(_: &Notification) -> String {
@@ -115,7 +142,7 @@ fn format_status_page(_: &Notification) -> String {
 }
 
 fn format_time(notification: &Notification) -> String {
-    format!("<p>Time : {}</p>", notification.time)
+    format!("<p>Time: {}</p>", notification.time)
 }
 
 fn format_message(notification: &Notification) -> String {
@@ -126,67 +153,3 @@ fn format_message(notification: &Notification) -> String {
             accumulator
         })
 }
-
-async fn setup_client(matrix: &ConfigNotifyMatrix) -> Result<Client, Box<dyn std::error::Error>> {
-    let client_config = ClientConfig::default();
-
-    let domain = matrix.homeserver_url.domain().unwrap_or_default();
-    let client = Client::new_with_config(matrix.homeserver_url.0.as_str(), client_config)?;
-
-    match (matrix.password.as_ref(), matrix.access_token.as_ref()) {
-        (_, Some(access_token)) => {
-            client
-                .restore_login(Session {
-                    access_token: access_token.clone(),
-                    user_id: UserId::try_from(format!("@{}:{}", matrix.username.as_str(), domain))?,
-                    device_id: matrix.device_id.as_str().into(),
-                })
-                .await?;
-        }
-        (Some(password), _) => {
-            client
-                .login(
-                    matrix.username.as_str(),
-                    password,
-                    Some(matrix.device_id.as_str()),
-                    None,
-                )
-                .await?;
-        }
-
-        _ => {
-            return Err(Box::new(MatrixNotifierError(String::from(
-                "missing password or access_token",
-            ))))
-        }
-    };
-
-    Ok(client)
-}
-
-async fn send_message(
-    client: Client,
-    matrix: &ConfigNotifyMatrix,
-    message: String,
-) -> Result<(), Box<dyn std::error::Error>> {
-    debug!("will send Matrix notification with message: {}", &message);
-
-    let content = AnyMessageEventContent::RoomMessage(MessageEventContent::text_html(
-        message.as_str(),
-        message.as_str(),
-    ));
-
-    client
-        .room_send(&RoomId::try_from(matrix.room_id.as_str())?, content, None)
-        .await?;
-
-    Ok(())
-}
-
-impl std::fmt::Display for MatrixNotifierError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "matrix notifier error : {}", self.0)
-    }
-}
-
-impl std::error::Error for MatrixNotifierError {}

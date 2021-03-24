@@ -220,11 +220,8 @@ pub struct ConfigNotifyWebHook {
 #[derive(Deserialize)]
 pub struct ConfigNotifyMatrix {
     pub homeserver_url: SerdeUrl,
-    pub username: String,
-    pub password: Option<String>,
-    pub access_token: Option<String>,
+    pub access_token: String,
     pub room_id: String,
-    pub device_id: String,
 
     #[serde(default = "defaults::notify_matrix_reminders_only")]
     pub reminders_only: bool,

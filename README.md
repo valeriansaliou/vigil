@@ -246,14 +246,9 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 
 **[notify.matrix]**
 
-**Notice: the Matrix notifier requires the feature `notifier-matrix` enabled upon Cargo build.**
-
 * `homeserver_url` (type: _string_, allowed: URL, no default) — Matrix server where the account has been created (eg. `https://matrix.org`)
-* `username` (type: _string_, allowed: any string, no default) — Matrix username from which to send messages
-* `password` (type: _string_, allowed: any string, no default) — Matrix username password
-* `access_token` (type: _string_, allowed: any string, no default) — Alternatively to the `password` an access token from a previously created session can be used (eg. Element Web access token)
+* `access_token` (type: _string_, allowed: any string, no default) — Matrix access token from a previously created session (eg. Element Web access token)
 * `room_id` (type: _string_, allowed: any string, no default) — Matrix room ID which to send messages (eg. `!abc123:matrix.org`)
-* `device_id` (type: _string_, allowed: any string, no default) — Matrix device ID associated to the user. It can be a `device_id` from a previous session (eg. Element Web) or a new `device_id` if it is a new session
 * `reminders_only` (type: _boolean_, allowed: `true`, `false`, default: `false`) — Whether to send messages only for downtime reminders or everytime
 
 **[notify.webhook]**
