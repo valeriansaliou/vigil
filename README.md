@@ -248,7 +248,7 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 
 * `homeserver_url` (type: _string_, allowed: URL, no default) — Matrix server where the account has been created (eg. `https://matrix.org`)
 * `access_token` (type: _string_, allowed: any string, no default) — Matrix access token from a previously created session (eg. Element Web access token)
-* `room_id` (type: _string_, allowed: any string, no default) — Matrix room ID which to send messages (eg. `!abc123:matrix.org`)
+* `room_id` (type: _string_, allowed: any string, no default) — Matrix room ID to which to send messages (eg. `!abc123:matrix.org`)
 * `reminders_only` (type: _boolean_, allowed: `true`, `false`, default: `false`) — Whether to send messages only for downtime reminders or everytime
 
 **[notify.webhook]**
