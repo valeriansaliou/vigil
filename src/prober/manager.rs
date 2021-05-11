@@ -377,48 +377,51 @@ fn proceed_replica_probe_poll_http(
         PROBE_HTTP_CLIENT.head(&url_bang).send()
     };
 
-    if let Ok(response_inner) = response {
-        let status_code = response_inner.status().as_u16();
+    match response {
+        Ok(response_inner) => {
+            let status_code = response_inner.status().as_u16();
 
-        debug!(
-            "prober poll result received for http target: {} with status: {}",
-            &url_bang, status_code
-        );
+            debug!(
+                "prober poll result received for http target: {} with status: {}",
+                &url_bang, status_code
+            );
 
-        // Consider as UP?
-        if status_code >= APP_CONF.metrics.poll_http_status_healthy_above
-            && status_code < APP_CONF.metrics.poll_http_status_healthy_below
-        {
-            // Check response body for match? (if configured)
-            if let &Some(ref body_match_regex) = body_match {
-                if let Ok(text) = response_inner.text() {
-                    debug!(
+            // Consider as UP?
+            if status_code >= APP_CONF.metrics.poll_http_status_healthy_above
+                && status_code < APP_CONF.metrics.poll_http_status_healthy_below
+            {
+                // Check response body for match? (if configured)
+                if let &Some(ref body_match_regex) = body_match {
+                    if let Ok(text) = response_inner.text() {
+                        debug!(
                         "checking prober poll response text for http target: {} for any match: {}",
                         &url_bang, &text
                     );
 
-                    // Doesnt match? Consider as DOWN.
-                    if body_match_regex.is_match(&text) == false {
+                        // Doesnt match? Consider as DOWN.
+                        if body_match_regex.is_match(&text) == false {
+                            return (false, None);
+                        }
+                    } else {
+                        debug!(
+                            "could not unpack response text for http target: {}",
+                            &url_bang
+                        );
+
+                        // Consider as DOWN (the response text could not be checked)
                         return (false, None);
                     }
-                } else {
-                    debug!(
-                        "could not unpack response text for http target: {}",
-                        &url_bang
-                    );
-
-                    // Consider as DOWN (the response text could not be checked)
-                    return (false, None);
                 }
-            }
 
-            return (true, None);
+                return (true, None);
+            }
         }
-    } else {
-        debug!(
-            "prober poll result was not received for http target: {}",
-            &url_bang
-        );
+        Err(err) => {
+            debug!(
+                "prober poll result was not received for http target: {}, {}",
+                &url_bang, err
+            );
+        }
     }
 
     // Consider as DOWN.
