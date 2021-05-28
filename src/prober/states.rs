@@ -36,6 +36,9 @@ pub struct ServiceStatesProbeNode {
     pub mode: Mode,
     pub replicas: IndexMap<String, ServiceStatesProbeNodeReplica>,
     pub http_body_healthy_match: Option<Regex>,
+    #[serde(default)]
+    #[serde(with = "http_serde::header_map")]
+    pub http_headers: http::HeaderMap,
     pub rabbitmq_queue: Option<String>,
 }
 

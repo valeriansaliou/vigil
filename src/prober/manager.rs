@@ -67,7 +67,7 @@ pub struct Store {
 }
 
 enum DispatchMode<'a> {
-    Poll(&'a ReplicaURL, &'a Option<Regex>),
+    Poll(&'a ReplicaURL, &'a Option<Regex>, &'a HeaderMap),
     Script(&'a String),
 }
 
@@ -84,7 +84,7 @@ fn make_default_headers() -> HeaderMap {
     headers
 }
 
-fn map_poll_replicas() -> Vec<(String, String, String, ReplicaURL, Option<Regex>)> {
+fn map_poll_replicas() -> Vec<(String, String, String, ReplicaURL, Option<Regex>, HeaderMap)> {
     let mut replica_list = Vec::new();
 
     // Acquire states
@@ -106,6 +106,7 @@ fn map_poll_replicas() -> Vec<(String, String, String, ReplicaURL, Option<Regex>
                             replica_id.to_owned(),
                             replica_url.to_owned(),
                             node.http_body_healthy_match.to_owned(),
+                            node.http_headers.clone(),
                         ));
                     }
                 }
@@ -148,6 +149,7 @@ fn map_script_replicas() -> Vec<(String, String, String, String)> {
 fn proceed_replica_probe_poll_with_retry(
     replica_url: &ReplicaURL,
     body_match: &Option<Regex>,
+    http_headers: &HeaderMap,
 ) -> (Status, Option<Duration>) {
     let (mut status, mut latency, mut retry_count) = (Status::Dead, None, 0);
 
@@ -161,7 +163,7 @@ fn proceed_replica_probe_poll_with_retry(
 
         thread::sleep(Duration::from_millis(PROBE_HOLD_MILLISECONDS));
 
-        let probe_results = proceed_replica_probe_poll(replica_url, body_match);
+        let probe_results = proceed_replica_probe_poll(replica_url, body_match, http_headers);
 
         status = probe_results.0;
         latency = Some(probe_results.1);
@@ -173,14 +175,16 @@ fn proceed_replica_probe_poll_with_retry(
 fn proceed_replica_probe_poll(
     replica_url: &ReplicaURL,
     body_match: &Option<Regex>,
+    http_headers: &HeaderMap,
 ) -> (Status, Duration) {
     let start_time = SystemTime::now();
 
     let (is_up, poll_duration) = match replica_url {
         &ReplicaURL::ICMP(ref host) => proceed_replica_probe_poll_icmp(host),
         &ReplicaURL::TCP(ref host, port) => proceed_replica_probe_poll_tcp(host, port),
-        &ReplicaURL::HTTP(ref url) => proceed_replica_probe_poll_http(url, body_match),
-        &ReplicaURL::HTTPS(ref url) => proceed_replica_probe_poll_http(url, body_match),
+        &ReplicaURL::HTTP(ref url) | &ReplicaURL::HTTPS(ref url) => {
+            proceed_replica_probe_poll_http(url, body_match, http_headers)
+        }
     };
 
     let duration_latency = match poll_duration {
@@ -357,6 +361,7 @@ fn proceed_replica_probe_poll_tcp(host: &str, port: u16) -> (bool, Option<Durati
 fn proceed_replica_probe_poll_http(
     url: &str,
     body_match: &Option<Regex>,
+    http_headers: &HeaderMap,
 ) -> (bool, Option<Duration>) {
     // Acquire query string separator (if the URL already contains a query string, use append mode)
     let query_separator = if url.contains("?") { "&" } else { "?" };
@@ -372,10 +377,12 @@ fn proceed_replica_probe_poll_http(
     debug!("prober poll will fire for http target: {}", &url_bang);
 
     let response = if body_match.is_some() {
-        PROBE_HTTP_CLIENT.get(&url_bang).send()
+        PROBE_HTTP_CLIENT.get(&url_bang)
     } else {
-        PROBE_HTTP_CLIENT.head(&url_bang).send()
-    };
+        PROBE_HTTP_CLIENT.head(&url_bang)
+    }
+    .headers(http_headers.clone())
+    .send();
 
     if let Ok(response_inner) = response {
         let status_code = response_inner.status().as_u16();
@@ -544,8 +551,8 @@ fn proceed_rabbitmq_queue_probe(
 fn dispatch_replica<'a>(mode: DispatchMode<'a>, probe_id: &str, node_id: &str, replica_id: &str) {
     // Acquire replica status (with optional latency)
     let (replica_status, replica_latency) = match mode {
-        DispatchMode::Poll(replica_url, body_match) => {
-            proceed_replica_probe_poll_with_retry(replica_url, body_match)
+        DispatchMode::Poll(replica_url, body_match, http_headers) => {
+            proceed_replica_probe_poll_with_retry(replica_url, body_match, http_headers)
         }
         DispatchMode::Script(script) => proceed_replica_probe_script(script),
     };
@@ -576,7 +583,7 @@ fn dispatch_polls() {
     // Probe hosts
     for probe_replica in map_poll_replicas() {
         dispatch_replica(
-            DispatchMode::Poll(&probe_replica.3, &probe_replica.4),
+            DispatchMode::Poll(&probe_replica.3, &probe_replica.4, &probe_replica.5),
             &probe_replica.0,
             &probe_replica.1,
             &probe_replica.2,
@@ -693,6 +700,7 @@ pub fn initialize_store() {
                 mode: node.mode.to_owned(),
                 replicas: IndexMap::new(),
                 http_body_healthy_match: node.http_body_healthy_match.to_owned(),
+                http_headers: node.http_headers.clone(),
                 rabbitmq_queue: node.rabbitmq_queue.to_owned(),
             };
 

@@ -270,6 +270,7 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 * `replicas` (type: _array[string]_, allowed: TCP, ICMP or HTTP URLs, default: empty) — Node replica URLs to be probed (only used if `mode` is `poll`)
 * `scripts` (type: _array[string]_, allowed: shell scripts as source code, default: empty) — Shell scripts to be executed on the system as a Vigil sub-process; they are handy to build custom probes (only used if `mode` is `script`)
 * `http_body_healthy_match` (type: _string_, allowed: regular expressions, no default) — HTTP response body for which to report node replica as `healthy` (if the body does not match, the replica will be reported as `dead`, even if the status code check passes; the check uses a `GET` rather than the usual `HEAD` if this option is set)
+* `http_headers` (type: _map[string, string_), allowed: any valid header name / value) — HTTP headers to add to HTTP requests. Example for authorization: `http_headers = { "Authorization" = "Bearer whatever" }`
 * `rabbitmq_queue` (type: _string_, allowed: RabbitMQ queue names, no default) — RabbitMQ queue associated to node, which to check against for pending payloads via RabbitMQ API (this helps monitor unacked payloads accumulating in the queue)
 
 ### Run Vigil
