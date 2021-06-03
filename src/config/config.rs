@@ -250,5 +250,7 @@ pub struct ConfigProbeServiceNode {
     #[serde(default)]
     #[serde(with = "http_serde::header_map")]
     pub http_headers: http::HeaderMap,
+    pub http_method: Option<String>,
+    pub http_body: Option<String>,
     pub rabbitmq_queue: Option<String>,
 }

@@ -67,7 +67,13 @@ pub struct Store {
 }
 
 enum DispatchMode<'a> {
-    Poll(&'a ReplicaURL, &'a Option<Regex>, &'a HeaderMap),
+    Poll(
+        &'a ReplicaURL,
+        &'a Option<Regex>,
+        &'a HeaderMap,
+        &'a Option<String>,
+        &'a Option<String>,
+    ),
     Script(&'a String),
 }
 
@@ -84,7 +90,16 @@ fn make_default_headers() -> HeaderMap {
     headers
 }
 
-fn map_poll_replicas() -> Vec<(String, String, String, ReplicaURL, Option<Regex>, HeaderMap)> {
+fn map_poll_replicas() -> Vec<(
+    String,
+    String,
+    String,
+    ReplicaURL,
+    Option<Regex>,
+    HeaderMap,
+    Option<String>,
+    Option<String>,
+)> {
     let mut replica_list = Vec::new();
 
     // Acquire states
@@ -107,6 +122,8 @@ fn map_poll_replicas() -> Vec<(String, String, String, ReplicaURL, Option<Regex>
                             replica_url.to_owned(),
                             node.http_body_healthy_match.to_owned(),
                             node.http_headers.clone(),
+                            node.http_method.clone(),
+                            node.http_body.clone(),
                         ));
                     }
                 }
@@ -150,6 +167,8 @@ fn proceed_replica_probe_poll_with_retry(
     replica_url: &ReplicaURL,
     body_match: &Option<Regex>,
     http_headers: &HeaderMap,
+    http_method: &Option<String>,
+    http_body: &Option<String>,
 ) -> (Status, Option<Duration>) {
     let (mut status, mut latency, mut retry_count) = (Status::Dead, None, 0);
 
@@ -163,7 +182,13 @@ fn proceed_replica_probe_poll_with_retry(
 
         thread::sleep(Duration::from_millis(PROBE_HOLD_MILLISECONDS));
 
-        let probe_results = proceed_replica_probe_poll(replica_url, body_match, http_headers);
+        let probe_results = proceed_replica_probe_poll(
+            replica_url,
+            body_match,
+            http_headers,
+            http_method,
+            http_body,
+        );
 
         status = probe_results.0;
         latency = Some(probe_results.1);
@@ -176,6 +201,8 @@ fn proceed_replica_probe_poll(
     replica_url: &ReplicaURL,
     body_match: &Option<Regex>,
     http_headers: &HeaderMap,
+    http_method: &Option<String>,
+    http_body: &Option<String>,
 ) -> (Status, Duration) {
     let start_time = SystemTime::now();
 
@@ -183,7 +210,7 @@ fn proceed_replica_probe_poll(
         &ReplicaURL::ICMP(ref host) => proceed_replica_probe_poll_icmp(host),
         &ReplicaURL::TCP(ref host, port) => proceed_replica_probe_poll_tcp(host, port),
         &ReplicaURL::HTTP(ref url) | &ReplicaURL::HTTPS(ref url) => {
-            proceed_replica_probe_poll_http(url, body_match, http_headers)
+            proceed_replica_probe_poll_http(url, body_match, http_headers, http_method, http_body)
         }
     };
 
@@ -362,6 +389,8 @@ fn proceed_replica_probe_poll_http(
     url: &str,
     body_match: &Option<Regex>,
     http_headers: &HeaderMap,
+    http_method: &Option<String>,
+    http_body: &Option<String>,
 ) -> (bool, Option<Duration>) {
     // Acquire query string separator (if the URL already contains a query string, use append mode)
     let query_separator = if url.contains("?") { "&" } else { "?" };
@@ -374,12 +403,30 @@ fn proceed_replica_probe_poll_http(
         time::now().to_timespec().sec
     );
 
-    debug!("prober poll will fire for http target: {}", &url_bang);
+    let effective_http_method = http_method.as_ref().map(String::as_str).unwrap_or_else(|| {
+        if body_match.is_some() {
+            "GET"
+        } else {
+            "HEAD"
+        }
+    });
 
-    let response = if body_match.is_some() {
-        PROBE_HTTP_CLIENT.get(&url_bang)
-    } else {
-        PROBE_HTTP_CLIENT.head(&url_bang)
+    let effective_http_body = http_body.as_ref().map(String::as_str).unwrap_or_default();
+
+    debug!(
+        "prober poll will fire for http target: {} with method: {} and body: \"{}\"",
+        &url_bang, &effective_http_method, &effective_http_body
+    );
+
+    let response = match effective_http_method {
+        "GET" => PROBE_HTTP_CLIENT.get(&url_bang),
+        "POST" => PROBE_HTTP_CLIENT
+            .post(&url_bang)
+            .body(reqwest::blocking::Body::from(
+                effective_http_body.to_string(),
+            )),
+        "HEAD" => PROBE_HTTP_CLIENT.head(&url_bang),
+        method => panic!("Invalid HTTP method: {}", method),
     }
     .headers(http_headers.clone())
     .send();
@@ -551,8 +598,14 @@ fn proceed_rabbitmq_queue_probe(
 fn dispatch_replica<'a>(mode: DispatchMode<'a>, probe_id: &str, node_id: &str, replica_id: &str) {
     // Acquire replica status (with optional latency)
     let (replica_status, replica_latency) = match mode {
-        DispatchMode::Poll(replica_url, body_match, http_headers) => {
-            proceed_replica_probe_poll_with_retry(replica_url, body_match, http_headers)
+        DispatchMode::Poll(replica_url, body_match, http_headers, http_method, http_body) => {
+            proceed_replica_probe_poll_with_retry(
+                replica_url,
+                body_match,
+                http_headers,
+                http_method,
+                http_body,
+            )
         }
         DispatchMode::Script(script) => proceed_replica_probe_script(script),
     };
@@ -583,7 +636,13 @@ fn dispatch_polls() {
     // Probe hosts
     for probe_replica in map_poll_replicas() {
         dispatch_replica(
-            DispatchMode::Poll(&probe_replica.3, &probe_replica.4, &probe_replica.5),
+            DispatchMode::Poll(
+                &probe_replica.3,
+                &probe_replica.4,
+                &probe_replica.5,
+                &probe_replica.6,
+                &probe_replica.7,
+            ),
             &probe_replica.0,
             &probe_replica.1,
             &probe_replica.2,
@@ -701,6 +760,8 @@ pub fn initialize_store() {
                 replicas: IndexMap::new(),
                 http_body_healthy_match: node.http_body_healthy_match.to_owned(),
                 http_headers: node.http_headers.clone(),
+                http_method: node.http_method.clone(),
+                http_body: node.http_body.clone(),
                 rabbitmq_queue: node.rabbitmq_queue.to_owned(),
             };
 
