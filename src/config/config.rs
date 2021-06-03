@@ -112,6 +112,7 @@ pub struct ConfigNotify {
     pub xmpp: Option<ConfigNotifyXMPP>,
     pub matrix: Option<ConfigNotifyMatrix>,
     pub webhook: Option<ConfigNotifyWebHook>,
+    pub zulip: Option<ConfigNotifyZulip>,
 }
 
 #[derive(Deserialize)]
@@ -215,6 +216,17 @@ pub struct ConfigNotifyXMPP {
 #[derive(Deserialize)]
 pub struct ConfigNotifyWebHook {
     pub hook_url: SerdeUrl,
+}
+
+#[derive(Deserialize)]
+pub struct ConfigNotifyZulip {
+    pub bot_email: String,
+    pub bot_api_key: String,
+    pub channel: String,
+    pub api_url: SerdeUrl,
+
+    #[serde(default = "defaults::notify_zulip_reminders_only")]
+    pub reminders_only: bool,
 }
 
 #[derive(Deserialize)]

@@ -119,6 +119,10 @@ pub fn notify_xmpp_reminders_only() -> bool {
     false
 }
 
+pub fn notify_zulip_reminders_only() -> bool {
+    false
+}
+
 pub fn notify_matrix_reminders_only() -> bool {
     false
 }

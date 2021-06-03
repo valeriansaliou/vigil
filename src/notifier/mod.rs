@@ -32,3 +32,6 @@ pub mod matrix;
 
 #[cfg(feature = "notifier-webhook")]
 pub mod webhook;
+
+#[cfg(feature = "notifier-zulip")]
+pub mod zulip;
