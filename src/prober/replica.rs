@@ -29,8 +29,8 @@ impl ReplicaURL {
                     }
                     _ => Err(()),
                 },
-                "http" => Ok(ReplicaURL::HTTP(url.into_string())),
-                "https" => Ok(ReplicaURL::HTTPS(url.into_string())),
+                "http" => Ok(ReplicaURL::HTTP(url.into())),
+                "https" => Ok(ReplicaURL::HTTPS(url.into())),
                 _ => Err(()),
             },
             _ => Err(()),
