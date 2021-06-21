@@ -248,4 +248,6 @@ pub struct ConfigProbeServiceNode {
     pub scripts: Option<Vec<String>>,
     pub http_body_healthy_match: Option<Regex>,
     pub rabbitmq_queue: Option<String>,
+    pub rabbitmq_queue_nack_healthy_below: Option<u32>,
+    pub rabbitmq_queue_nack_dead_above: Option<u32>,
 }

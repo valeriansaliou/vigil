@@ -9,9 +9,10 @@ use std::time::{Duration, SystemTime};
 use log::{debug, warn};
 
 use super::states::{
-    ServiceStatesProbeNodeReplica, ServiceStatesProbeNodeReplicaLoad,
-    ServiceStatesProbeNodeReplicaLoadQueue, ServiceStatesProbeNodeReplicaMetrics,
-    ServiceStatesProbeNodeReplicaMetricsSystem, ServiceStatesProbeNodeReplicaReport,
+    ServiceStatesProbeNodeRabbitMQ, ServiceStatesProbeNodeReplica,
+    ServiceStatesProbeNodeReplicaLoad, ServiceStatesProbeNodeReplicaLoadQueue,
+    ServiceStatesProbeNodeReplicaMetrics, ServiceStatesProbeNodeReplicaMetricsSystem,
+    ServiceStatesProbeNodeReplicaReport,
 };
 use crate::prober::manager::STORE as PROBER_STORE;
 use crate::prober::mode::Mode;
@@ -40,7 +41,7 @@ pub fn handle_load(
     interval: u64,
     load_cpu: f32,
     load_ram: f32,
-) -> Result<Option<String>, HandleLoadError> {
+) -> Result<Option<ServiceStatesProbeNodeRabbitMQ>, HandleLoadError> {
     debug!(
         "load report handle: {}:{}:{}",
         probe_id, node_id, replica_id
@@ -103,7 +104,7 @@ pub fn handle_load(
                 },
             );
 
-            return Ok(node.rabbitmq_queue.to_owned());
+            return Ok(node.rabbitmq.clone());
         }
     }
 

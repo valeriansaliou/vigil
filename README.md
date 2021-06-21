@@ -184,8 +184,8 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 * `virtualhost` (type: _string_, allowed: virtual host, no default) — RabbitMQ virtual host hosting the queues to be monitored
 * `queue_ready_healthy_below` (type: _integer_, allowed: any number, no default) — Maximum number of payloads in RabbitMQ queue with status `ready` to consider node `healthy`.
 * `queue_nack_healthy_below` (type: _integer_, allowed: any number, no default) — Maximum number of payloads in RabbitMQ queue with status `nack` to consider node `healthy`.
-* `queue_ready_dead_above` (type: _integer_, allowed: any number, no default) — Threshold on the number of payloads in RabbitMQ queue with status `ready` above which node should be considered `dead` (stalled queue).
-* `queue_nack_dead_above` (type: _integer_, allowed: any number, no default) — Threshold on the number of payloads in RabbitMQ queue with status `nack` above which node should be considered `dead` (stalled queue).
+* `queue_ready_dead_above` (type: _integer_, allowed: any number, no default) — Threshold on the number of payloads in RabbitMQ queue with status `ready` above which node should be considered `dead` (stalled queue)
+* `queue_nack_dead_above` (type: _integer_, allowed: any number, no default) — Threshold on the number of payloads in RabbitMQ queue with status `nack` above which node should be considered `dead` (stalled queue)
 * `queue_loaded_retry_delay` (type: _integer_, allowed: milliseconds, no default) — Re-check queue if it reports as loaded after delay; this avoids false-positives if your systems usually take a bit of time to process pending queue payloads (if any)
 
 **[notify]**
@@ -271,6 +271,8 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 * `scripts` (type: _array[string]_, allowed: shell scripts as source code, default: empty) — Shell scripts to be executed on the system as a Vigil sub-process; they are handy to build custom probes (only used if `mode` is `script`)
 * `http_body_healthy_match` (type: _string_, allowed: regular expressions, no default) — HTTP response body for which to report node replica as `healthy` (if the body does not match, the replica will be reported as `dead`, even if the status code check passes; the check uses a `GET` rather than the usual `HEAD` if this option is set)
 * `rabbitmq_queue` (type: _string_, allowed: RabbitMQ queue names, no default) — RabbitMQ queue associated to node, which to check against for pending payloads via RabbitMQ API (this helps monitor unacked payloads accumulating in the queue)
+* `rabbitmq_queue_nack_healthy_below` (type: _integer_, allowed: any number, no default) — Maximum number of payloads in RabbitMQ queue associated to node, with status `nack` to consider node `healthy` (this overrides the global `plugins.rabbitmq.queue_nack_healthy_below`)
+* `rabbitmq_queue_nack_dead_above` (type: _integer_, allowed: any number, no default) — Threshold on the number of payloads in RabbitMQ queue associated to node, with status `nack` above which node should be considered `dead` (stalled queue, this overrides the global `plugins.rabbitmq.queue_nack_dead_above`)
 
 ### Run Vigil
 
