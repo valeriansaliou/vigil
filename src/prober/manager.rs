@@ -414,15 +414,11 @@ fn proceed_replica_probe_poll_http(
     });
 
     // Acquire effective HTTP body to use for probe query (for POST methods only)
-    let effective_http_body = if effective_http_method == "POST" {
-        Some(http_body.as_ref().map(String::as_str).unwrap_or_default())
-    } else {
-        None
-    };
+    let effective_http_body = http_body.as_ref().map(String::as_str).unwrap_or_default();
 
     // Probe target, with provided HTTP method and body (if any)
     debug!(
-        "prober poll will fire for http target: {} with method: '{}' and body: {:?}",
+        "prober poll will fire for http target: {} with method: '{}' and body: '{}'",
         &url_bang, &effective_http_method, &effective_http_body
     );
 
@@ -432,7 +428,17 @@ fn proceed_replica_probe_poll_http(
         "POST" => PROBE_HTTP_CLIENT
             .post(&url_bang)
             .body(reqwest::blocking::Body::from(
-                effective_http_body.unwrap_or_default().to_string(),
+                effective_http_body.to_string(),
+            )),
+        "PUT" => PROBE_HTTP_CLIENT
+            .put(&url_bang)
+            .body(reqwest::blocking::Body::from(
+                effective_http_body.to_string(),
+            )),
+        "PATCH" => PROBE_HTTP_CLIENT
+            .patch(&url_bang)
+            .body(reqwest::blocking::Body::from(
+                effective_http_body.to_string(),
             )),
         method => panic!("cannot probe due to invalid http method: '{}'", method),
     }
