@@ -7,6 +7,7 @@
 
 use std::time::Duration;
 
+use log::warn;
 use reqwest::blocking::Client;
 use serde_derive::Serialize;
 
@@ -39,7 +40,7 @@ impl GenericNotifier for ZulipNotifier {
         if let Some(ref zulip) = notify.zulip {
             let status_label = format!("{:?}", notification.status);
 
-            let status_str = match notification.status {
+            let status_text = match notification.status {
                 Status::Dead => " *dead* :boom:",
                 Status::Healthy => " *healthy* :check_mark:",
                 Status::Sick => " *sick* :sick:",
@@ -47,11 +48,11 @@ impl GenericNotifier for ZulipNotifier {
 
             // Build message
             let mut message_text = if notification.startup == true {
-                format!("Status started up, as: {}.", status_str)
+                format!("Status started up, as: {}.", status_text)
             } else if notification.changed {
-                format!("Status changed to: {}.", status_str)
+                format!("Status changed to: {}.", status_text)
             } else {
-                format!("Status is still: {}.", status_str)
+                format!("Status is still: {}.", status_text)
             };
 
             if notification.replicas.len() > 0 {
@@ -86,8 +87,8 @@ impl GenericNotifier for ZulipNotifier {
                 if response_inner.status().is_success() == true {
                     return Ok(());
                 } else {
-                    log::warn!(
-                        "Error while submitting data to zulip: {:?}",
+                    warn!(
+                        "could not submit data to zulip: {:?}",
                         response_inner.text()
                     );
                 }
