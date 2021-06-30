@@ -419,7 +419,7 @@ fn proceed_replica_probe_poll_http(
         }
         Err(err) => {
             debug!(
-                "prober poll result was not received for http target: {}, {}",
+                "prober poll result was not received for http target: {} (error: {})",
                 &url_bang, err
             );
         }
