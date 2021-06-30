@@ -53,6 +53,7 @@ _👋 You use Vigil and you want to be listed there? [Contact me](https://valeri
   * XMPP
   * Matrix
   * Webhook
+  * Zulip
 * **Generates a status page**, that you can host on your domain for your public users (eg. `https://status.example.com`)
 
 ## How does it work?
@@ -254,6 +255,14 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 **[notify.webhook]**
 
 * `hook_url` (type: _string_, allowed: URL, no default) — Web Hook URL (eg. `https://domain.com/webhooks/[..]`)
+
+**[notify.zulip]**
+
+* `bot_email` (type: _string_, allowed: any string, no default) — The bot mail address as given by the zulip interface
+* `bot_api_key` (type: _string_, allowed: any string, no default) — The bot API key as given by the zulip interface
+* `channel` (type: _string_, allowed: any string, no default) — The name of the channel to send notifications to
+* `api_url` (type: _string_, allowed: URL, no default) — The API endpoint url (eg. `https://domain.zulipchat.com/api/v1/`)
+* `reminders_only` (type: _boolean_, allowed: `true`, `false`, default: `false`) — Whether to send messages only for downtime reminders or everytime
 
 **[probe]**
 

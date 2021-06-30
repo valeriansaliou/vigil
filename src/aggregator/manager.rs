@@ -44,6 +44,9 @@ use crate::notifier::matrix::MatrixNotifier;
 #[cfg(feature = "notifier-webhook")]
 use crate::notifier::webhook::WebHookNotifier;
 
+#[cfg(feature = "notifier-zulip")]
+use crate::notifier::zulip::ZulipNotifier;
+
 const AGGREGATE_INTERVAL_SECONDS: u64 = 10;
 
 struct BumpedStates {
@@ -324,6 +327,9 @@ fn notify(bumped_states: &BumpedStates) {
 
         #[cfg(feature = "notifier-webhook")]
         Notification::dispatch::<WebHookNotifier>(notify, &notification).ok();
+
+        #[cfg(feature = "notifier-zulip")]
+        Notification::dispatch::<ZulipNotifier>(notify, &notification).ok();
     }
 }
 
