@@ -1,6 +1,6 @@
 [package]
 name = "vigil-server"
-version = "1.21.1"
+version = "1.21.2"
 description = "Microservices Status Page. Monitors a distributed infrastructure and sends alerts (Slack, SMS, etc.)."
 readme = "README.md"
 license = "MPL-2.0"
@@ -46,10 +46,11 @@ http-serde = "1.0.2"
 http = "0.2"
 
 [features]
-default = ["notifier-email", "notifier-twilio", "notifier-slack", "notifier-telegram", "notifier-pushover", "notifier-gotify", "notifier-matrix", "notifier-webhook"]
+default = ["notifier-email", "notifier-twilio", "notifier-slack", "notifier-zulip", "notifier-telegram", "notifier-pushover", "notifier-gotify", "notifier-matrix", "notifier-webhook"]
 notifier-email = ["lettre", "lettre_email"]
 notifier-twilio = []
 notifier-slack = []
+notifier-zulip = []
 notifier-telegram = []
 notifier-pushover = []
 notifier-gotify = []

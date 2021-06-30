@@ -9,7 +9,7 @@ Vigil is an open-source Status Page you can host on your infrastructure, used to
 
 It is useful in microservices contexts to monitor both apps and backends. If a node goes down in your infrastructure, you receive a status change notification in a Slack channel, Email, Twilio SMS or/and XMPP.
 
-_Tested at Rust version: `rustc 1.49.0 (e1884a8e3 2020-12-29)`_
+_Tested at Rust version: `rustc 1.53.0 (53cb7b09b 2021-06-17)`_
 
 **🇭🇺 Crafted in Budapest, Hungary.**
 
@@ -47,6 +47,7 @@ _👋 You use Vigil and you want to be listed there? [Contact me](https://valeri
   * Email
   * Twilio (SMS)
   * Slack
+  * Zulip
   * Telegram
   * Pushover
   * Gotify
@@ -114,13 +115,13 @@ You might find it convenient to run Vigil via Docker. You can find the pre-built
 First, pull the `valeriansaliou/vigil` image:
 
 ```bash
-docker pull valeriansaliou/vigil:v1.21.1
+docker pull valeriansaliou/vigil:v1.21.2
 ```
 
 Then, seed it a configuration file and run it (replace `/path/to/your/vigil/config.cfg` with the path to your configuration file):
 
 ```bash
-docker run -p 8080:8080 -v /path/to/your/vigil/config.cfg:/etc/vigil.cfg valeriansaliou/vigil:v1.21.1
+docker run -p 8080:8080 -v /path/to/your/vigil/config.cfg:/etc/vigil.cfg valeriansaliou/vigil:v1.21.2
 ```
 
 In the configuration file, ensure that:
@@ -184,8 +185,8 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 * `virtualhost` (type: _string_, allowed: virtual host, no default) — RabbitMQ virtual host hosting the queues to be monitored
 * `queue_ready_healthy_below` (type: _integer_, allowed: any number, no default) — Maximum number of payloads in RabbitMQ queue with status `ready` to consider node `healthy`.
 * `queue_nack_healthy_below` (type: _integer_, allowed: any number, no default) — Maximum number of payloads in RabbitMQ queue with status `nack` to consider node `healthy`.
-* `queue_ready_dead_above` (type: _integer_, allowed: any number, no default) — Threshold on the number of payloads in RabbitMQ queue with status `ready` above which node should be considered `dead` (stalled queue).
-* `queue_nack_dead_above` (type: _integer_, allowed: any number, no default) — Threshold on the number of payloads in RabbitMQ queue with status `nack` above which node should be considered `dead` (stalled queue).
+* `queue_ready_dead_above` (type: _integer_, allowed: any number, no default) — Threshold on the number of payloads in RabbitMQ queue with status `ready` above which node should be considered `dead` (stalled queue)
+* `queue_nack_dead_above` (type: _integer_, allowed: any number, no default) — Threshold on the number of payloads in RabbitMQ queue with status `nack` above which node should be considered `dead` (stalled queue)
 * `queue_loaded_retry_delay` (type: _integer_, allowed: milliseconds, no default) — Re-check queue if it reports as loaded after delay; this avoids false-positives if your systems usually take a bit of time to process pending queue payloads (if any)
 
 **[notify]**
@@ -217,6 +218,14 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 * `hook_url` (type: _string_, allowed: URL, no default) — Slack hook URL (ie. `https://hooks.slack.com/[..]`)
 * `mention_channel` (type: _boolean_, allowed: `true`, `false`, default: `false`) — Whether to mention channel when sending Slack messages (using _@channel_, which is handy to receive a high-priority notification)
 * `reminders_only` (type: _boolean_, allowed: `true`, `false`, default: `false`) — Whether to send Slack messages only for downtime reminders or everytime
+
+**[notify.zulip]**
+
+* `bot_email` (type: _string_, allowed: any string, no default) — The bot mail address as given by the Zulip interface
+* `bot_api_key` (type: _string_, allowed: any string, no default) — The bot API key as given by the Zulip interface
+* `channel` (type: _string_, allowed: any string, no default) — The name of the channel to send notifications to
+* `api_url` (type: _string_, allowed: URL, no default) — The API endpoint url (eg. `https://domain.zulipchat.com/api/v1/`)
+* `reminders_only` (type: _boolean_, allowed: `true`, `false`, default: `false`) — Whether to send messages only for downtime reminders or everytime
 
 **[notify.telegram]**
 
@@ -274,6 +283,8 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 * `http_method` (type _string_), allowed: GET, POST, HEAD — HTTP method to use when polling the endpoint. Omitting this will default to using HEAD or GET depending on the `http_body_healthy_match` config value
 * `http_body` (type _string_) — Body to send in the HTTP request when polling an endpoint. This is only valid if the `http_method` is set to POST
 * `rabbitmq_queue` (type: _string_, allowed: RabbitMQ queue names, no default) — RabbitMQ queue associated to node, which to check against for pending payloads via RabbitMQ API (this helps monitor unacked payloads accumulating in the queue)
+* `rabbitmq_queue_nack_healthy_below` (type: _integer_, allowed: any number, no default) — Maximum number of payloads in RabbitMQ queue associated to node, with status `nack` to consider node `healthy` (this overrides the global `plugins.rabbitmq.queue_nack_healthy_below`)
+* `rabbitmq_queue_nack_dead_above` (type: _integer_, allowed: any number, no default) — Threshold on the number of payloads in RabbitMQ queue associated to node, with status `nack` above which node should be considered `dead` (stalled queue, this overrides the global `plugins.rabbitmq.queue_nack_dead_above`)
 
 ### Run Vigil
 

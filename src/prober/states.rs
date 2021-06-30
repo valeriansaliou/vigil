@@ -41,7 +41,7 @@ pub struct ServiceStatesProbeNode {
     pub http_headers: http::HeaderMap,
     pub http_method: Option<String>,
     pub http_body: Option<String>,
-    pub rabbitmq_queue: Option<String>,
+    pub rabbitmq: Option<ServiceStatesProbeNodeRabbitMQ>,
 }
 
 #[derive(Serialize)]
@@ -52,6 +52,13 @@ pub struct ServiceStatesProbeNodeReplica {
     pub metrics: ServiceStatesProbeNodeReplicaMetrics,
     pub load: Option<ServiceStatesProbeNodeReplicaLoad>,
     pub report: Option<ServiceStatesProbeNodeReplicaReport>,
+}
+
+#[derive(Serialize, Clone)]
+pub struct ServiceStatesProbeNodeRabbitMQ {
+    pub queue: String,
+    pub queue_nack_healthy_below: Option<u32>,
+    pub queue_nack_dead_above: Option<u32>,
 }
 
 #[derive(Serialize, Clone, Default)]

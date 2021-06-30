@@ -26,6 +26,9 @@ use crate::notifier::twilio::TwilioNotifier;
 #[cfg(feature = "notifier-slack")]
 use crate::notifier::slack::SlackNotifier;
 
+#[cfg(feature = "notifier-zulip")]
+use crate::notifier::zulip::ZulipNotifier;
+
 #[cfg(feature = "notifier-telegram")]
 use crate::notifier::telegram::TelegramNotifier;
 
@@ -306,6 +309,9 @@ fn notify(bumped_states: &BumpedStates) {
 
         #[cfg(feature = "notifier-slack")]
         Notification::dispatch::<SlackNotifier>(notify, &notification).ok();
+
+        #[cfg(feature = "notifier-zulip")]
+        Notification::dispatch::<ZulipNotifier>(notify, &notification).ok();
 
         #[cfg(feature = "notifier-telegram")]
         Notification::dispatch::<TelegramNotifier>(notify, &notification).ok();

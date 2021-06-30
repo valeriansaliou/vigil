@@ -87,38 +87,10 @@ pub fn notify_email_smtp_encrypt() -> bool {
     true
 }
 
-pub fn notify_email_reminders_only() -> bool {
-    false
-}
-
-pub fn notify_twilio_reminders_only() -> bool {
-    false
-}
-
 pub fn notify_slack_mention_channel() -> bool {
     false
 }
 
-pub fn notify_slack_reminders_only() -> bool {
-    false
-}
-
-pub fn notify_telegram_reminders_only() -> bool {
-    false
-}
-
-pub fn notify_pushover_reminders_only() -> bool {
-    false
-}
-
-pub fn notify_gotify_reminders_only() -> bool {
-    false
-}
-
-pub fn notify_xmpp_reminders_only() -> bool {
-    false
-}
-
-pub fn notify_matrix_reminders_only() -> bool {
+pub fn notify_generic_reminders_only() -> bool {
     false
 }
