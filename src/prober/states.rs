@@ -12,7 +12,7 @@ use serde_derive::Serialize;
 use super::mode::Mode;
 use super::replica::ReplicaURL;
 use super::status::Status;
-use crate::config::regex::Regex;
+use crate::config::{config::ConfigProbeServiceNodeHTTPMethod, regex::Regex};
 
 #[derive(Serialize)]
 pub struct ServiceStates {
@@ -38,7 +38,7 @@ pub struct ServiceStatesProbeNode {
     #[serde(default)]
     #[serde(with = "http_serde::header_map")]
     pub http_headers: http::HeaderMap,
-    pub http_method: Option<String>,
+    pub http_method: Option<ConfigProbeServiceNodeHTTPMethod>,
     pub http_body: Option<String>,
     pub http_body_healthy_match: Option<Regex>,
     pub rabbitmq: Option<ServiceStatesProbeNodeRabbitMQ>,

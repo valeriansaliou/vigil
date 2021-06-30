@@ -7,7 +7,7 @@
 use std::net::SocketAddr;
 use std::path::PathBuf;
 
-use serde_derive::Deserialize;
+use serde_derive::{Deserialize, Serialize};
 use url_serde::SerdeUrl;
 
 use super::defaults;
@@ -261,10 +261,28 @@ pub struct ConfigProbeServiceNode {
     #[serde(default)]
     #[serde(with = "http_serde::header_map")]
     pub http_headers: http::HeaderMap,
-    pub http_method: Option<String>,
+    pub http_method: Option<ConfigProbeServiceNodeHTTPMethod>,
     pub http_body: Option<String>,
     pub http_body_healthy_match: Option<Regex>,
     pub rabbitmq_queue: Option<String>,
     pub rabbitmq_queue_nack_healthy_below: Option<u32>,
     pub rabbitmq_queue_nack_dead_above: Option<u32>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum ConfigProbeServiceNodeHTTPMethod {
+    #[serde(rename = "HEAD")]
+    Head,
+
+    #[serde(rename = "GET")]
+    Get,
+
+    #[serde(rename = "POST")]
+    Post,
+
+    #[serde(rename = "PUT")]
+    Put,
+
+    #[serde(rename = "PATCH")]
+    Patch,
 }

@@ -29,7 +29,7 @@ use super::states::{
     ServiceStatesProbeNodeReplicaMetricsRabbitMQ,
 };
 use super::status::Status;
-use crate::config::config::ConfigPluginsRabbitMQ;
+use crate::config::config::{ConfigPluginsRabbitMQ, ConfigProbeServiceNodeHTTPMethod};
 use crate::config::regex::Regex;
 use crate::prober::manager::STORE as PROBER_STORE;
 use crate::prober::mode::Mode;
@@ -71,7 +71,7 @@ enum DispatchMode<'a> {
     Poll(
         &'a ReplicaURL,
         &'a HeaderMap,
-        &'a Option<String>,
+        &'a Option<ConfigProbeServiceNodeHTTPMethod>,
         &'a Option<String>,
         &'a Option<Regex>,
     ),
@@ -97,7 +97,7 @@ fn map_poll_replicas() -> Vec<(
     String,
     ReplicaURL,
     HeaderMap,
-    Option<String>,
+    Option<ConfigProbeServiceNodeHTTPMethod>,
     Option<String>,
     Option<Regex>,
 )> {
@@ -167,7 +167,7 @@ fn map_script_replicas() -> Vec<(String, String, String, String)> {
 fn proceed_replica_probe_poll_with_retry(
     replica_url: &ReplicaURL,
     http_headers: &HeaderMap,
-    http_method: &Option<String>,
+    http_method: &Option<ConfigProbeServiceNodeHTTPMethod>,
     http_body: &Option<String>,
     body_match: &Option<Regex>,
 ) -> (Status, Option<Duration>) {
@@ -201,7 +201,7 @@ fn proceed_replica_probe_poll_with_retry(
 fn proceed_replica_probe_poll(
     replica_url: &ReplicaURL,
     http_headers: &HeaderMap,
-    http_method: &Option<String>,
+    http_method: &Option<ConfigProbeServiceNodeHTTPMethod>,
     http_body: &Option<String>,
     body_match: &Option<Regex>,
 ) -> (Status, Duration) {
@@ -389,7 +389,7 @@ fn proceed_replica_probe_poll_tcp(host: &str, port: u16) -> (bool, Option<Durati
 fn proceed_replica_probe_poll_http(
     url: &str,
     http_headers: &HeaderMap,
-    http_method: &Option<String>,
+    http_method: &Option<ConfigProbeServiceNodeHTTPMethod>,
     http_body: &Option<String>,
     body_match: &Option<Regex>,
 ) -> (bool, Option<Duration>) {
@@ -405,12 +405,10 @@ fn proceed_replica_probe_poll_http(
     );
 
     // Acquire effective HTTP method to use for probe query
-    let effective_http_method = http_method.as_ref().map(String::as_str).unwrap_or_else(|| {
-        if body_match.is_some() {
-            "GET"
-        } else {
-            "HEAD"
-        }
+    let effective_http_method = http_method.as_ref().unwrap_or(if body_match.is_some() {
+        &ConfigProbeServiceNodeHTTPMethod::Get
+    } else {
+        &ConfigProbeServiceNodeHTTPMethod::Head
     });
 
     // Acquire effective HTTP body to use for probe query (for POST methods only)
@@ -418,29 +416,34 @@ fn proceed_replica_probe_poll_http(
 
     // Probe target, with provided HTTP method and body (if any)
     debug!(
-        "prober poll will fire for http target: {} with method: '{}' and body: '{}'",
+        "prober poll will fire for http target: {} with method: {:?} and body: '{}'",
         &url_bang, &effective_http_method, &effective_http_body
     );
 
     let response = match effective_http_method {
-        "HEAD" => PROBE_HTTP_CLIENT.head(&url_bang),
-        "GET" => PROBE_HTTP_CLIENT.get(&url_bang),
-        "POST" => PROBE_HTTP_CLIENT
-            .post(&url_bang)
-            .body(reqwest::blocking::Body::from(
-                effective_http_body.to_string(),
-            )),
-        "PUT" => PROBE_HTTP_CLIENT
-            .put(&url_bang)
-            .body(reqwest::blocking::Body::from(
-                effective_http_body.to_string(),
-            )),
-        "PATCH" => PROBE_HTTP_CLIENT
-            .patch(&url_bang)
-            .body(reqwest::blocking::Body::from(
-                effective_http_body.to_string(),
-            )),
-        method => panic!("cannot probe due to invalid http method: '{}'", method),
+        ConfigProbeServiceNodeHTTPMethod::Head => PROBE_HTTP_CLIENT.head(&url_bang),
+        ConfigProbeServiceNodeHTTPMethod::Get => PROBE_HTTP_CLIENT.get(&url_bang),
+        ConfigProbeServiceNodeHTTPMethod::Post => {
+            PROBE_HTTP_CLIENT
+                .post(&url_bang)
+                .body(reqwest::blocking::Body::from(
+                    effective_http_body.to_string(),
+                ))
+        }
+        ConfigProbeServiceNodeHTTPMethod::Put => {
+            PROBE_HTTP_CLIENT
+                .put(&url_bang)
+                .body(reqwest::blocking::Body::from(
+                    effective_http_body.to_string(),
+                ))
+        }
+        ConfigProbeServiceNodeHTTPMethod::Patch => {
+            PROBE_HTTP_CLIENT
+                .patch(&url_bang)
+                .body(reqwest::blocking::Body::from(
+                    effective_http_body.to_string(),
+                ))
+        }
     }
     .headers(http_headers.to_owned())
     .send();
