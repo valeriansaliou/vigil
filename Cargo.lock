@@ -1154,6 +1154,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "http-serde"
+version = "1.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "55db33e92608c6d9b19168e0c3dd22bad81306dc530e8e2acce5647a31023699"
+dependencies = [
+ "http",
+ "serde",
+]
+
+[[package]]
 name = "httparse"
 version = "1.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2973,6 +2983,8 @@ dependencies = [
  "actix-web-httpauth",
  "base64 0.13.0",
  "clap",
+ "http",
+ "http-serde",
  "indexmap",
  "lazy_static",
  "lettre",

@@ -259,6 +259,11 @@ pub struct ConfigProbeServiceNode {
     pub replicas: Option<Vec<String>>,
     pub scripts: Option<Vec<String>>,
     pub http_body_healthy_match: Option<Regex>,
+    #[serde(default)]
+    #[serde(with = "http_serde::header_map")]
+    pub http_headers: http::HeaderMap,
+    pub http_method: Option<String>,
+    pub http_body: Option<String>,
     pub rabbitmq_queue: Option<String>,
     pub rabbitmq_queue_nack_healthy_below: Option<u32>,
     pub rabbitmq_queue_nack_dead_above: Option<u32>,
