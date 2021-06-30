@@ -2,6 +2,7 @@
 //
 // Microservices Status Page
 // Copyright: 2021, Valerian Saliou <valerian@valeriansaliou.name>
+// Copyright: 2021, Bastien Orivel <eijebong@bananium.fr>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
 use std::time::Duration;
