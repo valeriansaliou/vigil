@@ -35,12 +35,12 @@ pub struct ServiceStatesProbeNode {
     pub label: String,
     pub mode: Mode,
     pub replicas: IndexMap<String, ServiceStatesProbeNodeReplica>,
-    pub http_body_healthy_match: Option<Regex>,
     #[serde(default)]
     #[serde(with = "http_serde::header_map")]
     pub http_headers: http::HeaderMap,
     pub http_method: Option<String>,
     pub http_body: Option<String>,
+    pub http_body_healthy_match: Option<Regex>,
     pub rabbitmq: Option<ServiceStatesProbeNodeRabbitMQ>,
 }
 

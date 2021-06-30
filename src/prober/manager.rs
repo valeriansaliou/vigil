@@ -70,10 +70,10 @@ pub struct Store {
 enum DispatchMode<'a> {
     Poll(
         &'a ReplicaURL,
-        &'a Option<Regex>,
         &'a HeaderMap,
         &'a Option<String>,
         &'a Option<String>,
+        &'a Option<Regex>,
     ),
     Script(&'a String),
 }
@@ -96,10 +96,10 @@ fn map_poll_replicas() -> Vec<(
     String,
     String,
     ReplicaURL,
-    Option<Regex>,
     HeaderMap,
     Option<String>,
     Option<String>,
+    Option<Regex>,
 )> {
     let mut replica_list = Vec::new();
 
@@ -121,10 +121,10 @@ fn map_poll_replicas() -> Vec<(
                             node_id.to_owned(),
                             replica_id.to_owned(),
                             replica_url.to_owned(),
+                            node.http_headers.to_owned(),
+                            node.http_method.to_owned(),
+                            node.http_body.to_owned(),
                             node.http_body_healthy_match.to_owned(),
-                            node.http_headers.clone(),
-                            node.http_method.clone(),
-                            node.http_body.clone(),
                         ));
                     }
                 }
@@ -166,10 +166,10 @@ fn map_script_replicas() -> Vec<(String, String, String, String)> {
 
 fn proceed_replica_probe_poll_with_retry(
     replica_url: &ReplicaURL,
-    body_match: &Option<Regex>,
     http_headers: &HeaderMap,
     http_method: &Option<String>,
     http_body: &Option<String>,
+    body_match: &Option<Regex>,
 ) -> (Status, Option<Duration>) {
     let (mut status, mut latency, mut retry_count) = (Status::Dead, None, 0);
 
@@ -185,10 +185,10 @@ fn proceed_replica_probe_poll_with_retry(
 
         let probe_results = proceed_replica_probe_poll(
             replica_url,
-            body_match,
             http_headers,
             http_method,
             http_body,
+            body_match,
         );
 
         status = probe_results.0;
@@ -200,10 +200,10 @@ fn proceed_replica_probe_poll_with_retry(
 
 fn proceed_replica_probe_poll(
     replica_url: &ReplicaURL,
-    body_match: &Option<Regex>,
     http_headers: &HeaderMap,
     http_method: &Option<String>,
     http_body: &Option<String>,
+    body_match: &Option<Regex>,
 ) -> (Status, Duration) {
     let start_time = SystemTime::now();
 
@@ -211,7 +211,7 @@ fn proceed_replica_probe_poll(
         &ReplicaURL::ICMP(ref host) => proceed_replica_probe_poll_icmp(host),
         &ReplicaURL::TCP(ref host, port) => proceed_replica_probe_poll_tcp(host, port),
         &ReplicaURL::HTTP(ref url) | &ReplicaURL::HTTPS(ref url) => {
-            proceed_replica_probe_poll_http(url, body_match, http_headers, http_method, http_body)
+            proceed_replica_probe_poll_http(url, http_headers, http_method, http_body, body_match)
         }
     };
 
@@ -388,10 +388,10 @@ fn proceed_replica_probe_poll_tcp(host: &str, port: u16) -> (bool, Option<Durati
 
 fn proceed_replica_probe_poll_http(
     url: &str,
-    body_match: &Option<Regex>,
     http_headers: &HeaderMap,
     http_method: &Option<String>,
     http_body: &Option<String>,
+    body_match: &Option<Regex>,
 ) -> (bool, Option<Duration>) {
     // Acquire query string separator (if the URL already contains a query string, use append mode)
     let query_separator = if url.contains("?") { "&" } else { "?" };
@@ -404,6 +404,7 @@ fn proceed_replica_probe_poll_http(
         time::now().to_timespec().sec
     );
 
+    // Acquire effective HTTP method to use for probe query
     let effective_http_method = http_method.as_ref().map(String::as_str).unwrap_or_else(|| {
         if body_match.is_some() {
             "GET"
@@ -412,24 +413,30 @@ fn proceed_replica_probe_poll_http(
         }
     });
 
-    let effective_http_body = http_body.as_ref().map(String::as_str).unwrap_or_default();
+    // Acquire effective HTTP body to use for probe query (for POST methods only)
+    let effective_http_body = if effective_http_method == "POST" {
+        Some(http_body.as_ref().map(String::as_str).unwrap_or_default())
+    } else {
+        None
+    };
 
+    // Probe target, with provided HTTP method and body (if any)
     debug!(
-        "prober poll will fire for http target: {} with method: {} and body: \"{}\"",
+        "prober poll will fire for http target: {} with method: '{}' and body: {:?}",
         &url_bang, &effective_http_method, &effective_http_body
     );
 
     let response = match effective_http_method {
+        "HEAD" => PROBE_HTTP_CLIENT.head(&url_bang),
         "GET" => PROBE_HTTP_CLIENT.get(&url_bang),
         "POST" => PROBE_HTTP_CLIENT
             .post(&url_bang)
             .body(reqwest::blocking::Body::from(
-                effective_http_body.to_string(),
+                effective_http_body.unwrap_or_default().to_string(),
             )),
-        "HEAD" => PROBE_HTTP_CLIENT.head(&url_bang),
-        method => panic!("Invalid HTTP method: {}", method),
+        method => panic!("cannot probe due to invalid http method: '{}'", method),
     }
-    .headers(http_headers.clone())
+    .headers(http_headers.to_owned())
     .send();
 
     match response {
@@ -607,13 +614,13 @@ fn proceed_rabbitmq_queue_probe(
 fn dispatch_replica<'a>(mode: DispatchMode<'a>, probe_id: &str, node_id: &str, replica_id: &str) {
     // Acquire replica status (with optional latency)
     let (replica_status, replica_latency) = match mode {
-        DispatchMode::Poll(replica_url, body_match, http_headers, http_method, http_body) => {
+        DispatchMode::Poll(replica_url, http_headers, http_method, http_body, body_match) => {
             proceed_replica_probe_poll_with_retry(
                 replica_url,
-                body_match,
                 http_headers,
                 http_method,
                 http_body,
+                body_match,
             )
         }
         DispatchMode::Script(script) => proceed_replica_probe_script(script),
@@ -783,10 +790,10 @@ pub fn initialize_store() {
                 label: node.label.to_owned(),
                 mode: node.mode.to_owned(),
                 replicas: IndexMap::new(),
+                http_headers: node.http_headers.to_owned(),
+                http_method: node.http_method.to_owned(),
+                http_body: node.http_body.to_owned(),
                 http_body_healthy_match: node.http_body_healthy_match.to_owned(),
-                http_headers: node.http_headers.clone(),
-                http_method: node.http_method.clone(),
-                http_body: node.http_body.clone(),
                 rabbitmq: node.rabbitmq_queue.as_ref().map(|queue| {
                     ServiceStatesProbeNodeRabbitMQ {
                         queue: queue.to_owned(),

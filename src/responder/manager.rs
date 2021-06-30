@@ -41,7 +41,6 @@ pub fn run() {
 
     let server = HttpServer::new(move || {
         App::new()
-            .wrap(actix_web::middleware::Logger::default())
             .data(tera.clone())
             .wrap(middleware::NormalizePath::new(TrailingSlash::Trim))
             .service(routes::assets_javascripts)

@@ -29,6 +29,8 @@ base64 = "0.13"
 regex = "1.3"
 url = { version = "2.1", default-features = false }
 url_serde = { version = "0.2", default-features = false }
+http = "0.2"
+http-serde = "1.0"
 indexmap = { version = "1.3", features = ["serde-1"] }
 actix-web = { version = "3.3", default-features = false }
 actix-files = "0.5"
@@ -42,8 +44,6 @@ run_script = "0.6"
 lettre = { version = "0.9", features = ["smtp-transport"], optional = true }
 lettre_email = { version = "0.9", optional = true }
 libstrophe = { version = "0.13", default-features = false, optional = true }
-http-serde = "1.0.2"
-http = "0.2"
 
 [features]
 default = ["notifier-email", "notifier-twilio", "notifier-slack", "notifier-zulip", "notifier-telegram", "notifier-pushover", "notifier-gotify", "notifier-matrix", "notifier-webhook"]
