@@ -106,13 +106,13 @@ pub struct ConfigNotify {
     pub email: Option<ConfigNotifyEmail>,
     pub twilio: Option<ConfigNotifyTwilio>,
     pub slack: Option<ConfigNotifySlack>,
+    pub zulip: Option<ConfigNotifyZulip>,
     pub telegram: Option<ConfigNotifyTelegram>,
     pub pushover: Option<ConfigNotifyPushover>,
     pub gotify: Option<ConfigNotifyGotify>,
     pub xmpp: Option<ConfigNotifyXMPP>,
     pub matrix: Option<ConfigNotifyMatrix>,
     pub webhook: Option<ConfigNotifyWebHook>,
-    pub zulip: Option<ConfigNotifyZulip>,
 }
 
 #[derive(Deserialize)]
@@ -150,7 +150,7 @@ pub struct ConfigNotifyEmail {
     #[serde(default = "defaults::notify_email_smtp_encrypt")]
     pub smtp_encrypt: bool,
 
-    #[serde(default = "defaults::notify_email_reminders_only")]
+    #[serde(default = "defaults::notify_generic_reminders_only")]
     pub reminders_only: bool,
 }
 
@@ -161,7 +161,7 @@ pub struct ConfigNotifyTwilio {
     pub account_sid: String,
     pub auth_token: String,
 
-    #[serde(default = "defaults::notify_twilio_reminders_only")]
+    #[serde(default = "defaults::notify_generic_reminders_only")]
     pub reminders_only: bool,
 }
 
@@ -172,50 +172,8 @@ pub struct ConfigNotifySlack {
     #[serde(default = "defaults::notify_slack_mention_channel")]
     pub mention_channel: bool,
 
-    #[serde(default = "defaults::notify_slack_reminders_only")]
+    #[serde(default = "defaults::notify_generic_reminders_only")]
     pub reminders_only: bool,
-}
-
-#[derive(Deserialize)]
-pub struct ConfigNotifyTelegram {
-    pub bot_token: String,
-    pub chat_id: String,
-
-    #[serde(default = "defaults::notify_telegram_reminders_only")]
-    pub reminders_only: bool,
-}
-
-#[derive(Deserialize)]
-pub struct ConfigNotifyPushover {
-    pub app_token: String,
-    pub user_keys: Vec<String>,
-
-    #[serde(default = "defaults::notify_pushover_reminders_only")]
-    pub reminders_only: bool,
-}
-
-#[derive(Deserialize)]
-pub struct ConfigNotifyGotify {
-    pub app_url: SerdeUrl,
-    pub app_token: String,
-
-    #[serde(default = "defaults::notify_gotify_reminders_only")]
-    pub reminders_only: bool,
-}
-
-#[derive(Deserialize)]
-pub struct ConfigNotifyXMPP {
-    pub to: String,
-    pub from: String,
-    pub xmpp_password: String,
-
-    #[serde(default = "defaults::notify_xmpp_reminders_only")]
-    pub reminders_only: bool,
-}
-
-#[derive(Deserialize)]
-pub struct ConfigNotifyWebHook {
-    pub hook_url: SerdeUrl,
 }
 
 #[derive(Deserialize)]
@@ -225,8 +183,50 @@ pub struct ConfigNotifyZulip {
     pub channel: String,
     pub api_url: SerdeUrl,
 
-    #[serde(default = "defaults::notify_zulip_reminders_only")]
+    #[serde(default = "defaults::notify_generic_reminders_only")]
     pub reminders_only: bool,
+}
+
+#[derive(Deserialize)]
+pub struct ConfigNotifyTelegram {
+    pub bot_token: String,
+    pub chat_id: String,
+
+    #[serde(default = "defaults::notify_generic_reminders_only")]
+    pub reminders_only: bool,
+}
+
+#[derive(Deserialize)]
+pub struct ConfigNotifyPushover {
+    pub app_token: String,
+    pub user_keys: Vec<String>,
+
+    #[serde(default = "defaults::notify_generic_reminders_only")]
+    pub reminders_only: bool,
+}
+
+#[derive(Deserialize)]
+pub struct ConfigNotifyGotify {
+    pub app_url: SerdeUrl,
+    pub app_token: String,
+
+    #[serde(default = "defaults::notify_generic_reminders_only")]
+    pub reminders_only: bool,
+}
+
+#[derive(Deserialize)]
+pub struct ConfigNotifyXMPP {
+    pub to: String,
+    pub from: String,
+    pub xmpp_password: String,
+
+    #[serde(default = "defaults::notify_generic_reminders_only")]
+    pub reminders_only: bool,
+}
+
+#[derive(Deserialize)]
+pub struct ConfigNotifyWebHook {
+    pub hook_url: SerdeUrl,
 }
 
 #[derive(Deserialize)]
@@ -235,7 +235,7 @@ pub struct ConfigNotifyMatrix {
     pub access_token: String,
     pub room_id: String,
 
-    #[serde(default = "defaults::notify_matrix_reminders_only")]
+    #[serde(default = "defaults::notify_generic_reminders_only")]
     pub reminders_only: bool,
 }
 
