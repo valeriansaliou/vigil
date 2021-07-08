@@ -49,7 +49,7 @@ impl GenericNotifier for GotifyNotifier {
             // Generate URL
             // See: https://gotify.net/docs/pushmsg
             let url = format!(
-                "{}/message?token={}",
+                "{}message?token={}",
                 gotify.app_url.as_str(),
                 gotify.app_token
             );
