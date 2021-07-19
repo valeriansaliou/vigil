@@ -28,6 +28,7 @@ _Tested at Rust version: `rustc 1.53.0 (53cb7b09b 2021-06-17)`_
 <td align="center"><a href="https://miragespace.com/"><img src="https://valeriansaliou.github.io/vigil/images/miragespace-icon.png" width="64" /></a></td>
 <td align="center"><a href="https://www.redsmin.com/"><img src="https://valeriansaliou.github.io/vigil/images/redsmin-icon.png" width="64" /></a></td>
 <td align="center"><a href="https://www.image-charts.com/"><img src="https://valeriansaliou.github.io/vigil/images/imagecharts-icon.png" width="64" /></a></td>
+<td align="center"><a href="https://pikomit.com/"><img src="https://valeriansaliou.github.io/vigil/images/pikomit-icon.png" width="64" /></a></td>
 </tr>
 <tr>
 <td align="center">Crisp</td>
