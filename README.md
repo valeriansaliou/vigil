@@ -394,6 +394,7 @@ Vigil Reporter is used to actively submit health information to Vigil from your 
 * **Python**: **[py-vigil-reporter](https://pypi.org/project/py-vigil-reporter/)**
 * **Golang**: **[go-vigil-reporter](https://github.com/valeriansaliou/go-vigil-reporter)**
 * **Rust**: **[rs-vigil-reporter](https://crates.io/crates/vigil-reporter)**
+* **Dart**: **[dart-vigil-reporter](https://github.com/jonasroussel/dart_vigil_reporter)**
 
 👉 Cannot find the library for your programming language? Build your own and be referenced here! ([contact me](https://valeriansaliou.name/))
 
