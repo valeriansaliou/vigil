@@ -43,7 +43,7 @@ ping = "0.2"
 run_script = "0.6"
 lettre = { version = "0.9", features = ["smtp-transport"], optional = true }
 lettre_email = { version = "0.9", optional = true }
-libstrophe = { version = "0.13", default-features = false, optional = true }
+libstrophe = { version = "0.16.0", default-features = false, optional = true }
 
 [features]
 default = ["notifier-email", "notifier-twilio", "notifier-slack", "notifier-zulip", "notifier-telegram", "notifier-pushover", "notifier-gotify", "notifier-matrix", "notifier-webhook"]
