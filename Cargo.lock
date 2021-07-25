@@ -876,11 +876,11 @@ dependencies = [
 
 [[package]]
 name = "fsio"
-version = "0.1.3"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c1fd087255f739f4f1aeea69f11b72f8080e9c2e7645cd06955dad4a178a49e3"
+checksum = "a50045aa8931ae01afbc5d72439e8f57f326becb8c70d07dfc816778eff3d167"
 dependencies = [
- "rand 0.7.3",
+ "rand 0.8.4",
  "users",
 ]
 
@@ -2147,9 +2147,9 @@ dependencies = [
 
 [[package]]
 name = "run_script"
-version = "0.6.4"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "70f5efb6762d8cafcab5b2a5545dad239d896989b15304e7d1a03cc6cf1aa626"
+checksum = "7fa4becc694242c537d43695743701f362b43c42cb11a3d44c8a01eb0cd18ded"
 dependencies = [
  "fsio",
 ]
@@ -2877,9 +2877,9 @@ dependencies = [
 
 [[package]]
 name = "users"
-version = "0.10.0"
+version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aa4227e95324a443c9fcb06e03d4d85e91aabe9a5a02aa818688b6918b6af486"
+checksum = "24cc0f6d6f267b73e5a2cadf007ba8f9bc39c6a6f9666f8cf25ea809a153b032"
 dependencies = [
  "libc",
  "log",

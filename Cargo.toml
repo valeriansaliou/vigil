@@ -40,7 +40,7 @@ native-tls = { version = "0.2", features = ["vendored"] }
 openssl-probe = "0.1"
 reqwest = { version = "0.10", features = ["native-tls-vendored", "gzip", "blocking", "json"], default-features = false }
 ping = "0.2"
-run_script = "0.6"
+run_script = "0.8.0"
 lettre = { version = "0.9", features = ["smtp-transport"], optional = true }
 lettre_email = { version = "0.9", optional = true }
 libstrophe = { version = "0.16.0", default-features = false, optional = true }
