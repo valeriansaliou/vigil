@@ -67,7 +67,7 @@ impl ImageMime {
 impl Default for IndexContextEnvironment {
     fn default() -> Self {
         IndexContextEnvironment {
-            year: 1900 + (time::now().tm_year as u16),
+            year: time::OffsetDateTime::now_utc().year() as u16,
         }
     }
 }
