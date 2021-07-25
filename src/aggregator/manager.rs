@@ -253,7 +253,6 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
 
     // Bump stored values
     store.states.status = general_status.to_owned();
-
     store.states.date = Some(time_now_as_string());
 
     if should_notify == true {
