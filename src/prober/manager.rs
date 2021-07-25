@@ -401,7 +401,7 @@ fn proceed_replica_probe_poll_http(
         "{}{}{}",
         url,
         query_separator,
-        time::now().to_timespec().sec
+        time::OffsetDateTime::now_utc().unix_timestamp()
     );
 
     // Acquire effective HTTP method to use for probe query
