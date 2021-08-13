@@ -150,7 +150,7 @@
                                 Checked via a local probe (internal).
                               {% elif node.mode == "script" %}
                                 Checked via a script probe.
-                              {% elif replica.status == "push" %}
+                              {% elif node.mode == "push" %}
                                 Checked via a push probe (Reporter).
                               {% else %}
                                 Checked via a poll probe (HTTP, TCP or ICMP).
