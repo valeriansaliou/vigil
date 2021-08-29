@@ -2540,6 +2540,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "time"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3e0a10c9a9fb3a5dce8c2239ed670f1a2569fcf42da035f5face1b19860d52b0"
+dependencies = [
+ "itoa",
+ "libc",
+]
+
+[[package]]
 name = "time-macros"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2946,7 +2956,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "tera",
- "time 0.2.27",
+ "time 0.3.2",
  "toml",
  "url 2.2.2",
  "url_serde",
