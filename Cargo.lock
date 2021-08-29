@@ -3021,7 +3021,7 @@ checksum = "5fecdca9a5291cc2b8dcf7dc02453fee791a280f3743cb0905f8822ae463b3fe"
 
 [[package]]
 name = "vigil-server"
-version = "1.22.1"
+version = "1.22.2"
 dependencies = [
  "actix-files",
  "actix-web",
