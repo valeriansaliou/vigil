@@ -1,0 +1,228 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: {{ include "app.fullname" . }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+data:
+  vigil.cfg: |-
+    # Vigil
+    # Microservices Status Page
+    # Configuration file
+    # Example: https://github.com/valeriansaliou/vigil/blob/master/config.cfg
+
+
+    [server]
+
+    log_level = "debug"
+    inet = "0.0.0.0:8080"
+    workers = 4
+    reporter_token = "REPLACE_THIS_WITH_A_SECRET_KEY"
+
+    [assets]
+
+    path = "./res/assets/"
+
+    [branding]
+
+    page_title = "Crisp Status"
+    page_url = "https://status.crisp.chat/"
+    company_name = "Crisp IM SARL"
+    icon_color = "#1972F5"
+    icon_url = "https://valeriansaliou.github.io/vigil/images/crisp-icon.png"
+    logo_color = "#1972F5"
+    logo_url = "https://valeriansaliou.github.io/vigil/images/crisp-logo.svg"
+    website_url = "https://crisp.chat/"
+    support_url = "mailto:support@crisp.chat"
+
+    [metrics]
+
+    poll_interval = 120
+    poll_retry = 2
+
+    poll_http_status_healthy_above = 200
+    poll_http_status_healthy_below = 400
+
+    poll_delay_dead = 30
+    poll_delay_sick = 10
+
+    push_delay_dead = 20
+
+    push_system_cpu_sick_above = 0.90
+    push_system_ram_sick_above = 0.90
+
+    script_interval = 300
+
+    local_delay_dead = 40
+
+    [plugins]
+
+    [plugins.rabbitmq]
+
+    api_url = "http://127.0.0.1:15672"
+    auth_username = "rabbitmq-administrator"
+    auth_password = "RABBITMQ_ADMIN_PASSWORD"
+    virtualhost = "crisp"
+
+    queue_ready_healthy_below = 500
+    queue_nack_healthy_below = 100
+    queue_ready_dead_above = 20000
+    queue_nack_dead_above = 5000
+    queue_loaded_retry_delay = 500
+
+    [notify]
+
+    startup_notification = true
+    reminder_interval = 300
+
+    [notify.email]
+
+    from = "status@crisp.chat"
+    to = "status@crisp.chat"
+
+    smtp_host = "localhost"
+    smtp_port = 587
+    smtp_username = "user-access"
+    smtp_password = "user-password"
+    smtp_encrypt = false
+
+    [notify.twilio]
+
+    to = [
+      "+336xxxxxxx",
+      "+337xxxxxxx"
+    ]
+
+    service_sid = "service-sid"
+    account_sid = "account-sid"
+    auth_token = "auth-token"
+
+    reminders_only = true
+
+    [notify.slack]
+
+    hook_url = "https://hooks.slack.com/services/xxxx"
+    mention_channel = true
+
+    [notify.zulip]
+
+    bot_email = "bot-name@domain.zulipchat.com"
+    bot_api_key = "xxxx"
+    channel = "vigil"
+    api_url = "https://domain.zulipchat.com/api/v1/"
+
+    [notify.telegram]
+
+    bot_token = "xxxxxxxxxx:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    chat_id = "xxxxxxxxx"
+
+    [notify.pushover]
+
+    app_token = "xxxx"
+    user_keys = ["xxxx"]
+
+    [notify.gotify]
+
+    app_url = "https://push.gotify.net"
+    app_token = "xxxx"
+
+    [notify.xmpp]
+
+    from = "vigil@valeriansaliou.name"
+    to = "valerian@valeriansaliou.name"
+
+    xmpp_password = "xmpp-password"
+
+    [notify.matrix]
+
+    homeserver_url = "https://matrix.org"
+    access_token = "xxxx"
+    room_id = "!abc123:matrix.org"
+
+    [notify.webhook]
+
+    hook_url = "https://domain.com/webhooks/xxxx"
+
+    [probe]
+
+    [[probe.service]]
+
+    id = "web"
+    label = "Web nodes"
+
+    [[probe.service.node]]
+
+    id = "router"
+    label = "Core main router"
+    mode = "poll"
+
+    replicas = [
+      "icmp://edge-1.pool.net.crisp.chat",
+      "icmp://edge-2.pool.net.crisp.chat"
+    ]
+
+    [[probe.service.node]]
+
+    id = "load-balancer"
+    label = "Core main load balancer"
+    mode = "poll"
+
+    replicas = [
+      "tcp://edge-1.pool.net.crisp.chat:80",
+      "tcp://edge-2.pool.net.crisp.chat:80",
+      "tcp://edge-3.pool.net.crisp.chat:80"
+    ]
+
+    [[probe.service.node]]
+
+    id = "help"
+    label = "Core help load balancer"
+    mode = "poll"
+    replicas = ["tcp://help-1.pool.net.crisp.chat:80"]
+
+    [[probe.service.node]]
+
+    id = "api"
+    label = "Access to API service"
+    mode = "poll"
+    replicas = ["https://api.crisp.chat/v1/_system/health"]
+
+    [[probe.service.node]]
+
+    id = "status"
+    label = "Access to status page"
+    mode = "poll"
+    replicas = ["https://status.crisp.chat/robots.txt"]
+    http_body_healthy_match = "User-agent:.*"
+
+    [[probe.service]]
+
+    id = "relay"
+    label = "Relay nodes"
+
+    [[probe.service.node]]
+
+    id = "socket-client"
+    label = "Visitor realtime sockets"
+    mode = "push"
+    rabbitmq_queue = "client"
+    rabbitmq_queue_nack_healthy_below = 100
+    rabbitmq_queue_nack_dead_above = 1000
+
+    [[probe.service]]
+
+    id = "internal"
+    label = "Internal nodes"
+
+    [[probe.service.node]]
+
+    id = "gateway"
+    label = "Private gateway"
+    mode = "local"
+
+    [[probe.service.node]]
+
+    id = "capacity"
+    label = "Network capacity"
+    mode = "local"
