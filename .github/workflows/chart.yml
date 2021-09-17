@@ -4,7 +4,7 @@ name: Push Helm Chart
 
 env:
   HELM_EXPERIMENTAL_OCI: 1 #enable OCI support
-  HELM_VERSION_TO_INSTALL: 3.5.0 # version of HEL to install
+  HELM_VERSION_TO_INSTALL: 3.5.0 # version of HELM to install
   GCR_IMAGE: ghcr.io/${{ github.repository_owner }}/vigil
 
 jobs:
