@@ -1,0 +1,35 @@
+on: [push, pull_request]
+
+name: Push Helm Chart
+
+env:
+  HELM_EXPERIMENTAL_OCI: 1 #enable OCI support
+  HELM_VERSION_TO_INSTALL: 3.5.0 # version of HEL to install
+  GCR_IMAGE: ghcr.io/${{ github.repository_owner }}/vigil
+
+jobs:
+  build:
+    name: publish gcr
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - uses: actions/checkout@v2
+        name: checkout repo
+      
+      - name: install helm
+        uses: Azure/setup-helm@v1
+        with:
+          # Version of helm
+          version: ${{ env.HELM_VERSION_TO_INSTALL }} # default is latest
+
+      - name: login to acr using helm
+        run: |
+          echo ${{ secrets.GITHUB_TOKEN }} | helm registry login ${{ env.GCR_IMAGE }} --username ${{ github.repository_owner }} --password-stdin
+
+      - name: save helm chart to local registry
+        run: |
+          helm chart save ${{ github.workspace }}/src/azure-vote-helm-chart/ ${{ env.GCR_IMAGE }}:${{ github.sha }}
+
+      - name: publish chart to acr
+        run: |
+          helm chart push ${{ env.GCR_IMAGE }}:${{ github.sha }}
