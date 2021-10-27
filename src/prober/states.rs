@@ -19,6 +19,7 @@ pub struct ServiceStates {
     pub status: Status,
     pub date: Option<String>,
     pub probes: IndexMap<String, ServiceStatesProbe>,
+    pub backoff_counter: u64,
 }
 
 #[derive(Serialize)]

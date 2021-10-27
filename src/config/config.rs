@@ -103,6 +103,9 @@ pub struct ConfigNotify {
     pub startup_notification: bool,
 
     pub reminder_interval: Option<u64>,
+    #[serde(default = "defaults::enable_timer_backoff")]
+    pub enable_timer_backoff: bool,
+
     pub email: Option<ConfigNotifyEmail>,
     pub twilio: Option<ConfigNotifyTwilio>,
     pub slack: Option<ConfigNotifySlack>,

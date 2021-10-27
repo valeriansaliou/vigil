@@ -44,6 +44,7 @@ lazy_static::lazy_static! {
             status: Status::Healthy,
             date: None,
             probes: IndexMap::new(),
+            backoff_counter: 1,
         },
         notified: None,
     }));

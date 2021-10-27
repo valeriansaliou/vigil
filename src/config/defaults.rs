@@ -94,3 +94,7 @@ pub fn notify_slack_mention_channel() -> bool {
 pub fn notify_generic_reminders_only() -> bool {
     false
 }
+
+pub fn enable_timer_backoff() -> bool {
+    false
+}
