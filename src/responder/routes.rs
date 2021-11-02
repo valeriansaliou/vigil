@@ -18,7 +18,7 @@ use crate::prober::report::{
 use crate::APP_CONF;
 
 #[get("/")]
-pub fn index(tera: Data<Tera>) -> HttpResponse {
+async fn index(tera: Data<Tera>) -> HttpResponse {
     // Notice acquire lock in a block to release it ASAP (ie. before template renders)
     let context = {
         IndexContext {
@@ -39,17 +39,17 @@ pub fn index(tera: Data<Tera>) -> HttpResponse {
 }
 
 #[get("/robots.txt")]
-pub async fn robots() -> Option<NamedFile> {
+async fn robots() -> Option<NamedFile> {
     NamedFile::open(APP_CONF.assets.path.join("public").join("robots.txt")).ok()
 }
 
 #[get("/status/text")]
-pub async fn status_text() -> &'static str {
+async fn status_text() -> &'static str {
     &PROBER_STORE.read().unwrap().states.status.as_str()
 }
 
 #[get("/badge/{kind}")]
-pub async fn badge(web::Path(kind): web::Path<String>) -> Option<NamedFile> {
+async fn badge(web::Path(kind): web::Path<String>) -> Option<NamedFile> {
     // Notice acquire lock in a block to release it ASAP (ie. before OS access to file)
     let status = { &PROBER_STORE.read().unwrap().states.status.as_str() };
 
@@ -65,26 +65,26 @@ pub async fn badge(web::Path(kind): web::Path<String>) -> Option<NamedFile> {
 }
 
 #[get("/assets/fonts/{folder}/{file}")]
-pub async fn assets_fonts(
+async fn assets_fonts(
     web::Path((folder, file)): web::Path<(String, String)>,
 ) -> Option<NamedFile> {
     NamedFile::open(APP_CONF.assets.path.join("fonts").join(folder).join(file)).ok()
 }
 
 #[get("/assets/images/{folder}/{file}")]
-pub async fn assets_images(
+async fn assets_images(
     web::Path((folder, file)): web::Path<(String, String)>,
 ) -> Option<NamedFile> {
     NamedFile::open(APP_CONF.assets.path.join("images").join(folder).join(file)).ok()
 }
 
 #[get("/assets/stylesheets/{file}")]
-pub async fn assets_stylesheets(web::Path(file): web::Path<String>) -> Option<NamedFile> {
+async fn assets_stylesheets(web::Path(file): web::Path<String>) -> Option<NamedFile> {
     NamedFile::open(APP_CONF.assets.path.join("stylesheets").join(file)).ok()
 }
 
 #[get("/assets/javascripts/{file}")]
-pub async fn assets_javascripts(web::Path(file): web::Path<String>) -> Option<NamedFile> {
+async fn assets_javascripts(web::Path(file): web::Path<String>) -> Option<NamedFile> {
     NamedFile::open(APP_CONF.assets.path.join("javascripts").join(file)).ok()
 }
 
