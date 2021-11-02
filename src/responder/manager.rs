@@ -23,7 +23,7 @@ use super::routes;
 use crate::APP_CONF;
 
 pub fn run() {
-    let mut runtime = rt::System::new("test");
+    let mut runtime = rt::System::new("responder");
 
     let templates: String = APP_CONF
         .assets
