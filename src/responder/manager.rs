@@ -65,6 +65,7 @@ pub fn run() {
                     .to(routes::reporter_flush),
             )
     })
+    .workers(APP_CONF.server.workers)
     .bind(APP_CONF.server.inet)
     .unwrap()
     .run();

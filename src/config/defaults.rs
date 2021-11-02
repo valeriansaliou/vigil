@@ -15,7 +15,7 @@ pub fn server_inet() -> SocketAddr {
     "[::1]:8080".parse().unwrap()
 }
 
-pub fn server_workers() -> u16 {
+pub fn server_workers() -> usize {
     4
 }
 

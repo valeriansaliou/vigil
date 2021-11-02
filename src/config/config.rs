@@ -34,7 +34,7 @@ pub struct ConfigServer {
     pub inet: SocketAddr,
 
     #[serde(default = "defaults::server_workers")]
-    pub workers: u16,
+    pub workers: usize,
 
     pub reporter_token: String,
 }
