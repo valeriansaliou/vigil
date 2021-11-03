@@ -7,8 +7,6 @@
 use std::thread;
 use std::time::Duration;
 
-use log::{debug, error, info};
-
 use crate::config::config::ConfigNotify;
 use crate::prober::status::Status;
 

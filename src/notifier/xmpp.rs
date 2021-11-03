@@ -9,7 +9,6 @@ use std::time::Duration;
 use time;
 
 use libstrophe::{Connection, ConnectionEvent, Context, Stanza, StreamError};
-use log::debug;
 
 use super::generic::{GenericNotifier, Notification, DISPATCH_TIMEOUT_SECONDS};
 use crate::config::config::ConfigNotify;

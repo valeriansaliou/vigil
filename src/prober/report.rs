@@ -6,8 +6,6 @@
 
 use std::time::{Duration, SystemTime};
 
-use log::{debug, warn};
-
 use super::states::{
     ServiceStatesProbeNodeRabbitMQ, ServiceStatesProbeNodeReplica,
     ServiceStatesProbeNodeReplicaLoad, ServiceStatesProbeNodeReplicaLoadQueue,

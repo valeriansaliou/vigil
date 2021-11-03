@@ -4,7 +4,6 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
-use serde_derive::Serialize;
 use url::{Host, Url};
 
 #[derive(Serialize, Debug, Clone)]

@@ -8,7 +8,6 @@ use std::collections::hash_set::HashSet;
 use std::fs::File;
 use std::io::Read;
 
-use log::debug;
 use toml;
 
 use super::config::*;

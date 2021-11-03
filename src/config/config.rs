@@ -7,7 +7,6 @@
 use std::net::SocketAddr;
 use std::path::PathBuf;
 
-use serde_derive::{Deserialize, Serialize};
 use url_serde::SerdeUrl;
 
 use super::defaults;

@@ -4,8 +4,6 @@
 // Copyright: 2021, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
-use serde_derive::Deserialize;
-
 use crate::prober::status::Status as HealthStatus;
 
 #[derive(Deserialize)]

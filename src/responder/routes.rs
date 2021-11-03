@@ -65,9 +65,7 @@ async fn badge(web::Path(kind): web::Path<String>) -> Option<NamedFile> {
 }
 
 #[get("/assets/fonts/{folder}/{file}")]
-async fn assets_fonts(
-    web::Path((folder, file)): web::Path<(String, String)>,
-) -> Option<NamedFile> {
+async fn assets_fonts(web::Path((folder, file)): web::Path<(String, String)>) -> Option<NamedFile> {
     NamedFile::open(APP_CONF.assets.path.join("fonts").join(folder).join(file)).ok()
 }
 

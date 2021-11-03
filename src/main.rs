@@ -4,6 +4,13 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
+#[macro_use]
+extern crate log;
+#[macro_use]
+extern crate lazy_static;
+#[macro_use]
+extern crate serde_derive;
+
 mod aggregator;
 mod config;
 mod notifier;
@@ -16,7 +23,7 @@ use std::thread;
 use std::time::Duration;
 
 use clap::{App, Arg};
-use log::{debug, error, info, LevelFilter};
+use log::LevelFilter;
 
 use crate::aggregator::manager::run as run_aggregator;
 use crate::config::config::Config;
@@ -66,7 +73,7 @@ macro_rules! gen_spawn_managed {
     };
 }
 
-lazy_static::lazy_static! {
+lazy_static! {
     static ref APP_ARGS: AppArgs = make_app_args();
     static ref APP_CONF: Config = ConfigReader::make();
 }

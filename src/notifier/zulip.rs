@@ -7,16 +7,14 @@
 
 use std::time::Duration;
 
-use log::warn;
 use reqwest::blocking::Client;
-use serde_derive::Serialize;
 
 use super::generic::{GenericNotifier, Notification, DISPATCH_TIMEOUT_SECONDS};
 use crate::config::config::ConfigNotify;
 use crate::prober::status::Status;
 use crate::APP_CONF;
 
-lazy_static::lazy_static! {
+lazy_static! {
     static ref ZULIP_HTTP_CLIENT: Client = Client::builder()
         .timeout(Duration::from_secs(DISPATCH_TIMEOUT_SECONDS))
         .gzip(true)
