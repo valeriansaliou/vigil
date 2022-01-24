@@ -250,7 +250,7 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
                         // We use backoff_counter all the time because if it's disabled then the
                         // value is 1 at all time thus not impacting the interval
                         if duration_since_notified
-                            >= Duration::from_secs(reminder_interval * store.states.backoff_counter)
+                            >= Duration::from_secs(reminder_interval * store.states.backoff_counter.pow(2))
                         {
                             info!("should re-notify about unchanged status");
 
