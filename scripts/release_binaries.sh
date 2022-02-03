@@ -63,7 +63,6 @@ pushd "$BASE_DIR" > /dev/null
     echo "Executing release steps for Vigil v$VIGIL_VERSION..."
 
     release_for_architecture "x86_64" "x86_64-unknown-linux-musl" && \
-        release_for_architecture "i686" "i686-unknown-linux-musl" && \
         release_for_architecture "armv7" "armv7-unknown-linux-musleabihf"
     rc=$?
 
