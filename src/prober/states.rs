@@ -101,5 +101,5 @@ pub struct ServiceStatesProbeNodeReplicaReport {
 
 #[derive(Serialize)]
 pub struct ServiceStatesNotifier {
-    pub reminder_backoff_counter: u64,
+    pub reminder_backoff_counter: u16,
 }

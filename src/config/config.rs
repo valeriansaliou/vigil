@@ -103,8 +103,11 @@ pub struct ConfigNotify {
 
     pub reminder_interval: Option<u64>,
 
-    #[serde(default = "defaults::notify_reminder_backoff")]
-    pub reminder_backoff: ConfigNotifyReminderBackoff,
+    #[serde(default = "defaults::notify_reminder_backoff_function")]
+    pub reminder_backoff_function: ConfigNotifyReminderBackoffFunction,
+
+    #[serde(default = "defaults::notify_reminder_backoff_limit")]
+    pub reminder_backoff_limit: u16,
 
     pub email: Option<ConfigNotifyEmail>,
     pub twilio: Option<ConfigNotifyTwilio>,
@@ -119,7 +122,7 @@ pub struct ConfigNotify {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
-pub enum ConfigNotifyReminderBackoff {
+pub enum ConfigNotifyReminderBackoffFunction {
     #[serde(rename = "none")]
     None = 0,
 

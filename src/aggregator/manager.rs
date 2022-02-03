@@ -10,7 +10,7 @@ use std::time::{Duration, SystemTime};
 use time;
 use time::format_description::FormatItem;
 
-use crate::config::config::ConfigNotifyReminderBackoff;
+use crate::config::config::ConfigNotifyReminderBackoffFunction;
 use crate::notifier::generic::Notification;
 use crate::prober::manager::STORE as PROBER_STORE;
 use crate::prober::mode::Mode;
@@ -251,7 +251,8 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
                             store.states.notifier.reminder_backoff_counter;
                         let reminder_interval_backoff = Duration::from_secs(
                             reminder_interval
-                                * reminder_backoff_counter.pow(notify.reminder_backoff as u32),
+                                * (reminder_backoff_counter as u64)
+                                    .pow(notify.reminder_backoff_function as u32),
                         );
 
                         debug!(
@@ -266,9 +267,20 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
 
                             should_notify = true;
 
-                            // Increment the backoff counter?
-                            if notify.reminder_backoff != ConfigNotifyReminderBackoff::None {
+                            // Increment the backoff counter? (a backoff function is set, \
+                            //   therefore reminders backoff is enabled)
+                            if notify.reminder_backoff_function
+                                != ConfigNotifyReminderBackoffFunction::None
+                                && store.states.notifier.reminder_backoff_counter
+                                    < notify.reminder_backoff_limit
+                            {
                                 store.states.notifier.reminder_backoff_counter += 1;
+
+                                debug!(
+                                    "incremented re-notify backoff counter to: {} (limit: {})",
+                                    store.states.notifier.reminder_backoff_counter,
+                                    notify.reminder_backoff_limit
+                                );
                             }
                         } else {
                             debug!(

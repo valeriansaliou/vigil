@@ -7,7 +7,7 @@
 use std::net::SocketAddr;
 use std::path::PathBuf;
 
-use super::config::ConfigNotifyReminderBackoff;
+use super::config::ConfigNotifyReminderBackoffFunction;
 
 pub fn server_log_level() -> String {
     "error".to_string()
@@ -77,8 +77,12 @@ pub fn notify_startup_notification() -> bool {
     true
 }
 
-pub fn notify_reminder_backoff() -> ConfigNotifyReminderBackoff {
-    ConfigNotifyReminderBackoff::None
+pub fn notify_reminder_backoff_function() -> ConfigNotifyReminderBackoffFunction {
+    ConfigNotifyReminderBackoffFunction::None
+}
+
+pub fn notify_reminder_backoff_limit() -> u16 {
+    3
 }
 
 pub fn notify_email_smtp_host() -> String {
