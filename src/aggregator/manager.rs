@@ -10,6 +10,7 @@ use std::time::{Duration, SystemTime};
 use time;
 use time::format_description::FormatItem;
 
+use crate::config::config::ConfigNotifyReminderBackoff;
 use crate::notifier::generic::Notification;
 use crate::prober::manager::STORE as PROBER_STORE;
 use crate::prober::mode::Mode;
@@ -244,21 +245,29 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
                     if let Ok(duration_since_notified) =
                         SystemTime::now().duration_since(last_notified)
                     {
-                        // Duration since last notified exceeds reminder interval, should re-notify
                         // Notice: we use backoff counter all the time because if it is disabled, \
                         //   then the value is 1 at any time, thus not impacting the interval.
-                        if duration_since_notified
-                            >= Duration::from_secs(
-                                reminder_interval
-                                    * store.states.notifier.reminder_backoff_counter.pow(2),
-                            )
-                        {
+                        let reminder_backoff_counter =
+                            store.states.notifier.reminder_backoff_counter;
+                        let reminder_interval_backoff = Duration::from_secs(
+                            reminder_interval
+                                * reminder_backoff_counter.pow(notify.reminder_backoff as u32),
+                        );
+
+                        debug!(
+                            "checking if should re-notify about unchanged status ({}s / {}↑)",
+                            reminder_interval_backoff.as_secs(),
+                            reminder_backoff_counter
+                        );
+
+                        // Duration since last notified exceeds reminder interval? Should re-notify
+                        if duration_since_notified >= reminder_interval_backoff {
                             info!("should re-notify about unchanged status");
 
                             should_notify = true;
 
                             // Increment the backoff counter?
-                            if notify.reminder_backoff == true {
+                            if notify.reminder_backoff != ConfigNotifyReminderBackoff::None {
                                 store.states.notifier.reminder_backoff_counter += 1;
                             }
                         } else {
