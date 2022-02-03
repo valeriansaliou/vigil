@@ -18,7 +18,7 @@ pub struct ServiceStates {
     pub status: Status,
     pub date: Option<String>,
     pub probes: IndexMap<String, ServiceStatesProbe>,
-    pub backoff_counter: u64,
+    pub notifier: ServiceStatesNotifier,
 }
 
 #[derive(Serialize)]
@@ -97,4 +97,9 @@ pub struct ServiceStatesProbeNodeReplicaLoadQueue {
 pub struct ServiceStatesProbeNodeReplicaReport {
     pub time: SystemTime,
     pub interval: Duration,
+}
+
+#[derive(Serialize)]
+pub struct ServiceStatesNotifier {
+    pub reminder_backoff_counter: u64,
 }

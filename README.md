@@ -195,7 +195,7 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 
 * `startup_notification` (type: _boolean_, allowed: `true`, `false`, default: `true`) — Whether to send startup notification or not (stating that systems are `healthy`)
 * `reminder_interval` (type: _integer_, allowed: seconds, no default) — Interval at which downtime reminder notifications should be sent (if any)
-* `enable_timer_backoff` (type: _bool_, allowed: `true`, `false`, default: `false`) — If enabled, the downtime reminder interval will get larger as remainders are sent. The value will be `reminder_interval` * N with N being the number of reminders sent since the service went down.
+* `reminder_backoff` (type: _boolean_, allowed: `true`, `false`, default: `false`) — If enabled, the downtime reminder interval will get larger as reminders are sent. The value will be `reminder_interval × N²` with `N` being the number of reminders sent since the service went down.
 
 **[notify.email]**
 

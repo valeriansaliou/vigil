@@ -228,9 +228,9 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
     let mut should_notify = (store.states.status != Status::Dead && general_status == Status::Dead)
         || (store.states.status == Status::Dead && general_status != Status::Dead);
 
-    // Reset the backoff counter when we're back to being healthy
-    if store.states.status != Status::Healthy && general_status == Status::Healthy {
-        store.states.backoff_counter = 1;
+    // Reset the backoff counter when we are back to healthy
+    if general_status == Status::Healthy && store.states.status != general_status {
+        store.states.notifier.reminder_backoff_counter = 1;
     }
 
     // Check if should re-notify? (in case status did not change; only if dead)
@@ -245,21 +245,26 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
                         SystemTime::now().duration_since(last_notified)
                     {
                         // Duration since last notified exceeds reminder interval, should re-notify
-                        // We use backoff_counter all the time because if it's disabled then the
-                        // value is 1 at all time thus not impacting the interval
+                        // Notice: we use backoff counter all the time because if it is disabled, \
+                        //   then the value is 1 at any time, thus not impacting the interval.
                         if duration_since_notified
-                            >= Duration::from_secs(reminder_interval * store.states.backoff_counter.pow(2))
+                            >= Duration::from_secs(
+                                reminder_interval
+                                    * store.states.notifier.reminder_backoff_counter.pow(2),
+                            )
                         {
                             info!("should re-notify about unchanged status");
 
                             should_notify = true;
-                            if notify.enable_timer_backoff {
-                                store.states.backoff_counter += 1;
+
+                            // Increment the backoff counter?
+                            if notify.reminder_backoff == true {
+                                store.states.notifier.reminder_backoff_counter += 1;
                             }
                         } else {
                             debug!(
-                                "should not re-notify about unchanged status (interval: {}, backoff_counter: {})",
-                                reminder_interval, store.states.backoff_counter
+                                "should not re-notify about unchanged status (interval: {})",
+                                reminder_interval
                             );
                         }
                     }

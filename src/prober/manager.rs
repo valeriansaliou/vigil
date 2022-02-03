@@ -22,9 +22,9 @@ use run_script::{self, ScriptOptions};
 
 use super::replica::ReplicaURL;
 use super::states::{
-    ServiceStates, ServiceStatesProbe, ServiceStatesProbeNode, ServiceStatesProbeNodeRabbitMQ,
-    ServiceStatesProbeNodeReplica, ServiceStatesProbeNodeReplicaMetrics,
-    ServiceStatesProbeNodeReplicaMetricsRabbitMQ,
+    ServiceStates, ServiceStatesNotifier, ServiceStatesProbe, ServiceStatesProbeNode,
+    ServiceStatesProbeNodeRabbitMQ, ServiceStatesProbeNodeReplica,
+    ServiceStatesProbeNodeReplicaMetrics, ServiceStatesProbeNodeReplicaMetricsRabbitMQ,
 };
 use super::status::Status;
 use crate::config::config::{ConfigPluginsRabbitMQ, ConfigProbeServiceNodeHTTPMethod};
@@ -42,7 +42,9 @@ lazy_static! {
             status: Status::Healthy,
             date: None,
             probes: IndexMap::new(),
-            backoff_counter: 1,
+            notifier: ServiceStatesNotifier {
+                reminder_backoff_counter: 1,
+            }
         },
         notified: None,
     }));
