@@ -39,7 +39,7 @@ tera = { version = "1.6", default-features = false }
 native-tls = { version = "0.2", features = ["vendored"] }
 openssl-probe = "0.1"
 reqwest = { version = "0.11", features = ["native-tls-vendored", "gzip", "blocking", "json"], default-features = false }
-ping = "0.3"
+ping = "0.4"
 run_script = "0.9"
 lettre = { version = "0.9", features = ["smtp-transport"], optional = true }
 lettre_email = { version = "0.9", optional = true }
