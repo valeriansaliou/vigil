@@ -33,7 +33,7 @@ use crate::prober::manager::STORE as PROBER_STORE;
 use crate::prober::mode::Mode;
 use crate::APP_CONF;
 
-const PROBE_HOLD_MILLISECONDS: u64 = 250;
+const PROBE_HOLD_MILLISECONDS: u64 = 500;
 const PROBE_ICMP_TIMEOUT_SECONDS: u64 = 1;
 
 lazy_static! {
