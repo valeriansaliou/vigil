@@ -73,6 +73,10 @@ pub fn metrics_local_delay_dead() -> u64 {
     40
 }
 
+pub fn parallel_thread_limit() -> u16 {
+    2
+}
+
 pub fn notify_startup_notification() -> bool {
     true
 }
