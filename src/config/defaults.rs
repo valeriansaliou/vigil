@@ -53,7 +53,7 @@ pub fn metrics_poll_delay_sick() -> u64 {
     10
 }
 
-pub fn poll_threads_limit() -> u16 {
+pub fn poll_parallelism() -> u16 {
     2
 }
 
@@ -73,7 +73,7 @@ pub fn metrics_script_interval() -> u64 {
     300
 }
 
-pub fn script_threads_limit() -> u16 {
+pub fn script_parallelism() -> u16 {
     1
 }
 
