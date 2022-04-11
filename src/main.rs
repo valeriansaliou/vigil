@@ -22,7 +22,7 @@ use std::str::FromStr;
 use std::thread;
 use std::time::Duration;
 
-use clap::{Command, Arg};
+use clap::{Arg, Command};
 use log::LevelFilter;
 
 use crate::aggregator::manager::run as run_aggregator;
