@@ -53,6 +53,10 @@ pub fn metrics_poll_delay_sick() -> u64 {
     10
 }
 
+pub fn poll_threads_limit() -> u16 {
+    2
+}
+
 pub fn metrics_push_delay_dead() -> u64 {
     20
 }
@@ -69,12 +73,12 @@ pub fn metrics_script_interval() -> u64 {
     300
 }
 
-pub fn metrics_local_delay_dead() -> u64 {
-    40
+pub fn script_threads_limit() -> u16 {
+    1
 }
 
-pub fn parallel_thread_limit() -> u16 {
-    2
+pub fn metrics_local_delay_dead() -> u64 {
+    40
 }
 
 pub fn notify_startup_notification() -> bool {

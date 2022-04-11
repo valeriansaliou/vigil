@@ -681,14 +681,17 @@ fn dispatch_replica<'a>(probe_replica: &ProbeReplica) {
     }
 }
 
-fn dispatch_replicas_in_threads(replicas: Vec<ProbeReplica>) {
-    for probe_replica_chunk in replicas.chunks(APP_CONF.metrics.parallel_thread_limit.into()) {
+fn dispatch_replicas_in_threads(replicas: Vec<ProbeReplica>, threads_limit: u16) {
+    for probe_replica_chunk in replicas.chunks(threads_limit.into()) {
         let mut handles = Vec::new();
+
         for probe_replica_initial in probe_replica_chunk {
             let probe_replica = probe_replica_initial.clone();
             let thread_handle = thread::spawn(move || dispatch_replica(&probe_replica));
+
             handles.push(thread_handle);
         }
+
         for handle in handles {
             handle.join().unwrap();
         }
@@ -697,12 +700,12 @@ fn dispatch_replicas_in_threads(replicas: Vec<ProbeReplica>) {
 
 fn dispatch_polls() {
     // Probe hosts
-    dispatch_replicas_in_threads(map_poll_replicas());
+    dispatch_replicas_in_threads(map_poll_replicas(), APP_CONF.metrics.poll_threads_limit);
 }
 
 fn dispatch_scripts() {
     // Run scripts
-    dispatch_replicas_in_threads(map_script_replicas());
+    dispatch_replicas_in_threads(map_script_replicas(), APP_CONF.metrics.script_threads_limit);
 }
 
 fn dispatch_plugins_rabbitmq(
