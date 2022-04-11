@@ -705,6 +705,7 @@ fn dispatch_replicas_in_threads(replicas: Vec<ProbeReplica>, parallelism: u16) {
         let mut prober_threads = Vec::new();
 
         for replicas_chunk in replicas.chunks(chunk_size) {
+            // Re-map list of chunked replicas so that they can be passed to their thread
             let replicas_chunk: Vec<ProbeReplica> = replicas_chunk
                 .iter()
                 .map(|replica| replica.clone())
