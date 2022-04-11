@@ -22,7 +22,7 @@ use std::str::FromStr;
 use std::thread;
 use std::time::Duration;
 
-use clap::{App, Arg};
+use clap::{Command, Arg};
 use log::LevelFilter;
 
 use crate::aggregator::manager::run as run_aggregator;
@@ -105,7 +105,7 @@ gen_spawn_managed!(
 );
 
 fn make_app_args() -> AppArgs {
-    let matches = App::new(clap::crate_name!())
+    let matches = Command::new(clap::crate_name!())
         .version(clap::crate_version!())
         .author(clap::crate_authors!())
         .about(clap::crate_description!())
