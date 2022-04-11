@@ -69,20 +69,14 @@ pub struct Store {
 }
 
 #[derive(Clone)]
-struct ProbeReplicaScript {
+struct ProbeReplicaTarget {
     pub probe_id: String,
     pub node_id: String,
     pub replica_id: String,
-
-    pub script: String,
 }
 
 #[derive(Clone)]
 struct ProbeReplicaPoll {
-    pub probe_id: String,
-    pub node_id: String,
-    pub replica_id: String,
-
     pub replica_url: ReplicaURL,
     pub http_headers: HeaderMap,
     pub http_method: Option<ConfigProbeServiceNodeHTTPMethod>,
@@ -91,9 +85,14 @@ struct ProbeReplicaPoll {
 }
 
 #[derive(Clone)]
+struct ProbeReplicaScript {
+    pub script: String,
+}
+
+#[derive(Clone)]
 enum ProbeReplica {
-    Poll(ProbeReplicaPoll),
-    Script(ProbeReplicaScript),
+    Poll(ProbeReplicaTarget, ProbeReplicaPoll),
+    Script(ProbeReplicaTarget, ProbeReplicaScript),
 }
 
 fn make_default_headers() -> HeaderMap {
@@ -125,16 +124,20 @@ fn map_poll_replicas() -> Vec<ProbeReplica> {
                         //   the replica scan is performed. As this whole operation can take time, \
                         //   it could lock all the pipelines depending on the shared store data \
                         //   (eg. the reporter HTTP API).
-                        replica_list.push(ProbeReplica::Poll(ProbeReplicaPoll {
-                            probe_id: probe_id.to_owned(),
-                            node_id: node_id.to_owned(),
-                            replica_id: replica_id.to_owned(),
-                            replica_url: replica_url.to_owned(),
-                            http_headers: node.http_headers.to_owned(),
-                            http_method: node.http_method.to_owned(),
-                            http_body: node.http_body.to_owned(),
-                            body_match: node.http_body_healthy_match.to_owned(),
-                        }));
+                        replica_list.push(ProbeReplica::Poll(
+                            ProbeReplicaTarget {
+                                probe_id: probe_id.to_owned(),
+                                node_id: node_id.to_owned(),
+                                replica_id: replica_id.to_owned(),
+                            },
+                            ProbeReplicaPoll {
+                                replica_url: replica_url.to_owned(),
+                                http_headers: node.http_headers.to_owned(),
+                                http_method: node.http_method.to_owned(),
+                                http_body: node.http_body.to_owned(),
+                                body_match: node.http_body_healthy_match.to_owned(),
+                            },
+                        ));
                     }
                 }
             }
@@ -158,12 +161,16 @@ fn map_script_replicas() -> Vec<ProbeReplica> {
                     if let Some(ref replica_script) = replica.script {
                         // Clone values to scan; this ensure the write lock is not held while \
                         //   the script execution is performed. Same as in `map_poll_replicas()`.
-                        replica_list.push(ProbeReplica::Script(ProbeReplicaScript {
-                            probe_id: probe_id.to_owned(),
-                            node_id: node_id.to_owned(),
-                            replica_id: replica_id.to_owned(),
-                            script: replica_script.to_owned(),
-                        }));
+                        replica_list.push(ProbeReplica::Script(
+                            ProbeReplicaTarget {
+                                probe_id: probe_id.to_owned(),
+                                node_id: node_id.to_owned(),
+                                replica_id: replica_id.to_owned(),
+                            },
+                            ProbeReplicaScript {
+                                script: replica_script.to_owned(),
+                            },
+                        ));
                     }
                 }
             }
@@ -637,10 +644,10 @@ fn dispatch_replica<'a>(probe_replica: &ProbeReplica) {
 
     // Acquire replica status (with optional latency)
     let (replica_status, replica_latency) = match probe_replica {
-        ProbeReplica::Poll(probe_replica_poll) => {
-            probe_id = &probe_replica_poll.probe_id;
-            node_id = &probe_replica_poll.node_id;
-            replica_id = &probe_replica_poll.replica_id;
+        ProbeReplica::Poll(probe_replica_target, probe_replica_poll) => {
+            probe_id = &probe_replica_target.probe_id;
+            node_id = &probe_replica_target.node_id;
+            replica_id = &probe_replica_target.replica_id;
 
             proceed_replica_probe_poll_with_retry(
                 &probe_replica_poll.replica_url,
@@ -650,10 +657,10 @@ fn dispatch_replica<'a>(probe_replica: &ProbeReplica) {
                 &probe_replica_poll.body_match,
             )
         }
-        ProbeReplica::Script(probe_replica_script) => {
-            probe_id = &probe_replica_script.probe_id;
-            node_id = &probe_replica_script.node_id;
-            replica_id = &probe_replica_script.replica_id;
+        ProbeReplica::Script(probe_replica_target, probe_replica_script) => {
+            probe_id = &probe_replica_target.probe_id;
+            node_id = &probe_replica_target.node_id;
+            replica_id = &probe_replica_target.replica_id;
 
             proceed_replica_probe_script(&probe_replica_script.script)
         }
@@ -682,19 +689,59 @@ fn dispatch_replica<'a>(probe_replica: &ProbeReplica) {
 }
 
 fn dispatch_replicas_in_threads(replicas: Vec<ProbeReplica>, parallelism: u16) {
-    for probe_replica_chunk in replicas.chunks(parallelism.into()) {
-        let mut handles = Vec::new();
+    // Acquire chunk size (round to the highest unit if there is a remainder)
+    let mut chunk_size = replicas.len() / parallelism as usize;
 
-        for probe_replica_initial in probe_replica_chunk {
-            let probe_replica = probe_replica_initial.clone();
-            let thread_handle = thread::spawn(move || dispatch_replica(&probe_replica));
+    if replicas.len() % parallelism as usize > 0 {
+        chunk_size += 1;
+    }
 
-            handles.push(thread_handle);
+    // Anything to scan?
+    if chunk_size > 0 {
+        let start_time = SystemTime::now();
+
+        // Initialize probing threads registry (this helps split the work into multiple parallel \
+        //   synchronous threads, where parallelism can be increased on large Vigil setups)
+        let mut prober_threads = Vec::new();
+
+        for replicas_chunk in replicas.chunks(chunk_size) {
+            let replicas_chunk: Vec<ProbeReplica> = replicas_chunk
+                .iter()
+                .map(|replica| replica.clone())
+                .collect();
+
+            // Append probing chunk into its own synchronous thread
+            prober_threads.push(thread::spawn(move || {
+                for probe_replica in replicas_chunk {
+                    dispatch_replica(&probe_replica);
+                }
+            }));
         }
 
-        for handle in handles {
-            handle.join().unwrap();
+        let prober_threads_len = prober_threads.len();
+
+        debug!(
+            "replicas will get probed in {}/{} threads, on {} total replicas and chunk size of {}",
+            prober_threads_len,
+            parallelism,
+            replicas.len(),
+            chunk_size
+        );
+
+        // Wait for all parallel probing threads to complete
+        for prober_thread in prober_threads {
+            prober_thread.join().unwrap();
         }
+
+        // Measure total probing duration
+        let probing_duration = SystemTime::now()
+            .duration_since(start_time)
+            .unwrap_or(Duration::from_secs(0));
+
+        info!(
+            "replicas have been probed with {}/{} threads in {:?}",
+            prober_threads_len, parallelism, probing_duration
+        );
     }
 }
 

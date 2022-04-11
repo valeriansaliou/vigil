@@ -54,7 +54,7 @@ pub fn metrics_poll_delay_sick() -> u64 {
 }
 
 pub fn poll_parallelism() -> u16 {
-    2
+    4
 }
 
 pub fn metrics_push_delay_dead() -> u64 {
@@ -74,7 +74,7 @@ pub fn metrics_script_interval() -> u64 {
 }
 
 pub fn script_parallelism() -> u16 {
-    1
+    2
 }
 
 pub fn metrics_local_delay_dead() -> u64 {
