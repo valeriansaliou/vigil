@@ -169,8 +169,8 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 * `poll_retry` (type: _integer_, allowed: seconds, default: `2`) — Interval after which to try probe for a second time nodes in `poll` mode (only when the first check fails)
 * `poll_http_status_healthy_above` (type: _integer_, allowed: HTTP status code, default: `200`) — HTTP status above which `poll` checks to HTTP replicas reports as `healthy`
 * `poll_http_status_healthy_below` (type: _integer_, allowed: HTTP status code, default: `400`) — HTTP status under which `poll` checks to HTTP replicas reports as `healthy`
-* `poll_delay_dead` (type: _integer_, allowed: seconds, default: `30`) — Delay after which a node in `poll` mode is to be considered `dead` (ie. check response delay)
-* `poll_delay_sick` (type: _integer_, allowed: seconds, default: `10`) — Delay after which a node in `poll` mode is to be considered `sick` (ie. check response delay)
+* `poll_delay_dead` (type: _integer_, allowed: seconds, default: `10`) — Delay after which a node in `poll` mode is to be considered `dead` (ie. check response delay)
+* `poll_delay_sick` (type: _integer_, allowed: seconds, default: `5`) — Delay after which a node in `poll` mode is to be considered `sick` (ie. check response delay)
 * `poll_parallelism` (type: _integer_, allowed: any number, default: `2`) — Maximum number of poll threads to be ran simultaneously (in case you are monitoring a lot of nodes and/or slow-replying nodes, increasing parallelism will help)
 * `push_delay_dead` (type: _integer_, allowed: seconds, default: `20`) — Delay after which a node in `push` mode is to be considered `dead` (ie. time after which the node did not report)
 * `push_system_cpu_sick_above` (type: _float_, allowed: system CPU loads, default: `0.90`) — System load indice for CPU above which to consider a node in `push` mode `sick` (ie. UNIX system load)

@@ -46,11 +46,11 @@ pub fn metrics_poll_http_status_healthy_below() -> u16 {
 }
 
 pub fn metrics_poll_delay_dead() -> u64 {
-    30
+    10
 }
 
 pub fn metrics_poll_delay_sick() -> u64 {
-    10
+    5
 }
 
 pub fn poll_parallelism() -> u16 {
