@@ -68,15 +68,32 @@ pub struct Store {
     pub notified: Option<SystemTime>,
 }
 
-enum DispatchMode<'a> {
-    Poll(
-        &'a ReplicaURL,
-        &'a HeaderMap,
-        &'a Option<ConfigProbeServiceNodeHTTPMethod>,
-        &'a Option<String>,
-        &'a Option<Regex>,
-    ),
-    Script(&'a String),
+#[derive(Clone)]
+struct ProbeReplicaScript {
+    pub probe_id: String,
+    pub node_id: String,
+    pub replica_id: String,
+
+    pub script: String,
+}
+
+#[derive(Clone)]
+struct ProbeReplicaPoll {
+    pub probe_id: String,
+    pub node_id: String,
+    pub replica_id: String,
+
+    pub replica_url: ReplicaURL,
+    pub http_headers: HeaderMap,
+    pub http_method: Option<ConfigProbeServiceNodeHTTPMethod>,
+    pub http_body: Option<String>,
+    pub body_match: Option<Regex>,
+}
+
+#[derive(Clone)]
+enum ProbeReplica {
+    Poll(ProbeReplicaPoll),
+    Script(ProbeReplicaScript),
 }
 
 fn make_default_headers() -> HeaderMap {
@@ -92,16 +109,7 @@ fn make_default_headers() -> HeaderMap {
     headers
 }
 
-fn map_poll_replicas() -> Vec<(
-    String,
-    String,
-    String,
-    ReplicaURL,
-    HeaderMap,
-    Option<ConfigProbeServiceNodeHTTPMethod>,
-    Option<String>,
-    Option<Regex>,
-)> {
+fn map_poll_replicas() -> Vec<ProbeReplica> {
     let mut replica_list = Vec::new();
 
     // Acquire states
@@ -117,16 +125,16 @@ fn map_poll_replicas() -> Vec<(
                         //   the replica scan is performed. As this whole operation can take time, \
                         //   it could lock all the pipelines depending on the shared store data \
                         //   (eg. the reporter HTTP API).
-                        replica_list.push((
-                            probe_id.to_owned(),
-                            node_id.to_owned(),
-                            replica_id.to_owned(),
-                            replica_url.to_owned(),
-                            node.http_headers.to_owned(),
-                            node.http_method.to_owned(),
-                            node.http_body.to_owned(),
-                            node.http_body_healthy_match.to_owned(),
-                        ));
+                        replica_list.push(ProbeReplica::Poll(ProbeReplicaPoll {
+                            probe_id: probe_id.to_owned(),
+                            node_id: node_id.to_owned(),
+                            replica_id: replica_id.to_owned(),
+                            replica_url: replica_url.to_owned(),
+                            http_headers: node.http_headers.to_owned(),
+                            http_method: node.http_method.to_owned(),
+                            http_body: node.http_body.to_owned(),
+                            body_match: node.http_body_healthy_match.to_owned(),
+                        }));
                     }
                 }
             }
@@ -136,7 +144,7 @@ fn map_poll_replicas() -> Vec<(
     replica_list
 }
 
-fn map_script_replicas() -> Vec<(String, String, String, String)> {
+fn map_script_replicas() -> Vec<ProbeReplica> {
     let mut replica_list = Vec::new();
 
     // Acquire states
@@ -150,12 +158,12 @@ fn map_script_replicas() -> Vec<(String, String, String, String)> {
                     if let Some(ref replica_script) = replica.script {
                         // Clone values to scan; this ensure the write lock is not held while \
                         //   the script execution is performed. Same as in `map_poll_replicas()`.
-                        replica_list.push((
-                            probe_id.to_owned(),
-                            node_id.to_owned(),
-                            replica_id.to_owned(),
-                            replica_script.to_owned(),
-                        ));
+                        replica_list.push(ProbeReplica::Script(ProbeReplicaScript {
+                            probe_id: probe_id.to_owned(),
+                            node_id: node_id.to_owned(),
+                            replica_id: replica_id.to_owned(),
+                            script: replica_script.to_owned(),
+                        }));
                     }
                 }
             }
@@ -622,19 +630,33 @@ fn proceed_rabbitmq_queue_probe(
     (false, false, None)
 }
 
-fn dispatch_replica<'a>(mode: DispatchMode<'a>, probe_id: &str, node_id: &str, replica_id: &str) {
+fn dispatch_replica<'a>(probe_replica: &ProbeReplica) {
+    let probe_id: &String;
+    let node_id: &String;
+    let replica_id: &String;
+
     // Acquire replica status (with optional latency)
-    let (replica_status, replica_latency) = match mode {
-        DispatchMode::Poll(replica_url, http_headers, http_method, http_body, body_match) => {
+    let (replica_status, replica_latency) = match probe_replica {
+        ProbeReplica::Poll(probe_replica_poll) => {
+            probe_id = &probe_replica_poll.probe_id;
+            node_id = &probe_replica_poll.node_id;
+            replica_id = &probe_replica_poll.replica_id;
+
             proceed_replica_probe_poll_with_retry(
-                replica_url,
-                http_headers,
-                http_method,
-                http_body,
-                body_match,
+                &probe_replica_poll.replica_url,
+                &probe_replica_poll.http_headers,
+                &probe_replica_poll.http_method,
+                &probe_replica_poll.http_body,
+                &probe_replica_poll.body_match,
             )
         }
-        DispatchMode::Script(script) => proceed_replica_probe_script(script),
+        ProbeReplica::Script(probe_replica_script) => {
+            probe_id = &probe_replica_script.probe_id;
+            node_id = &probe_replica_script.node_id;
+            replica_id = &probe_replica_script.replica_id;
+
+            proceed_replica_probe_script(&probe_replica_script.script)
+        }
     };
 
     debug!(
@@ -659,34 +681,28 @@ fn dispatch_replica<'a>(mode: DispatchMode<'a>, probe_id: &str, node_id: &str, r
     }
 }
 
+fn dispatch_replicas_in_threads(replicas: Vec<ProbeReplica>) {
+    for probe_replica_chunk in replicas.chunks(APP_CONF.metrics.parallel_thread_limit.into()) {
+        let mut handles = Vec::new();
+        for probe_replica_initial in probe_replica_chunk {
+            let probe_replica = probe_replica_initial.clone();
+            let thread_handle = thread::spawn(move || dispatch_replica(&probe_replica));
+            handles.push(thread_handle);
+        }
+        for handle in handles {
+            handle.join().unwrap();
+        }
+    }
+}
+
 fn dispatch_polls() {
     // Probe hosts
-    for probe_replica in map_poll_replicas() {
-        dispatch_replica(
-            DispatchMode::Poll(
-                &probe_replica.3,
-                &probe_replica.4,
-                &probe_replica.5,
-                &probe_replica.6,
-                &probe_replica.7,
-            ),
-            &probe_replica.0,
-            &probe_replica.1,
-            &probe_replica.2,
-        );
-    }
+    dispatch_replicas_in_threads(map_poll_replicas());
 }
 
 fn dispatch_scripts() {
     // Run scripts
-    for probe_replica in map_script_replicas() {
-        dispatch_replica(
-            DispatchMode::Script(&probe_replica.3),
-            &probe_replica.0,
-            &probe_replica.1,
-            &probe_replica.2,
-        );
-    }
+    dispatch_replicas_in_threads(map_script_replicas());
 }
 
 fn dispatch_plugins_rabbitmq(

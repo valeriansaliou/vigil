@@ -94,6 +94,9 @@ pub struct ConfigMetrics {
 
     #[serde(default = "defaults::metrics_local_delay_dead")]
     pub local_delay_dead: u64,
+
+    #[serde(default = "defaults::parallel_thread_limit")]
+    pub parallel_thread_limit: u16,
 }
 
 #[derive(Deserialize)]
