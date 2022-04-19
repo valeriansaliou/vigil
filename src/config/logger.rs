@@ -6,6 +6,10 @@
 
 use log;
 use log::{Level, LevelFilter, Metadata, Record, SetLoggerError};
+use std::time::SystemTime;
+
+use chrono::offset::Utc;
+use chrono::DateTime;
 
 pub struct ConfigLogger;
 
@@ -15,8 +19,15 @@ impl log::Log for ConfigLogger {
     }
 
     fn log(&self, record: &Record) {
+        let system_time = SystemTime::now();
+        let datetime: DateTime<Utc> = system_time.into();
         if self.enabled(record.metadata()) {
-            println!("({}) - {}", record.level(), record.args());
+            println!(
+                "{} ({}) - {}",
+                datetime.format("%Y-%m-%d %T"),
+                record.level(),
+                record.args()
+            );
         }
     }
 

@@ -64,6 +64,18 @@ pub fn run() {
                     .guard(guard::Delete())
                     .to(routes::reporter_flush),
             )
+            .service(
+                web::resource("/probe/start_planned_maintenance/{probe_id}")
+                    .wrap(middleware_auth.clone())
+                    .guard(guard::Post())
+                    .to(routes::start_planned_maintenance),
+                )
+            .service(
+                web::resource("/probe/stop_planned_maintenance/{probe_id}")
+                    .wrap(middleware_auth.clone())
+                    .guard(guard::Post())
+                    .to(routes::stop_planned_maintenance),
+                )
     })
     .workers(APP_CONF.server.workers)
     .bind(APP_CONF.server.inet)

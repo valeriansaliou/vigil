@@ -243,6 +243,27 @@ a:hover {
   border-color: rgba(241, 128, 0, 0.17);
 }
 
+.badge-status-maintenance.badge-default {
+  background-image: url("/assets/images/badges/icon-maintenance-default.svg");
+}
+
+.status-maintenance-background,
+.status-maintenance-background-before:before {
+  background-color: #A9A9A9;
+}
+
+.status-maintenance-color {
+  color: #A9A9A9;
+}
+
+.status-maintenance-background-subtle {
+  background-color: rgba(169, 169, 169, 0.08);
+}
+
+.status-maintenance-border-subtle {
+  border-color: rgba(169, 169, 169, 0.10);
+}
+
 .badge-status-dead.badge-default {
   background-image: url("/assets/images/badges/icon-dead-default.svg");
 }

@@ -149,5 +149,6 @@ fn status_to_color(status: &Status) -> &'static str {
         &Status::Healthy => "good",
         &Status::Sick => "warning",
         &Status::Dead => "danger",
+        &Status::Maintenance => "warning",
     }
 }
