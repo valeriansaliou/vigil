@@ -15,8 +15,8 @@ use crate::prober::report::{
     handle_flush as handle_flush_report, handle_health as handle_health_report,
     handle_load as handle_load_report, HandleFlushError, HandleHealthError, HandleLoadError,
 };
-use crate::APP_CONF;
 use crate::prober::status::Status;
+use crate::APP_CONF;
 
 #[get("/")]
 async fn index(tera: Data<Tera>) -> HttpResponse {
@@ -106,7 +106,10 @@ pub async fn stop_planned_maintenance(web::Path(probe_id): web::Path<String>) ->
             info!("Stopping planned maintenance for probe: {:?}", probe_id);
             HttpResponse::Ok().finish()
         } else {
-            HttpResponse::BadRequest().body(format!("ERROR: Service is not currently set to status maintenance: {:?}", probe_id))
+            HttpResponse::BadRequest().body(format!(
+                "ERROR: Service is not currently set to status maintenance: {:?}",
+                probe_id
+            ))
         }
     } else {
         HttpResponse::BadRequest().body(format!("Could not find service named '{}'", probe_id))
