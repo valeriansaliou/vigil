@@ -270,6 +270,12 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 
 * `hook_url` (type: _string_, allowed: URL, no default) — Web Hook URL (eg. `https://domain.com/webhooks/[..]`)
 
+**[notify.webex]**
+
+* `hook_url` (type: _string_, allowed: URL, no default) — Webex URL (eg. `https://webexapis.com/v1/messages`)
+* `token` (type: _string_, allowed: any string, no default) - Webex access token (eg. access token)
+* `room_id` (type: _string_, allowed: any string, no default) - Webex oom ID to which to send messages (eg. `Y2lzY29zcGFyazovL3VzL1JPT00vMmJmOD`)
+
 **[probe]**
 
 **[[probe.service]]**

@@ -46,7 +46,7 @@ lettre_email = { version = "0.9", optional = true }
 libstrophe = { version = "0.16", default-features = false, optional = true }
 
 [features]
-default = ["notifier-email", "notifier-twilio", "notifier-slack", "notifier-zulip", "notifier-telegram", "notifier-pushover", "notifier-gotify", "notifier-matrix", "notifier-webhook"]
+default = ["notifier-email", "notifier-twilio", "notifier-slack", "notifier-zulip", "notifier-telegram", "notifier-pushover", "notifier-gotify", "notifier-matrix", "notifier-webhook", "notifier-webex"]
 notifier-email = ["lettre", "lettre_email"]
 notifier-twilio = []
 notifier-slack = []
@@ -56,6 +56,7 @@ notifier-pushover = []
 notifier-gotify = []
 notifier-matrix = []
 notifier-webhook = []
+notifier-webex = []
 notifier-xmpp = ["libstrophe"]
 
 [profile.dev]

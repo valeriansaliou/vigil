@@ -125,6 +125,7 @@ pub struct ConfigNotify {
     pub xmpp: Option<ConfigNotifyXMPP>,
     pub matrix: Option<ConfigNotifyMatrix>,
     pub webhook: Option<ConfigNotifyWebHook>,
+    pub webex: Option<ConfigNotifyWebEx>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
@@ -254,6 +255,13 @@ pub struct ConfigNotifyXMPP {
 #[derive(Deserialize)]
 pub struct ConfigNotifyWebHook {
     pub hook_url: SerdeUrl,
+}
+
+#[derive(Deserialize)]
+pub struct ConfigNotifyWebEx {
+    pub hook_url: SerdeUrl,
+    pub token: String,
+    pub room_id: String,
 }
 
 #[derive(Deserialize)]

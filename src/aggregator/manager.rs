@@ -47,6 +47,9 @@ use crate::notifier::matrix::MatrixNotifier;
 #[cfg(feature = "notifier-webhook")]
 use crate::notifier::webhook::WebHookNotifier;
 
+#[cfg(feature = "notifier-webex")]
+use crate::notifier::webex::WebExNotifier;
+
 lazy_static! {
     static ref TIME_NOW_FORMATTER: Vec<FormatItem<'static>> = time::format_description::parse(
         "[hour]:[minute]:[second] UTC[offset_hour sign:mandatory]:[offset_minute]"
@@ -373,6 +376,9 @@ fn notify(bumped_states: &BumpedStates) {
 
         #[cfg(feature = "notifier-webhook")]
         Notification::dispatch::<WebHookNotifier>(notify, &notification).ok();
+
+        #[cfg(feature = "notifier-webex")]
+        Notification::dispatch::<WebExNotifier>(notify, &notification).ok();
     }
 }
 
