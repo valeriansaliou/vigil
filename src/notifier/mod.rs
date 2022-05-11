@@ -35,3 +35,6 @@ pub mod matrix;
 
 #[cfg(feature = "notifier-webhook")]
 pub mod webhook;
+
+#[cfg(feature = "notifier-webex")]
+pub mod webex;
