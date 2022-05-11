@@ -124,8 +124,8 @@ pub struct ConfigNotify {
     pub gotify: Option<ConfigNotifyGotify>,
     pub xmpp: Option<ConfigNotifyXMPP>,
     pub matrix: Option<ConfigNotifyMatrix>,
-    pub webhook: Option<ConfigNotifyWebHook>,
     pub webex: Option<ConfigNotifyWebEx>,
+    pub webhook: Option<ConfigNotifyWebHook>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
@@ -253,18 +253,6 @@ pub struct ConfigNotifyXMPP {
 }
 
 #[derive(Deserialize)]
-pub struct ConfigNotifyWebHook {
-    pub hook_url: SerdeUrl,
-}
-
-#[derive(Deserialize)]
-pub struct ConfigNotifyWebEx {
-    pub hook_url: SerdeUrl,
-    pub token: String,
-    pub room_id: String,
-}
-
-#[derive(Deserialize)]
 pub struct ConfigNotifyMatrix {
     pub homeserver_url: SerdeUrl,
     pub access_token: String,
@@ -272,6 +260,21 @@ pub struct ConfigNotifyMatrix {
 
     #[serde(default = "defaults::notify_generic_reminders_only")]
     pub reminders_only: bool,
+}
+
+#[derive(Deserialize)]
+pub struct ConfigNotifyWebEx {
+    pub endpoint_url: SerdeUrl,
+    pub token: String,
+    pub room_id: String,
+
+    #[serde(default = "defaults::notify_generic_reminders_only")]
+    pub reminders_only: bool,
+}
+
+#[derive(Deserialize)]
+pub struct ConfigNotifyWebHook {
+    pub hook_url: SerdeUrl,
 }
 
 #[derive(Deserialize)]

@@ -1,3 +1,10 @@
+// Vigil
+//
+// Microservices Status Page
+// Copyright: 2022, Valerian Saliou <valerian@valeriansaliou.name>
+// Copyright: 2022, Timmy O'Tool https://github.com/TimmyOtool
+// License: Mozilla Public License v2.0 (MPL v2.0)
+
 use std::time::Duration;
 
 use reqwest::blocking::Client;
@@ -23,12 +30,9 @@ struct WebExPayload<'a> {
     text: &'a str,
 }
 
-
 impl GenericNotifier for WebExNotifier {
     fn attempt(notify: &ConfigNotify, notification: &Notification) -> Result<(), bool> {
         if let Some(ref webex) = notify.webex {
-
-
             let nodes_label = notification.replicas.join(", ");
 
             // Build up the message text
@@ -51,7 +55,6 @@ impl GenericNotifier for WebExNotifier {
                 ));
             }
 
-
             message.push_str(&format!("Status: {:?}\n", notification.status));
             message.push_str(&format!("Nodes: {}\n", &nodes_label));
             message.push_str(&format!("Time: {}\n", &notification.time));
@@ -62,10 +65,10 @@ impl GenericNotifier for WebExNotifier {
                 room_id: webex.room_id.as_str(),
                 text: &message,
             };
-            
-            // Submit payload to Web Hooks
+
+            // Submit payload to Webex
             let response = WEBEX_HTTP_CLIENT
-                .post(webex.hook_url.as_str())
+                .post(webex.endpoint_url.as_str())
                 .header("Authorization", "Bearer ".to_owned() + webex.token.as_str())
                 .json(&payload)
                 .send();
@@ -82,8 +85,12 @@ impl GenericNotifier for WebExNotifier {
         Err(false)
     }
 
-    fn can_notify(notify: &ConfigNotify, _: &Notification) -> bool {
-        notify.webex.is_some()
+    fn can_notify(notify: &ConfigNotify, notification: &Notification) -> bool {
+        if let Some(ref webex_config) = notify.webex {
+            notification.expected(webex_config.reminders_only)
+        } else {
+            false
+        }
     }
 
     fn name() -> &'static str {

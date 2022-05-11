@@ -44,11 +44,11 @@ use crate::notifier::xmpp::XMPPNotifier;
 #[cfg(feature = "notifier-matrix")]
 use crate::notifier::matrix::MatrixNotifier;
 
-#[cfg(feature = "notifier-webhook")]
-use crate::notifier::webhook::WebHookNotifier;
-
 #[cfg(feature = "notifier-webex")]
 use crate::notifier::webex::WebExNotifier;
+
+#[cfg(feature = "notifier-webhook")]
+use crate::notifier::webhook::WebHookNotifier;
 
 lazy_static! {
     static ref TIME_NOW_FORMATTER: Vec<FormatItem<'static>> = time::format_description::parse(
@@ -374,11 +374,11 @@ fn notify(bumped_states: &BumpedStates) {
         #[cfg(feature = "notifier-matrix")]
         Notification::dispatch::<MatrixNotifier>(notify, &notification).ok();
 
-        #[cfg(feature = "notifier-webhook")]
-        Notification::dispatch::<WebHookNotifier>(notify, &notification).ok();
-
         #[cfg(feature = "notifier-webex")]
         Notification::dispatch::<WebExNotifier>(notify, &notification).ok();
+
+        #[cfg(feature = "notifier-webhook")]
+        Notification::dispatch::<WebHookNotifier>(notify, &notification).ok();
     }
 }
 
