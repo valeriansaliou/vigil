@@ -53,15 +53,22 @@ async fn badge(web::Path(kind): web::Path<String>) -> Option<NamedFile> {
     // Notice acquire lock in a block to release it ASAP (ie. before OS access to file)
     let status = { &PROBER_STORE.read().unwrap().states.status.as_str() };
 
-    NamedFile::open(
+    if let Ok(badge_file) = NamedFile::open(
         APP_CONF
             .assets
             .path
             .join("images")
             .join("badges")
             .join(format!("{}-{}-default.svg", kind, status)),
-    )
-    .ok()
+    ) {
+        // Return badge file without 'Last-Modified' HTTP header, which would otherwise hold the \
+        //   date the actual badge image file was last modified, which is not what we want there, \
+        //   as it would make browsers believe they can use a previous cache they hold, on a \
+        //   badge image that can be for a different status.
+        Some(badge_file.use_last_modified(false))
+    } else {
+        None
+    }
 }
 
 #[get("/assets/fonts/{folder}/{file}")]
