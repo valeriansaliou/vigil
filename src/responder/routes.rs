@@ -65,7 +65,11 @@ async fn badge(web::Path(kind): web::Path<String>) -> Option<NamedFile> {
         //   date the actual badge image file was last modified, which is not what we want there, \
         //   as it would make browsers believe they can use a previous cache they hold, on a \
         //   badge image that can be for a different status.
-        Some(badge_file.use_last_modified(false))
+        Some(
+            badge_file
+                .disable_content_disposition()
+                .use_last_modified(false),
+        )
     } else {
         None
     }
