@@ -186,9 +186,11 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
                     probe_id, node_id, replica_id, replica_status
                 );
 
-                // Append bumped replica path?
-                if replica_status == Status::Dead {
-                    bumped_replicas.push(format!("{}:{}:{}", probe_id, node_id, replica_id));
+                if probe.status != Status::Maintenance {
+                    // Append bumped replica path?
+                    if replica_status == Status::Dead {
+                        bumped_replicas.push(format!("{}:{}:{}", probe_id, node_id, replica_id));
+                    }
                 }
 
                 replica.status = replica_status;
@@ -207,17 +209,19 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
             node.status = node_status;
         }
 
-        // Bump general status with worst node status?
-        if let Some(worst_status) = check_child_status(&general_status, &probe_status) {
-            general_status = worst_status;
-        }
-
         debug!(
             "aggregated status for probe: {} => {:?}",
             probe_id, probe_status
         );
 
-        probe.status = probe_status;
+        if probe.status != Status::Maintenance {
+            // Bump general status with worst node status?
+            if let Some(worst_status) = check_child_status(&general_status, &probe_status) {
+                general_status = worst_status;
+            }
+
+            probe.status = probe_status;
+        }
     }
 
     // Check if general status has changed

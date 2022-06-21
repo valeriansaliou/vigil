@@ -15,6 +15,7 @@ use crate::prober::report::{
     handle_flush as handle_flush_report, handle_health as handle_health_report,
     handle_load as handle_load_report, HandleFlushError, HandleHealthError, HandleLoadError,
 };
+use crate::prober::status::Status;
 use crate::APP_CONF;
 
 #[get("/")]
@@ -95,6 +96,35 @@ async fn assets_stylesheets(web::Path(file): web::Path<String>) -> Option<NamedF
 #[get("/assets/javascripts/{file}")]
 async fn assets_javascripts(web::Path(file): web::Path<String>) -> Option<NamedFile> {
     NamedFile::open(APP_CONF.assets.path.join("javascripts").join(file)).ok()
+}
+
+pub async fn start_planned_maintenance(web::Path(probe_id): web::Path<String>) -> HttpResponse {
+    let store = &mut PROBER_STORE.write().unwrap();
+    if let Some(ref mut probe) = store.states.probes.get_mut(&probe_id) {
+        probe.status = Status::Maintenance;
+        info!("Starting planned maintenance for probe: {:?}. Notifications will be suppressed for this probe.", probe_id);
+        HttpResponse::Ok().finish()
+    } else {
+        HttpResponse::BadRequest().body(format!("Could not find service named '{}'", probe_id))
+    }
+}
+
+pub async fn stop_planned_maintenance(web::Path(probe_id): web::Path<String>) -> HttpResponse {
+    let store = &mut PROBER_STORE.write().unwrap();
+    if let Some(ref mut probe) = store.states.probes.get_mut(&probe_id) {
+        if probe.status == Status::Maintenance {
+            probe.status = Status::Healthy;
+            info!("Stopping planned maintenance for probe: {:?}", probe_id);
+            HttpResponse::Ok().finish()
+        } else {
+            HttpResponse::BadRequest().body(format!(
+                "ERROR: Service is not currently set to status maintenance: {:?}",
+                probe_id
+            ))
+        }
+    } else {
+        HttpResponse::BadRequest().body(format!("Could not find service named '{}'", probe_id))
+    }
 }
 
 // Notice: reporter report route is managed in manager due to authentication needs

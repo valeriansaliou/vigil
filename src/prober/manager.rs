@@ -116,28 +116,30 @@ fn map_poll_replicas() -> Vec<ProbeReplica> {
 
     // Map replica URLs to be probed
     for (probe_id, probe) in states.probes.iter() {
-        for (node_id, node) in probe.nodes.iter() {
-            if node.mode == Mode::Poll {
-                for (replica_id, replica) in node.replicas.iter() {
-                    if let Some(ref replica_url) = replica.url {
-                        // Clone values to scan; this ensure the write lock is not held while \
-                        //   the replica scan is performed. As this whole operation can take time, \
-                        //   it could lock all the pipelines depending on the shared store data \
-                        //   (eg. the reporter HTTP API).
-                        replica_list.push(ProbeReplica::Poll(
-                            ProbeReplicaTarget {
-                                probe_id: probe_id.to_owned(),
-                                node_id: node_id.to_owned(),
-                                replica_id: replica_id.to_owned(),
-                            },
-                            ProbeReplicaPoll {
-                                replica_url: replica_url.to_owned(),
-                                http_headers: node.http_headers.to_owned(),
-                                http_method: node.http_method.to_owned(),
-                                http_body: node.http_body.to_owned(),
-                                body_match: node.http_body_healthy_match.to_owned(),
-                            },
-                        ));
+        if probe.status != Status::Maintenance {
+            for (node_id, node) in probe.nodes.iter() {
+                if node.mode == Mode::Poll {
+                    for (replica_id, replica) in node.replicas.iter() {
+                        if let Some(ref replica_url) = replica.url {
+                            // Clone values to scan; this ensure the write lock is not held while \
+                            //   the replica scan is performed. As this whole operation can take time, \
+                            //   it could lock all the pipelines depending on the shared store data \
+                            //   (eg. the reporter HTTP API).
+                            replica_list.push(ProbeReplica::Poll(
+                                ProbeReplicaTarget {
+                                    probe_id: probe_id.to_owned(),
+                                    node_id: node_id.to_owned(),
+                                    replica_id: replica_id.to_owned(),
+                                },
+                                ProbeReplicaPoll {
+                                    replica_url: replica_url.to_owned(),
+                                    http_headers: node.http_headers.to_owned(),
+                                    http_method: node.http_method.to_owned(),
+                                    http_body: node.http_body.to_owned(),
+                                    body_match: node.http_body_healthy_match.to_owned(),
+                                },
+                            ));
+                        }
                     }
                 }
             }
@@ -155,22 +157,24 @@ fn map_script_replicas() -> Vec<ProbeReplica> {
 
     // Map scripts to be probed
     for (probe_id, probe) in states.probes.iter() {
-        for (node_id, node) in probe.nodes.iter() {
-            if node.mode == Mode::Script {
-                for (replica_id, replica) in node.replicas.iter() {
-                    if let Some(ref replica_script) = replica.script {
-                        // Clone values to scan; this ensure the write lock is not held while \
-                        //   the script execution is performed. Same as in `map_poll_replicas()`.
-                        replica_list.push(ProbeReplica::Script(
-                            ProbeReplicaTarget {
-                                probe_id: probe_id.to_owned(),
-                                node_id: node_id.to_owned(),
-                                replica_id: replica_id.to_owned(),
-                            },
-                            ProbeReplicaScript {
-                                script: replica_script.to_owned(),
-                            },
-                        ));
+        if probe.status != Status::Maintenance {
+            for (node_id, node) in probe.nodes.iter() {
+                if node.mode == Mode::Script {
+                    for (replica_id, replica) in node.replicas.iter() {
+                        if let Some(ref replica_script) = replica.script {
+                            // Clone values to scan; this ensure the write lock is not held while \
+                            //   the script execution is performed. Same as in `map_poll_replicas()`.
+                            replica_list.push(ProbeReplica::Script(
+                                ProbeReplicaTarget {
+                                    probe_id: probe_id.to_owned(),
+                                    node_id: node_id.to_owned(),
+                                    replica_id: replica_id.to_owned(),
+                                },
+                                ProbeReplicaScript {
+                                    script: replica_script.to_owned(),
+                                },
+                            ));
+                        }
                     }
                 }
             }
