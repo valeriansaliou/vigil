@@ -23,6 +23,10 @@ jobs:
           components: rustfmt
           override: true
 
+      - name: Install build headers
+        run: sudo apt-get install libstrophe-dev
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+
       - name: Verify versions
         run: rustc --version && rustup --version && cargo --version
 
