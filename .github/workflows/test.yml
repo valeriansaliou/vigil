@@ -38,11 +38,11 @@ jobs:
 
       - name: Build code (default features)
         run: cargo build
-        if: ${{ matrix.os !== 'ubuntu-latest' }}
+        if: ${{ matrix.os != 'ubuntu-latest' }}
 
       - name: Build code (all features)
         run: cargo build --all-features
-        if: ${{ matrix.os === 'ubuntu-latest' }}
+        if: ${{ matrix.os == 'ubuntu-latest' }}
 
       - name: Test code
         run: cargo test
