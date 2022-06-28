@@ -5,10 +5,9 @@
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
 use std::sync::RwLock;
-use std::time::Duration;
-use time;
+use std::time::{Duration, SystemTime};
 
-use libstrophe::{Connection, ConnectionEvent, Context, Stanza, StreamError};
+use libstrophe::{Connection, ConnectionEvent, Context, Stanza};
 
 use super::generic::{GenericNotifier, Notification, DISPATCH_TIMEOUT_SECONDS};
 use crate::config::config::ConfigNotify;
@@ -40,46 +39,56 @@ impl GenericNotifier for XMPPNotifier {
             debug!("will send XMPP notification with message: {}", &message);
 
             // Configure connection handler
-            let fn_handle = |context: &Context,
-                             connection: &mut Connection,
-                             event: ConnectionEvent,
-                             _error: i32,
-                             _stream_error: Option<StreamError>| {
-                match event {
-                    ConnectionEvent::XMPP_CONN_CONNECT => {
-                        debug!("connected to XMPP account: {}", &xmpp.from);
+            let fn_handle =
+                |context: &Context, connection: &mut Connection, event: ConnectionEvent| {
+                    match event {
+                        ConnectionEvent::Connect => {
+                            debug!("connected to XMPP account: {}", &xmpp.from);
 
-                        // Send status message
-                        let mut message_stanza = Stanza::new_message(
-                            Some("chat"),
-                            Some(&format!("vigil-{}", time::now().to_timespec().sec)),
-                            Some(&xmpp.to),
-                        );
-
-                        if message_stanza.set_body(&message).is_ok() == true {
-                            connection.send(&message_stanza);
-
+                            // Acquire UNIX time (used to stamp the message w/ an unique identifier)
+                            let now_timestamp = if let Ok(unix_time) =
+                                SystemTime::now().duration_since(SystemTime::UNIX_EPOCH)
                             {
-                                let mut is_sent_value = is_sent.write().unwrap();
+                                unix_time.as_secs()
+                            } else {
+                                0
+                            };
 
-                                *is_sent_value = true;
+                            // Send status message
+                            let mut message_stanza = Stanza::new_message(
+                                Some("chat"),
+                                Some(&format!("vigil-{}", now_timestamp)),
+                                Some(&xmpp.to),
+                            );
+
+                            if message_stanza.set_body(&message).is_ok() == true {
+                                connection.send(&message_stanza);
+
+                                {
+                                    let mut is_sent_value = is_sent.write().unwrap();
+
+                                    *is_sent_value = true;
+                                }
                             }
+
+                            // Disconnect immediately
+                            connection.disconnect();
                         }
+                        ConnectionEvent::Disconnect(err) => {
+                            if let Some(err) = err {
+                                error!(
+                                    "connection failure to XMPP account: {} ({:?})",
+                                    &xmpp.from, err
+                                );
+                            } else {
+                                debug!("disconnected from XMPP account: {}", &xmpp.from);
+                            }
 
-                        // Disconnect immediately
-                        connection.disconnect();
+                            context.stop();
+                        }
+                        _ => {}
                     }
-                    ConnectionEvent::XMPP_CONN_DISCONNECT | ConnectionEvent::XMPP_CONN_FAIL => {
-                        debug!(
-                            "disconnected from XMPP account: {} ({:?})",
-                            &xmpp.from, event
-                        );
-
-                        context.stop();
-                    }
-                    _ => {}
-                }
-            };
+                };
 
             // Configure XMPP connection
             let context = Context::new_with_default_logger();
