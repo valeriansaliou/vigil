@@ -36,6 +36,7 @@ fi
 # Define release pipeline
 function release_for_architecture {
     final_tar="v$VIGIL_VERSION-$1.tar.gz"
+    gpg_signer="valerian@valeriansaliou.name"
 
     rm -rf ./vigil/ && \
         RUSTFLAGS="-C link-arg=-s" cross build --target "$2" --release && \
@@ -43,7 +44,8 @@ function release_for_architecture {
         cp -p "target/$2/release/vigil" ./vigil/ && \
         cp -r ./config.cfg ./res vigil/ && \
         tar -czvf "$final_tar" ./vigil && \
-        rm -r ./vigil/
+        rm -r ./vigil/ && \
+        gpg -u "$gpg_signer" --armor --detach-sign "$final_tar"
     release_result=$?
 
     if [ $release_result -eq 0 ]; then
