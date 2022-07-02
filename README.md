@@ -87,7 +87,7 @@ _As an example of a status page running Crisp Status, check out [Enrich Status P
 
 Vigil is built in Rust. To install it, either download a version from the [Vigil releases](https://github.com/valeriansaliou/vigil/releases) page, use `cargo install` or pull the source code from `master`.
 
-👉 Each release binary comes with an `.asc` signature file, which can be verified using [@valeriansaliou](https://github.com/valeriansaliou) GPG public key: [:key:valeriansaliou.gpg.pub.asc](https://valeriansaliou.name/files/keys/valeriansaliou.gpg.pub.asc).
+👉 _Each release binary comes with an `.asc` signature file, which can be verified using [@valeriansaliou](https://github.com/valeriansaliou) GPG public key: [:key:valeriansaliou.gpg.pub.asc](https://valeriansaliou.name/files/keys/valeriansaliou.gpg.pub.asc)._
 
 **Install from Cargo:**
 
