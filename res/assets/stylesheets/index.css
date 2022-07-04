@@ -221,7 +221,7 @@ main section.general .general-inner p a {
 main section.announcement {
   margin-top: -5px;
   padding-top: 26px;
-  padding-bottom: 19px;
+  padding-bottom: 21px;
   display: flex;
   position: relative;
   z-index: 0;
@@ -235,8 +235,8 @@ main section.announcement .announcement-inner h4 {
 main section.announcement .announcement-inner time {
   color: rgba(0, 0, 0, 0.6);
   font-size: 12.5px;
-  line-height: 21px;
-  margin-top: 12px;
+  line-height: 16px;
+  margin-top: 14px;
   display: block;
 }
 
@@ -250,7 +250,7 @@ main section.announcement .announcement-badge {
 }
 
 main section.announcement .announcement-unit {
-  margin-bottom: 22px;
+  margin-bottom: 24px;
 }
 
 main section.announcement .announcement-unit:last-child {
@@ -477,7 +477,7 @@ footer p a {
 
   main section.announcement {
     padding-top: 25px;
-    padding-bottom: 16px;
+    padding-bottom: 18px;
   }
 
   footer {
