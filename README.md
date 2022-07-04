@@ -147,6 +147,7 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 * `log_level` (type: _string_, allowed: `debug`, `info`, `warn`, `error`, default: `error`) — Verbosity of logging, set it to `error` in production
 * `inet` (type: _string_, allowed: IPv4 / IPv6 + port, default: `[::1]:8080`) — Host and TCP port the Vigil public status page should listen on
 * `workers` (type: _integer_, allowed: any number, default: `4`) — Number of workers for the Vigil public status page to run on
+* `manager_token` (type: _string_, allowed: secret token, default: no default) — Manager secret token (ie. secret password)
 * `reporter_token` (type: _string_, allowed: secret token, default: no default) — Reporter secret token (ie. secret password)
 
 **[assets]**

@@ -7,15 +7,32 @@
 use crate::prober::status::Status as HealthStatus;
 
 #[derive(Deserialize)]
-pub struct ReporterPayload {
+pub struct ReporterRequestPayload {
     pub replica: String,
     pub interval: u64,
     pub health: Option<HealthStatus>,
-    pub load: Option<ReporterPayloadLoad>,
+    pub load: Option<ReporterRequestPayloadLoad>,
 }
 
 #[derive(Deserialize)]
-pub struct ReporterPayloadLoad {
+pub struct ReporterRequestPayloadLoad {
     pub cpu: f32,
     pub ram: f32,
+}
+
+#[derive(Deserialize)]
+pub struct ManagerAnnouncementInsertRequestPayload {
+    pub title: String,
+    pub text: String,
+}
+
+#[derive(Serialize)]
+pub struct ManagerAnnouncementsResponsePayload {
+    pub id: String,
+    pub title: String,
+}
+
+#[derive(Serialize)]
+pub struct ManagerAnnouncementInsertResponsePayload {
+    pub id: String,
 }

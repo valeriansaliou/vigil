@@ -1373,7 +1373,7 @@ dependencies = [
  "lettre",
  "mime",
  "time 0.1.44",
- "uuid",
+ "uuid 0.7.4",
 ]
 
 [[package]]
@@ -2936,6 +2936,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "uuid"
+version = "1.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dd6469f4314d5f1ffec476e05f17cc9a78bc7a27a6a857842170bdf8d6f98d2f"
+dependencies = [
+ "getrandom 0.2.7",
+ "rand 0.8.5",
+]
+
+[[package]]
 name = "v_escape"
 version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3015,6 +3025,7 @@ dependencies = [
  "toml",
  "url 2.2.2",
  "url_serde",
+ "uuid 1.1.2",
 ]
 
 [[package]]

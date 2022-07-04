@@ -35,6 +35,7 @@ pub struct ConfigServer {
     #[serde(default = "defaults::server_workers")]
     pub workers: usize,
 
+    pub manager_token: String,
     pub reporter_token: String,
 }
 

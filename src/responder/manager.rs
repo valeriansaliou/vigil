@@ -25,6 +25,7 @@ use crate::APP_CONF;
 pub fn run() {
     let mut runtime = rt::System::new("responder");
 
+    // Prepare templating engine
     let templates: String = APP_CONF
         .assets
         .path
@@ -37,8 +38,14 @@ pub fn run() {
         .into();
 
     let tera = Tera::new(&templates).unwrap();
-    let middleware_auth = HttpAuthentication::basic(authenticate);
 
+    // Prepare authentication middlewares
+    let (middleware_reporter_auth, middleware_manager_auth) = (
+        HttpAuthentication::basic(authenticate_reporter),
+        HttpAuthentication::basic(authenticate_manager),
+    );
+
+    // Start the HTTP server
     let server = HttpServer::new(move || {
         App::new()
             .data(tera.clone())
@@ -54,15 +61,33 @@ pub fn run() {
             .data(ConfigAuth::default().realm("Reporter Token"))
             .service(
                 web::resource("/reporter/{probe_id}/{node_id}")
-                    .wrap(middleware_auth.clone())
+                    .wrap(middleware_reporter_auth.clone())
                     .guard(guard::Post())
                     .to(routes::reporter_report),
             )
             .service(
                 web::resource("/reporter/{probe_id}/{node_id}/{replica_id}")
-                    .wrap(middleware_auth.clone())
+                    .wrap(middleware_reporter_auth.clone())
                     .guard(guard::Delete())
                     .to(routes::reporter_flush),
+            )
+            .service(
+                web::resource("/manager/announcements")
+                    .wrap(middleware_manager_auth.clone())
+                    .guard(guard::Get())
+                    .to(routes::manager_announcements),
+            )
+            .service(
+                web::resource("/manager/announcement")
+                    .wrap(middleware_manager_auth.clone())
+                    .guard(guard::Post())
+                    .to(routes::manager_announcement_insert),
+            )
+            .service(
+                web::resource("/manager/announcement/{announcement_id}")
+                    .wrap(middleware_manager_auth.clone())
+                    .guard(guard::Delete())
+                    .to(routes::manager_announcement_retract),
             )
     })
     .workers(APP_CONF.server.workers)
@@ -73,9 +98,10 @@ pub fn run() {
     runtime.block_on(server).unwrap()
 }
 
-async fn authenticate(
+fn authenticate(
     request: ServiceRequest,
     credentials: BasicAuth,
+    token: &str,
 ) -> Result<ServiceRequest, ActixError> {
     let password = if let Some(password) = credentials.password() {
         &*password
@@ -83,7 +109,7 @@ async fn authenticate(
         ""
     };
 
-    if password == APP_CONF.server.reporter_token {
+    if password == token {
         Ok(request)
     } else {
         let mut error = AuthenticationError::from(
@@ -97,4 +123,18 @@ async fn authenticate(
 
         Err(error.into())
     }
+}
+
+async fn authenticate_reporter(
+    request: ServiceRequest,
+    credentials: BasicAuth,
+) -> Result<ServiceRequest, ActixError> {
+    authenticate(request, credentials, &APP_CONF.server.reporter_token)
+}
+
+async fn authenticate_manager(
+    request: ServiceRequest,
+    credentials: BasicAuth,
+) -> Result<ServiceRequest, ActixError> {
+    authenticate(request, credentials, &APP_CONF.server.manager_token)
 }

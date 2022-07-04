@@ -119,7 +119,7 @@
           </div>
 
           <div class="announcement-inner">
-            {% for announcement in announcements %}
+            {% for announcement in announcements | reverse %}
               <div class="announcement-unit">
                 <h4 class="font-sans-semibold">{{ announcement.title | escape }}</h4>
                 <p class="font-sans-regular">{{ announcement.text | escape | linebreaksbr }}</p>

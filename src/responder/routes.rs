@@ -7,10 +7,18 @@
 use actix_files::NamedFile;
 use actix_web::{get, web, web::Data, web::Json, HttpResponse};
 use tera::Tera;
+use time;
+use uuid::Uuid;
 
-use super::announcements::STORE as ANNOUNCEMENTS_STORE;
+use super::announcements::{
+    Announcement, DATE_NOW_FORMATTER as ANNOUNCEMENTS_DATE_NOW_FORMATTER,
+    STORE as ANNOUNCEMENTS_STORE,
+};
 use super::context::{IndexContext, INDEX_CONFIG, INDEX_ENVIRONMENT};
-use super::payload::ReporterPayload;
+use super::payload::{
+    ManagerAnnouncementInsertRequestPayload, ManagerAnnouncementInsertResponsePayload,
+    ManagerAnnouncementsResponsePayload, ReporterRequestPayload,
+};
 use crate::prober::manager::{run_dispatch_plugins, STORE as PROBER_STORE};
 use crate::prober::report::{
     handle_flush as handle_flush_report, handle_health as handle_health_report,
@@ -102,7 +110,7 @@ async fn assets_javascripts(web::Path(file): web::Path<String>) -> Option<NamedF
 // Notice: reporter report route is managed in manager due to authentication needs
 pub async fn reporter_report(
     web::Path((probe_id, node_id)): web::Path<(String, String)>,
-    data: Json<ReporterPayload>,
+    data: Json<ReporterRequestPayload>,
 ) -> HttpResponse {
     // Route report to handler (depending on its contents)
     if let Some(ref load) = data.load {
@@ -147,5 +155,74 @@ pub async fn reporter_flush(
         Ok(()) => HttpResponse::Ok().finish(),
         Err(HandleFlushError::WrongMode) => HttpResponse::PreconditionFailed().finish(),
         Err(HandleFlushError::NotFound) => HttpResponse::NotFound().finish(),
+    }
+}
+
+// Notice: manager announcements route is managed in manager due to authentication needs
+pub async fn manager_announcements() -> HttpResponse {
+    // List all announcements in store
+    HttpResponse::Ok().json(
+        ANNOUNCEMENTS_STORE
+            .read()
+            .unwrap()
+            .announcements
+            .iter()
+            .map(|announcement| ManagerAnnouncementsResponsePayload {
+                id: announcement.id.to_owned(),
+                title: announcement.title.to_owned(),
+            })
+            .collect::<Vec<ManagerAnnouncementsResponsePayload>>(),
+    )
+}
+
+// Notice: manager announcement insert route is managed in manager due to authentication needs
+pub async fn manager_announcement_insert(
+    data: Json<ManagerAnnouncementInsertRequestPayload>,
+) -> HttpResponse {
+    // Validate data
+    if data.title.len() > 0 && data.text.len() > 0 {
+        // Generate unique identifier and insert in announcements
+        let id = Uuid::new_v4().hyphenated().to_string();
+
+        let mut store = ANNOUNCEMENTS_STORE.write().unwrap();
+
+        store.announcements.push(Announcement {
+            id: id.to_owned(),
+            title: data.title.to_owned(),
+            text: data.text.to_owned(),
+
+            date: Some(
+                time::OffsetDateTime::now_utc()
+                    .format(&ANNOUNCEMENTS_DATE_NOW_FORMATTER)
+                    .unwrap_or("?".to_string()),
+            ),
+        });
+
+        HttpResponse::Ok().json(ManagerAnnouncementInsertResponsePayload { id: id })
+    } else {
+        // Announcement data is invalid
+        HttpResponse::BadRequest().finish()
+    }
+}
+
+// Notice: manager announcement retract route is managed in manager due to authentication needs
+pub async fn manager_announcement_retract(
+    web::Path(announcement_id): web::Path<String>,
+) -> HttpResponse {
+    let mut store = ANNOUNCEMENTS_STORE.write().unwrap();
+
+    // Find announcement index (if it exists)
+    let announcement_index = store
+        .announcements
+        .iter()
+        .position(|announcement| announcement.id == announcement_id);
+
+    if let Some(announcement_index) = announcement_index {
+        // Remove target announcement
+        store.announcements.remove(announcement_index);
+
+        HttpResponse::Ok().finish()
+    } else {
+        HttpResponse::NotFound().finish()
     }
 }
