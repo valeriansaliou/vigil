@@ -58,6 +58,7 @@ _👋 You use Vigil and you want to be listed there? [Contact me](https://valeri
   * Cisco Webex
   * Webhook
 * **Generates a status page**, that you can host on your domain for your public users (eg. `https://status.example.com`)
+* **Allows publishing announcements**, eg. let your users know that a planned maintenance is upcoming
 
 ## How does it work?
 
@@ -474,6 +475,65 @@ Where:
 **Request headers:**
 
 * Add an `Authorization` header with a `Basic` authentication where the password is your configured `reporter_token`.
+
+## How can I administrate Vigil through Vigil Manager?
+
+Vigil Manager can be used to perform administrative actions on a running Vigil instance. For instance, it can be used to publish public announcements.
+
+### Vigil Manager HTTP API
+
+Vigil Manager can be interacted with over its dedicated HTTP API.
+
+#### 1️⃣ List published announcements
+
+**Endpoint URL:**
+
+`HTTP GET https://status.example.com/manager/announcements/`
+
+**Request headers:**
+
+* Add an `Authorization` header with a `Basic` authentication where the password is your configured `manager_token`.
+
+#### 2️⃣ Insert a new announcement
+
+**Endpoint URL:**
+
+`HTTP POST https://status.example.com/manager/announcement/`
+
+**Request headers:**
+
+* Add an `Authorization` header with a `Basic` authentication where the password is your configured `manager_token`.
+* Set the `Content-Type` to `application/json; charset=utf-8`, and ensure you submit the request data as UTF-8.
+
+**Request data:**
+
+Adjust the request data to your announcement and send it as `HTTP POST`:
+
+```json
+{
+  "title": "<title>",
+  "text": "<text>"
+}
+```
+
+Where:
+
+* `title`: The title for the announcement
+* `text`: The description text for the announcement (can be multi-line)
+
+#### 3️⃣ Retract a published announcement
+
+**Endpoint URL:**
+
+`HTTP DELETE https://status.example.com/manager/announcement/<announcement_id>/`
+
+Where:
+
+* `announcement_id`: The announcement identifier to be removed
+
+**Request headers:**
+
+* Add an `Authorization` header with a `Basic` authentication where the password is your configured `manager_token`.
 
 ## How can I monitor services on a different LAN using Vigil Local?
 
