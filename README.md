@@ -333,6 +333,12 @@ Vigil has 3 status variants, either `healthy` (no issue ongoing), `sick` (servic
 
 ![Status Dead](https://valeriansaliou.github.io/vigil/images/status-dead.png)
 
+## What do announcements look like?
+
+Announcements can be published to let your users know about any planned maintenance, as well as your progress on resolving a downtime:
+
+![Announcement](https://valeriansaliou.github.io/vigil/images/announcement.png)
+
 ## What do alerts look like?
 
 When a monitored backend or app goes down in your infrastructure, Vigil can let you know by Slack, Twilio SMS, Email and XMPP:
