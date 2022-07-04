@@ -1,7 +1,7 @@
 @charset "UTF-8";
 
 header {
-  background: #ffffff;
+  background: #FFFFFF;
   height: 62px;
   overflow: hidden;
   position: relative;
@@ -65,7 +65,7 @@ header nav ul li a {
 }
 
 header nav ul li a.nav-support {
-  color: #ffffff;
+  color: #FFFFFF;
   background-color: rgba(0, 0, 0, 0.85);
   letter-spacing: 0.10px;
   padding: 0 17px;
@@ -80,13 +80,13 @@ header nav ul li a.nav-support:active {
 
 header nav ul li a.nav-website {
   color: #000000;
-  background-color: #ffffff;
+  background-color: #FFFFFF;
   text-decoration: underline;
   padding: 0 15px;
 }
 
 aside {
-  color: #ffffff;
+  color: #FFFFFF;
   padding: 16px 0 19px;
   text-align: center;;
   overflow: hidden;
@@ -140,6 +140,39 @@ main section {
   border-radius: 2px;
 }
 
+main section.general:before,
+main section.announcement:before {
+  content: "";
+  width: 4px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  border-top-left-radius: 2px;
+  border-bottom-left-radius: 2px;
+}
+
+main section.general .general-inner,
+main section.announcement .announcement-inner {
+  letter-spacing: -0.10px;
+  hyphens: auto;
+  word-wrap: break-word;
+  word-break: break-word;
+  padding: 0 0 1px 24px;
+  flex: 1;
+}
+
+main section.general .general-inner h2,
+main section.announcement .announcement-inner h4 {
+  font-size: 15.5px;
+}
+
+main section.general .general-inner p,
+main section.announcement .announcement-inner p {
+  font-size: 13px;
+  line-height: 18px;
+}
+
 main section.general .general-icon .badge {
   width: 42px;
   height: 42px;
@@ -153,18 +186,10 @@ main section.general {
   position: relative;
 }
 
-main section.general:before {
-  content: "";
-  width: 4px;
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-}
-
-main section.general:before {
-  border-top-left-radius: 2px;
-  border-bottom-left-radius: 2px;
+main section.general.announcement-preceding {
+  margin-bottom: 0;
+  z-index: 1;
+  box-shadow: 0 1px 3px 0 rgba(15, 31, 64, 0.08);
 }
 
 main section.general .general-icon {
@@ -174,16 +199,9 @@ main section.general .general-icon {
 
 main section.general .general-inner {
   border-left: 1px solid rgba(0, 0, 0, 0.08);
-  letter-spacing: -0.10px;
-  hyphens: auto;
-  word-wrap: break-word;
-  word-break: break-word;
-  padding: 0 0 1px 24px;
-  flex: 1;
 }
 
 main section.general .general-inner h2 {
-  font-size: 15.5px;
   margin-bottom: 11px;
 }
 
@@ -193,13 +211,50 @@ main section.general .general-inner p a {
 }
 
 main section.general .general-inner p {
-  font-size: 13px;
-  line-height: 18px;
   margin-top: 3px;
 }
 
 main section.general .general-inner p a {
   text-decoration: underline;
+}
+
+main section.announcement {
+  margin-top: -5px;
+  padding-top: 26px;
+  padding-bottom: 19px;
+  display: flex;
+  position: relative;
+  z-index: 0;
+}
+
+main section.announcement .announcement-inner h4 {
+  margin-top: -1px;
+  margin-bottom: 9px;
+}
+
+main section.announcement .announcement-inner time {
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 12.5px;
+  line-height: 21px;
+  margin-top: 12px;
+  display: block;
+}
+
+main section.announcement .announcement-badge {
+  color: #FFFFFF;
+  font-size: 12.5px;
+  line-height: 30px;
+  padding: 0 14px;
+  display: inline-block;
+  border-radius: 2px;
+}
+
+main section.announcement .announcement-unit {
+  margin-bottom: 22px;
+}
+
+main section.announcement .announcement-unit:last-child {
+  margin-bottom: 0;
 }
 
 main section.probe {
@@ -278,7 +333,7 @@ main section.probe ul li .node {
 }
 
 main section.probe ul li .node .replica {
-  color: #ffffff;
+  color: #FFFFFF;
   font-size: 12px;
   text-align: center;
   line-height: 23px;
@@ -360,6 +415,20 @@ footer p a {
   main section.general .general-inner p {
     margin-top: 9px;
   }
+
+  main section.announcement {
+    flex-direction: column;
+  }
+
+  main section.announcement .announcement-badge {
+    text-align: center;
+    display: block;
+  }
+
+  main section.announcement .announcement-inner {
+    margin-top: 18px;
+    padding-left: 0;
+  }
 }
 
 @media screen and (max-width: 480px) {
@@ -404,6 +473,11 @@ footer p a {
   main section.probe ul li .node {
     padding-left: 18px;
     padding-right: 14px;
+  }
+
+  main section.announcement {
+    padding-top: 25px;
+    padding-bottom: 16px;
   }
 
   footer {

@@ -80,7 +80,7 @@
     </aside>
 
     <main class="wrapper">
-      <section class="general status-{{ states.status | escape }}-background-before">
+      <section class="general status-{{ states.status | escape }}-background-before{% if announcements | length > 0 %} announcement-preceding{% endif %}">
         <div class="general-icon">
           <div class="badge badge-large badge-status-{{ states.status | escape }}"></div>
         </div>
@@ -111,6 +111,27 @@
           </p>
         </div>
       </section>
+
+      {% if announcements | length > 0 %}
+        <section class="announcement alert-announce-background-before">
+          <div class="announcement-label">
+            <span class="announcement-badge alert-announce-background font-sans-semibold">Announcement</span>
+          </div>
+
+          <div class="announcement-inner">
+            {% for announcement in announcements %}
+              <div class="announcement-unit">
+                <h4 class="font-sans-semibold">{{ announcement.title | escape }}</h4>
+                <p class="font-sans-regular">{{ announcement.text | escape | linebreaksbr }}</p>
+
+                {% if announcement.date %}
+                  <time class="font-sans-regular">Published on {{ announcement.date | escape }}</time>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        </section>
+      {% endif %}
 
       {% for _, probe in states.probes %}
         <section class="probe">

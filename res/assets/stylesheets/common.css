@@ -156,7 +156,7 @@ a:hover {
 }
 
 .has-tooltip .tooltip .tooltip-value .tooltip-value-text .tooltip-main {
-  color: #ffffff;
+  color: #FFFFFF;
 }
 
 .has-tooltip .tooltip .tooltip-value .tooltip-value-text .tooltip-label {
@@ -266,6 +266,11 @@ a:hover {
 
 .status-dead-border-subtle {
   border-color: rgba(225, 0, 0, 0.10);
+}
+
+.alert-announce-background,
+.alert-announce-background-before:before {
+  background-color: #1972F5;
 }
 
 @media screen and (max-width: 1020px) {

@@ -8,6 +8,7 @@ use time;
 
 use url_serde::SerdeUrl;
 
+use super::announcements::Announcement;
 use crate::prober::states::ServiceStates;
 use crate::APP_CONF;
 
@@ -74,6 +75,7 @@ impl Default for IndexContextEnvironment {
 #[derive(Serialize)]
 pub struct IndexContext<'a, 'b> {
     pub states: &'a ServiceStates,
+    pub announcements: &'a Vec<Announcement>,
     pub environment: &'a IndexContextEnvironment,
     pub config: &'b IndexContextConfig,
 }

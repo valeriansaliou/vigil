@@ -8,6 +8,7 @@ use actix_files::NamedFile;
 use actix_web::{get, web, web::Data, web::Json, HttpResponse};
 use tera::Tera;
 
+use super::announcements::STORE as ANNOUNCEMENTS_STORE;
 use super::context::{IndexContext, INDEX_CONFIG, INDEX_ENVIRONMENT};
 use super::payload::ReporterPayload;
 use crate::prober::manager::{run_dispatch_plugins, STORE as PROBER_STORE};
@@ -23,6 +24,7 @@ async fn index(tera: Data<Tera>) -> HttpResponse {
     let context = {
         IndexContext {
             states: &PROBER_STORE.read().unwrap().states,
+            announcements: &ANNOUNCEMENTS_STORE.read().unwrap().announcements,
             environment: &*INDEX_ENVIRONMENT,
             config: &*INDEX_CONFIG,
         }
