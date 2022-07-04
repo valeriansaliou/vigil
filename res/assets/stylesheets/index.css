@@ -243,8 +243,8 @@ main section.announcement .announcement-inner time {
 main section.announcement .announcement-badge {
   color: #FFFFFF;
   font-size: 12.5px;
-  line-height: 30px;
-  padding: 0 14px;
+  line-height: 29px;
+  padding: 0 14px 1px;
   display: inline-block;
   border-radius: 2px;
 }
