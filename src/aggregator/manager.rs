@@ -253,20 +253,35 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
                         //   then the value is 1 at any time, thus not impacting the interval.
                         let reminder_backoff_counter =
                             store.states.notifier.reminder_backoff_counter;
+                        let reminder_ignore_until = store.states.notifier.reminder_ignore_until;
                         let reminder_interval_backoff = Duration::from_secs(
                             reminder_interval
                                 * (reminder_backoff_counter as u64)
                                     .pow(notify.reminder_backoff_function as u32),
                         );
 
+                        // Check if reminders should be ignored for now?
+                        let mut should_ignore_reminders = false;
+
+                        if let Some(reminder_ignore_until) = reminder_ignore_until {
+                            should_ignore_reminders = SystemTime::now() < reminder_ignore_until;
+                        }
+
                         debug!(
-                            "checking if should re-notify about unchanged status ({}s / {}↑)",
+                            "checking if should re-notify about unchanged status ({}s / {}↑ / {})",
                             reminder_interval_backoff.as_secs(),
-                            reminder_backoff_counter
+                            reminder_backoff_counter,
+                            if should_ignore_reminders == false {
+                                "✓"
+                            } else {
+                                "✖"
+                            }
                         );
 
                         // Duration since last notified exceeds reminder interval? Should re-notify
-                        if duration_since_notified >= reminder_interval_backoff {
+                        if duration_since_notified >= reminder_interval_backoff
+                            && should_ignore_reminders == false
+                        {
                             info!("should re-notify about unchanged status");
 
                             should_notify = true;
