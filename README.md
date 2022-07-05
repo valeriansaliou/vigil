@@ -541,6 +541,51 @@ Where:
 
 * Add an `Authorization` header with a `Basic` authentication where the password is your configured `manager_token`.
 
+#### 4️⃣ List prober alerts
+
+**Endpoint URL:**
+
+`HTTP GET https://status.example.com/manager/prober/alerts/`
+
+**Request headers:**
+
+* Add an `Authorization` header with a `Basic` authentication where the password is your configured `manager_token`.
+
+#### 5️⃣ Resolve ignore rules for prober alerts
+
+**Endpoint URL:**
+
+`HTTP GET https://status.example.com/manager/prober/alerts/ignored/`
+
+**Request headers:**
+
+* Add an `Authorization` header with a `Basic` authentication where the password is your configured `manager_token`.
+
+#### 6️⃣ Update ignore rules for prober alerts
+
+**Endpoint URL:**
+
+`HTTP PUT https://status.example.com/manager/prober/alerts/ignored/`
+
+**Request headers:**
+
+* Add an `Authorization` header with a `Basic` authentication where the password is your configured `manager_token`.
+* Set the `Content-Type` to `application/json; charset=utf-8`, and ensure you submit the request data as UTF-8.
+
+**Request data:**
+
+Adjust the request data to your announcement and send it as `HTTP PUT`:
+
+```json
+{
+  "reminders_seconds": 600
+}
+```
+
+Where:
+
+* `reminders_seconds`: The number of seconds during which downtime reminders should not be sent anymore (skipped)
+
 ## How can I monitor services on a different LAN using Vigil Local?
 
 Vigil Local is an (optional) slave daemon that you can use to report internal service health to your Vigil-powered status page master server. It is designed to be used behind a firewall, and to monitor hosts bound to a local loop or LAN network, that are not available to your main Vigil status page.
