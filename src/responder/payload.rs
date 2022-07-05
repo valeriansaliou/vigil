@@ -36,3 +36,23 @@ pub struct ManagerAnnouncementsResponsePayload {
 pub struct ManagerAnnouncementInsertResponsePayload {
     pub id: String,
 }
+
+#[derive(Serialize, Default)]
+pub struct ManagerProberAlertsResponsePayload {
+    pub dead: Vec<ManagerProberAlertsResponsePayloadEntry>,
+    pub sick: Vec<ManagerProberAlertsResponsePayloadEntry>,
+}
+
+#[derive(Serialize)]
+pub struct ManagerProberAlertsResponsePayloadEntry {
+    pub probe: String,
+    pub node: String,
+    pub replica: String,
+}
+
+#[derive(Serialize)]
+pub struct ManagerProberAlertsIgnoredListResponsePayload {
+    pub probe: String,
+    pub node: String,
+    pub replica: String,
+}

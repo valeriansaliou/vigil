@@ -17,13 +17,15 @@ use super::announcements::{
 use super::context::{IndexContext, INDEX_CONFIG, INDEX_ENVIRONMENT};
 use super::payload::{
     ManagerAnnouncementInsertRequestPayload, ManagerAnnouncementInsertResponsePayload,
-    ManagerAnnouncementsResponsePayload, ReporterRequestPayload,
+    ManagerAnnouncementsResponsePayload, ManagerProberAlertsResponsePayload,
+    ManagerProberAlertsResponsePayloadEntry, ReporterRequestPayload,
 };
 use crate::prober::manager::{run_dispatch_plugins, STORE as PROBER_STORE};
 use crate::prober::report::{
     handle_flush as handle_flush_report, handle_health as handle_health_report,
     handle_load as handle_load_report, HandleFlushError, HandleHealthError, HandleLoadError,
 };
+use crate::prober::status::Status;
 use crate::APP_CONF;
 
 #[get("/")]
@@ -225,4 +227,52 @@ pub async fn manager_announcement_retract(
     } else {
         HttpResponse::NotFound().finish()
     }
+}
+
+// Notice: manager prober alerts route is managed in manager due to authentication needs
+pub async fn manager_prober_alerts() -> HttpResponse {
+    let mut alerts = ManagerProberAlertsResponsePayload::default();
+
+    // Classify probes with a non-healthy status
+    let probes = &PROBER_STORE.read().unwrap().states.probes;
+
+    for (probe_id, probe) in probes.iter() {
+        for (node_id, node) in probe.nodes.iter() {
+            for (replica_id, replica) in node.replicas.iter() {
+                // Replica is either sick or dead, append to alerts
+                if replica.status == Status::Sick || replica.status == Status::Dead {
+                    let alert_entry = ManagerProberAlertsResponsePayloadEntry {
+                        probe: probe_id.to_owned(),
+                        node: node_id.to_owned(),
+                        replica: replica_id.to_owned(),
+                    };
+
+                    match replica.status {
+                        Status::Sick => alerts.sick.push(alert_entry),
+                        Status::Dead => alerts.dead.push(alert_entry),
+                        _ => {}
+                    }
+                }
+            }
+        }
+    }
+
+    HttpResponse::Ok().json(alerts)
+}
+
+// Notice: manager prober alerts ignored list route is managed in manager due to authentication \
+//   needs
+pub async fn manager_prober_alerts_ignored_list() -> HttpResponse {
+    // TODO: simply acquire the local list of ignored nodes, nothing more
+    HttpResponse::NotImplemented().finish()
+}
+
+// Notice: manager prober alerts ignored update route is managed in manager due to authentication \
+//   needs
+pub async fn manager_prober_alerts_ignored_update() -> HttpResponse {
+    // TODO: simply update the local list of ignored nodes, which gets reset once systems go back \
+    //   to HEALTHY status, nothing more
+    // TODO: check if a node or service ignored exists in storage before setting it, and that it \
+    //   really is still DEAD.
+    HttpResponse::NotImplemented().finish()
 }

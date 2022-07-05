@@ -89,6 +89,24 @@ pub fn run() {
                     .guard(guard::Delete())
                     .to(routes::manager_announcement_retract),
             )
+            .service(
+                web::resource("/manager/prober/alerts")
+                    .wrap(middleware_manager_auth.clone())
+                    .guard(guard::Get())
+                    .to(routes::manager_prober_alerts),
+            )
+            .service(
+                web::resource("/manager/prober/alerts/ignored")
+                    .wrap(middleware_manager_auth.clone())
+                    .guard(guard::Get())
+                    .to(routes::manager_prober_alerts_ignored_list),
+            )
+            .service(
+                web::resource("/manager/prober/alerts/ignored")
+                    .wrap(middleware_manager_auth.clone())
+                    .guard(guard::Put())
+                    .to(routes::manager_prober_alerts_ignored_update),
+            )
     })
     .workers(APP_CONF.server.workers)
     .bind(APP_CONF.server.inet)
