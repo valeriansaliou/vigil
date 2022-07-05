@@ -261,11 +261,12 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
                         );
 
                         // Check if reminders should be ignored for now?
-                        let mut should_ignore_reminders = false;
-
-                        if let Some(reminder_ignore_until) = reminder_ignore_until {
-                            should_ignore_reminders = SystemTime::now() < reminder_ignore_until;
-                        }
+                        let should_ignore_reminders =
+                            if let Some(reminder_ignore_until) = reminder_ignore_until {
+                                SystemTime::now() < reminder_ignore_until
+                            } else {
+                                false
+                            };
 
                         debug!(
                             "checking if should re-notify about unchanged status ({}s / {}↑ / {})",
