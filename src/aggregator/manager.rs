@@ -232,9 +232,10 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
     let mut should_notify = (store.states.status != Status::Dead && general_status == Status::Dead)
         || (store.states.status == Status::Dead && general_status != Status::Dead);
 
-    // Reset the backoff counter whenever we are not dead (yet, stored status changed)
+    // Reset the reminder states whenever we are not dead (yet, stored status changed)
     if has_changed == true && general_status != Status::Dead {
         store.states.notifier.reminder_backoff_counter = 1;
+        store.states.notifier.reminder_ignore_until = None;
     }
 
     // Check if should re-notify? (in case status did not change; only if dead)

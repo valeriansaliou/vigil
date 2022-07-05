@@ -99,7 +99,7 @@ pub fn run() {
                 web::resource("/manager/prober/alerts/ignored")
                     .wrap(middleware_manager_auth.clone())
                     .guard(guard::Get())
-                    .to(routes::manager_prober_alerts_ignored_list),
+                    .to(routes::manager_prober_alerts_ignored_resolve),
             )
             .service(
                 web::resource("/manager/prober/alerts/ignored")

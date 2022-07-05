@@ -44,6 +44,7 @@ lazy_static! {
             probes: IndexMap::new(),
             notifier: ServiceStatesNotifier {
                 reminder_backoff_counter: 1,
+                reminder_ignore_until: None
             }
         },
         notified: None,

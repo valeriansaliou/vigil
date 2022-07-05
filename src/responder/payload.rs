@@ -26,6 +26,11 @@ pub struct ManagerAnnouncementInsertRequestPayload {
     pub text: String,
 }
 
+#[derive(Deserialize)]
+pub struct ManagerProberAlertsIgnoredResolveRequestPayload {
+    pub reminders_seconds: Option<u16>,
+}
+
 #[derive(Serialize)]
 pub struct ManagerAnnouncementsResponsePayload {
     pub id: String,
@@ -51,8 +56,6 @@ pub struct ManagerProberAlertsResponsePayloadEntry {
 }
 
 #[derive(Serialize)]
-pub struct ManagerProberAlertsIgnoredListResponsePayload {
-    pub probe: String,
-    pub node: String,
-    pub replica: String,
+pub struct ManagerProberAlertsIgnoredResolveResponsePayload {
+    pub reminders_seconds: Option<u16>,
 }

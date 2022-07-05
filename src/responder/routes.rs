@@ -6,6 +6,7 @@
 
 use actix_files::NamedFile;
 use actix_web::{get, web, web::Data, web::Json, HttpResponse};
+use std::time::{Duration, SystemTime};
 use tera::Tera;
 use time;
 use uuid::Uuid;
@@ -17,7 +18,8 @@ use super::announcements::{
 use super::context::{IndexContext, INDEX_CONFIG, INDEX_ENVIRONMENT};
 use super::payload::{
     ManagerAnnouncementInsertRequestPayload, ManagerAnnouncementInsertResponsePayload,
-    ManagerAnnouncementsResponsePayload, ManagerProberAlertsResponsePayload,
+    ManagerAnnouncementsResponsePayload, ManagerProberAlertsIgnoredResolveRequestPayload,
+    ManagerProberAlertsIgnoredResolveResponsePayload, ManagerProberAlertsResponsePayload,
     ManagerProberAlertsResponsePayloadEntry, ReporterRequestPayload,
 };
 use crate::prober::manager::{run_dispatch_plugins, STORE as PROBER_STORE};
@@ -260,19 +262,36 @@ pub async fn manager_prober_alerts() -> HttpResponse {
     HttpResponse::Ok().json(alerts)
 }
 
-// Notice: manager prober alerts ignored list route is managed in manager due to authentication \
+// Notice: manager prober alerts ignored resolve route is managed in manager due to authentication \
 //   needs
-pub async fn manager_prober_alerts_ignored_list() -> HttpResponse {
-    // TODO: simply acquire the local list of ignored nodes, nothing more
-    HttpResponse::NotImplemented().finish()
+pub async fn manager_prober_alerts_ignored_resolve() -> HttpResponse {
+    let states = &PROBER_STORE.read().unwrap().states;
+
+    // Calculate remaining ignore reminders seconds (if any set or if time is still left)
+    let reminders_seconds = states
+        .notifier
+        .reminder_ignore_until
+        .and_then(|reminder_ignore_until| {
+            reminder_ignore_until.duration_since(SystemTime::now()).ok()
+        })
+        .map(|reminder_ignore_duration_since| reminder_ignore_duration_since.as_secs() as u16);
+
+    HttpResponse::Ok().json(ManagerProberAlertsIgnoredResolveResponsePayload {
+        reminders_seconds: reminders_seconds,
+    })
 }
 
 // Notice: manager prober alerts ignored update route is managed in manager due to authentication \
 //   needs
-pub async fn manager_prober_alerts_ignored_update() -> HttpResponse {
-    // TODO: simply update the local list of ignored nodes, which gets reset once systems go back \
-    //   to HEALTHY status, nothing more
-    // TODO: check if a node or service ignored exists in storage before setting it, and that it \
-    //   really is still DEAD.
-    HttpResponse::NotImplemented().finish()
+pub async fn manager_prober_alerts_ignored_update(
+    data: Json<ManagerProberAlertsIgnoredResolveRequestPayload>,
+) -> HttpResponse {
+    let mut store = PROBER_STORE.write().unwrap();
+
+    // Assign reminder ignore intil date (re-map from seconds to date time if set)
+    store.states.notifier.reminder_ignore_until = data
+        .reminders_seconds
+        .map(|reminders_seconds| SystemTime::now() + Duration::from_secs(reminders_seconds as _));
+
+    HttpResponse::Ok().finish()
 }
