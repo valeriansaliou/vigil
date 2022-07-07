@@ -16,6 +16,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Cache build artifacts
+        id: cache-cargo
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: test-${{ runner.os }}-cargo-${{ matrix.rust-toolchain }}
+
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
@@ -29,16 +39,6 @@ jobs:
 
       - name: Verify versions
         run: rustc --version && rustup --version && cargo --version
-
-      - name: Cache build artifacts
-        id: cache-cargo
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-${{ matrix.rust-toolchain }}
 
       - name: Build code (default features)
         run: cargo build

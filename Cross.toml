@@ -1,4 +1,0 @@
-[build.env]
-passthrough = [
-  "RUSTFLAGS"
-]

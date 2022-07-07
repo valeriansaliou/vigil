@@ -71,3 +71,4 @@ lto = true
 debug = false
 debug-assertions = false
 panic = "abort"
+strip = true

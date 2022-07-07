@@ -4,7 +4,7 @@
 #  Vigil
 #
 #  Microservices Status Page
-#  Copyright: 2020, Valerian Saliou <valerian@valeriansaliou.name>
+#  Copyright: 2022, Valerian Saliou <valerian@valeriansaliou.name>
 #  License: Mozilla Public License v2.0 (MPL v2.0)
 ##
 
@@ -34,43 +34,38 @@ if [ -z "$VIGIL_VERSION" ]; then
   exit 1
 fi
 
-# Define release pipeline
-function release_for_architecture {
+# Define sign pipeline
+function sign_for_architecture {
     final_tar="v$VIGIL_VERSION-$1.tar.gz"
+    gpg_signer="valerian@valeriansaliou.name"
 
-    rm -rf ./vigil/ && \
-        cross build --target "$2" --release && \
-        mkdir ./vigil && \
-        cp -p "target/$2/release/vigil" ./vigil/ && \
-        cp -r ./config.cfg ./res vigil/ && \
-        tar -czvf "$final_tar" ./vigil && \
-        rm -r ./vigil/
-    release_result=$?
+    gpg -u "$gpg_signer" --armor --detach-sign "$final_tar"
+    sign_result=$?
 
-    if [ $release_result -eq 0 ]; then
-        echo "Result: Packed architecture: $1 to file: $final_tar"
+    if [ $sign_result -eq 0 ]; then
+        echo "Result: Signed architecture: $1 for file: $final_tar"
     fi
 
-    return $release_result
+    return $sign_result
 }
 
-# Run release tasks
+# Run sign tasks
 ABSPATH=$(cd "$(dirname "$0")"; pwd)
 BASE_DIR="$ABSPATH/../"
 
 rc=0
 
 pushd "$BASE_DIR" > /dev/null
-    echo "Executing release steps for Vigil v$VIGIL_VERSION..."
+    echo "Executing sign steps for Vigil v$VIGIL_VERSION..."
 
-    release_for_architecture "x86_64" "x86_64-unknown-linux-musl" && \
-        release_for_architecture "armv7" "armv7-unknown-linux-musleabihf"
+    sign_for_architecture "x86_64" && \
+        sign_for_architecture "armv7"
     rc=$?
 
     if [ $rc -eq 0 ]; then
-        echo "Success: Done executing release steps for Vigil v$VIGIL_VERSION"
+        echo "Success: Done executing sign steps for Vigil v$VIGIL_VERSION"
     else
-        echo "Error: Failed executing release steps for Vigil v$VIGIL_VERSION"
+        echo "Error: Failed executing sign steps for Vigil v$VIGIL_VERSION"
     fi
 popd > /dev/null
 
