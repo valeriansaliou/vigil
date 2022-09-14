@@ -29,6 +29,7 @@ _Tested at Rust version: `rustc 1.62.0 (a8314ef7d 2022-06-27)`_
 <td align="center"><a href="https://www.redsmin.com/"><img src="https://valeriansaliou.github.io/vigil/images/redsmin-icon.png" width="64" /></a></td>
 <td align="center"><a href="https://www.image-charts.com/"><img src="https://valeriansaliou.github.io/vigil/images/imagecharts-icon.png" width="64" /></a></td>
 <td align="center"><a href="https://pikomit.com/"><img src="https://valeriansaliou.github.io/vigil/images/pikomit-icon.jpg" width="64" /></a></td>
+<td align="center"><a href="https://notice.studio/"><img src="https://valeriansaliou.github.io/vigil/images/notice-icon.png" width="64" /></a></td>
 </tr>
 <tr>
 <td align="center">Crisp</td>
@@ -37,6 +38,7 @@ _Tested at Rust version: `rustc 1.62.0 (a8314ef7d 2022-06-27)`_
 <td align="center">Redsmin</td>
 <td align="center">Image-Charts</td>
 <td align="center">Pikomit</td>
+<td align="center">Notice</td>
 </tr>
 </table>
 
