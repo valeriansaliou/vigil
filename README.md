@@ -24,7 +24,7 @@ _Tested at Rust version: `rustc 1.62.0 (a8314ef7d 2022-06-27)`_
 <table>
 <tr>
 <td align="center"><a href="https://crisp.chat/"><img src="https://valeriansaliou.github.io/vigil/images/crisp-icon.png" width="64" /></a></td>
-<td align="center"><a href="https://www.meilisearch.com/"><img src="https://raw.githubusercontent.com/meilisearch/meilisearch/main/assets/logo.svg" width="64" /></a></td>
+<td align="center"><a href="https://www.meilisearch.com/"><img src="https://valeriansaliou.github.io/vigil/images/meilisearch-icon.png" width="64" /></a></td>
 <td align="center"><a href="https://miragespace.com/"><img src="https://valeriansaliou.github.io/vigil/images/miragespace-icon.png" width="64" /></a></td>
 <td align="center"><a href="https://www.redsmin.com/"><img src="https://valeriansaliou.github.io/vigil/images/redsmin-icon.png" width="64" /></a></td>
 <td align="center"><a href="https://www.image-charts.com/"><img src="https://valeriansaliou.github.io/vigil/images/imagecharts-icon.png" width="64" /></a></td>
