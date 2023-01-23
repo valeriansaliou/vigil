@@ -114,14 +114,13 @@ fn make_app_args() -> AppArgs {
                 .short('c')
                 .long("config")
                 .help("Path to configuration file")
-                .default_value("./config.cfg")
-                .takes_value(true),
+                .default_value("./config.cfg"),
         )
         .get_matches();
 
     // Generate owned app arguments
     AppArgs {
-        config: String::from(matches.value_of("config").expect("invalid config value")),
+        config: matches.get_one::<String>("config").expect("invalid config value").to_owned(),
     }
 }
 
