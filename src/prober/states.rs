@@ -41,6 +41,7 @@ pub struct ServiceStatesProbeNode {
     pub http_method: Option<ConfigProbeServiceNodeHTTPMethod>,
     pub http_body: Option<String>,
     pub http_body_healthy_match: Option<Regex>,
+    pub reveal_replica_name: bool,
     pub rabbitmq: Option<ServiceStatesProbeNodeRabbitMQ>,
 }
 

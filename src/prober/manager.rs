@@ -873,6 +873,7 @@ pub fn initialize_store() {
                 http_method: node.http_method.to_owned(),
                 http_body: node.http_body.to_owned(),
                 http_body_healthy_match: node.http_body_healthy_match.to_owned(),
+                reveal_replica_name: node.reveal_replica_name,
                 rabbitmq: node.rabbitmq_queue.as_ref().map(|queue| {
                     ServiceStatesProbeNodeRabbitMQ {
                         queue: queue.to_owned(),

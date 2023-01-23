@@ -53,7 +53,7 @@ pub fn metrics_poll_delay_sick() -> u64 {
     5
 }
 
-pub fn poll_parallelism() -> u16 {
+pub fn metrics_poll_parallelism() -> u16 {
     4
 }
 
@@ -110,5 +110,9 @@ pub fn notify_slack_mention_channel() -> bool {
 }
 
 pub fn notify_generic_reminders_only() -> bool {
+    false
+}
+
+pub fn probe_service_node_reveal_replica_name() -> bool {
     false
 }

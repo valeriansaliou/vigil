@@ -149,7 +149,7 @@
                 <label class="font-sans-semibold status-{{ node.status | escape }}-background-subtle status-{{ node.status | escape }}-border-subtle">{{ node.label | escape }}</label>
 
                 <div class="node">
-                  {% for _, replica in node.replicas %}
+                  {% for replica_id, replica in node.replicas %}
                     <span class="replica status-{{ replica.status | escape }}-background has-tooltip font-sans-semibold">
                       {{ loop.index }}
 
@@ -178,6 +178,10 @@
                               {% endif %}
                             </span>
                           </span>
+
+                          {% if node.reveal_replica_name %}
+                            <span class="tooltip-value-details font-sans-light">{{ replica_id }}</span>
+                          {% endif %}
 
                           {% if replica.metrics.system or replica.metrics.latency or replica.metrics.latency == 0 or replica.metrics.rabbitmq %}
                             <span class="tooltip-value-details">

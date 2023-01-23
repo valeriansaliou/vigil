@@ -81,7 +81,7 @@ pub struct ConfigMetrics {
     #[serde(default = "defaults::metrics_poll_delay_sick")]
     pub poll_delay_sick: u64,
 
-    #[serde(default = "defaults::poll_parallelism")]
+    #[serde(default = "defaults::metrics_poll_parallelism")]
     pub poll_parallelism: u16,
 
     #[serde(default = "defaults::metrics_push_delay_dead")]
@@ -297,12 +297,18 @@ pub struct ConfigProbeServiceNode {
     pub mode: Mode,
     pub replicas: Option<Vec<String>>,
     pub scripts: Option<Vec<String>>,
+
     #[serde(default)]
     #[serde(with = "http_serde::header_map")]
     pub http_headers: http::HeaderMap,
+
     pub http_method: Option<ConfigProbeServiceNodeHTTPMethod>,
     pub http_body: Option<String>,
     pub http_body_healthy_match: Option<Regex>,
+
+    #[serde(default = "defaults::probe_service_node_reveal_replica_name")]
+    pub reveal_replica_name: bool,
+
     pub rabbitmq_queue: Option<String>,
     pub rabbitmq_queue_nack_healthy_below: Option<u32>,
     pub rabbitmq_queue_nack_dead_above: Option<u32>,
