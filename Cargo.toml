@@ -41,13 +41,12 @@ openssl-probe = "0.1"
 reqwest = { version = "0.11", features = ["native-tls-vendored", "gzip", "blocking", "json"], default-features = false }
 ping = "0.4"
 run_script = "0.10"
-lettre = { version = "0.9", features = ["smtp-transport"], optional = true }
-lettre_email = { version = "0.9", optional = true }
+lettre = { version = "0.10", features = ["smtp-transport", "builder"], optional = true }
 libstrophe = { version = "0.17", optional = true }
 
 [features]
 default = ["notifier-email", "notifier-twilio", "notifier-slack", "notifier-zulip", "notifier-telegram", "notifier-pushover", "notifier-gotify", "notifier-matrix", "notifier-webex", "notifier-webhook"]
-notifier-email = ["lettre", "lettre_email"]
+notifier-email = ["lettre"]
 notifier-twilio = []
 notifier-slack = []
 notifier-zulip = []
