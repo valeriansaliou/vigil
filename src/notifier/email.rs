@@ -124,7 +124,7 @@ fn acquire_transport(
     // Acquire TLS wrapper (may fail)
     let tls_wrapper = if let Ok(tls_parameters) = TlsParameters::new(smtp_host.into()) {
         if smtp_encrypt == true {
-            Ok(Tls::Wrapper(tls_parameters))
+            Ok(Tls::Required(tls_parameters))
         } else {
             Ok(Tls::Opportunistic(tls_parameters))
         }
