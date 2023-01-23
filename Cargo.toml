@@ -25,7 +25,6 @@ time = { version = "0.3", features = ["formatting"] }
 serde = "1.0"
 serde_derive = "1.0"
 toml = "0.5"
-base64 = "0.13"
 uuid = { version = "1.1", features = ["v4", "fast-rng"], default-features = false }
 regex = "1.6"
 url = { version = "2.2", default-features = false }
