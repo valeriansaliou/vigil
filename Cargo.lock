@@ -1217,7 +1217,6 @@ dependencies = [
  "email-encoding",
  "email_address",
  "fastrand",
- "futures-util",
  "hostname",
  "httpdate",
  "idna 0.2.3",
