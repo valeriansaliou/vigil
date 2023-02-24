@@ -295,6 +295,7 @@ Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/
 
 * `id` (type: _string_, allowed: any unique lowercase string, no default) — Unique identifier of the probed service node (not visible on the status page)
 * `label` (type: _string_, allowed: any string, no default) — Name of the probed service node (visible on the status page)
+* `sequence` (type: _uin16_, allowed: any number, no default) — Sort the fields based on that number
 * `mode` (type: _string_, allowed: `poll`, `push`, `script`, `local`, no default) — Probe mode for this node (ie. `poll` is direct HTTP, TCP or ICMP poll to the URLs set in `replicas`, while `push` is for Vigil Reporter nodes, `script` is used to execute a shell script and `local` is for Vigil Local nodes)
 * `replicas` (type: _array[string]_, allowed: TCP, ICMP or HTTP URLs, default: empty) — Node replica URLs to be probed (only used if `mode` is `poll`)
 * `scripts` (type: _array[string]_, allowed: shell scripts as source code, default: empty) — Shell scripts to be executed on the system as a Vigil sub-process; they are handy to build custom probes (only used if `mode` is `script`)

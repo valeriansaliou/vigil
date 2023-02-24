@@ -937,7 +937,14 @@ pub fn initialize_store() {
                 }
             }
 
-            probe.nodes.insert(node.id.to_owned(), probe_node);
+            match node.sequence {
+                None => {
+                    probe.nodes.insert(format!("z{}", node.id.to_owned()), probe_node);
+                }
+                Some(v) => {
+                    probe.nodes.insert(format!("{}{}", v, node.id.to_owned()), probe_node);
+                }
+            }
         }
 
         store.states.probes.insert(service.id.to_owned(), probe);

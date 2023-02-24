@@ -295,6 +295,7 @@ pub struct ConfigProbeServiceNode {
     pub id: String,
     pub label: String,
     pub mode: Mode,
+    pub sequence: Option<u16>,
     pub replicas: Option<Vec<String>>,
     pub scripts: Option<Vec<String>>,
 
