@@ -939,10 +939,14 @@ pub fn initialize_store() {
 
             match node.sequence {
                 None => {
-                    probe.nodes.insert(format!("z{}", node.id.to_owned()), probe_node);
+                    probe
+                        .nodes
+                        .insert(format!("z{}", node.id.to_owned()), probe_node);
                 }
                 Some(v) => {
-                    probe.nodes.insert(format!("{}{}", v, node.id.to_owned()), probe_node);
+                    probe
+                        .nodes
+                        .insert(format!("{}{}", v, node.id.to_owned()), probe_node);
                 }
             }
         }
