@@ -30,7 +30,7 @@ _Tested at Rust version: `rustc 1.66.1 (90743e729 2023-01-10)`_
 <td align="center"><a href="https://www.image-charts.com/"><img src="https://valeriansaliou.github.io/vigil/images/imagecharts-icon.png" width="64" /></a></td>
 <td align="center"><a href="https://pikomit.com/"><img src="https://valeriansaliou.github.io/vigil/images/pikomit-icon.jpg" width="64" /></a></td>
 <td align="center"><a href="https://notice.studio/"><img src="https://valeriansaliou.github.io/vigil/images/notice-icon.png" width="64" /></a></td>
-<td align="center"><a href="https://status.bareconnect.com/"><img src="https://valeriansaliou.github.io/vigil/images/bareconnect-icon.png" width="64" /></a></td>
+<td align="center"><a href="https://bareconnect.com/"><img src="https://valeriansaliou.github.io/vigil/images/bareconnect-icon.png" width="64" /></a></td>
 </tr>
 <tr>
 <td align="center">Crisp</td>
