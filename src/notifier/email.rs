@@ -23,7 +23,7 @@ impl GenericNotifier for EmailNotifier {
     fn attempt(notify: &ConfigNotify, notification: &Notification) -> Result<(), bool> {
         let email_config = match &notify.email {
             Some(cfg) => cfg,
-            None => return Ok(()),
+            None => return Err(false),
         };
 
         let nodes_label = notification.replicas.join(", ");
