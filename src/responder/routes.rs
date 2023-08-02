@@ -63,7 +63,7 @@ async fn status_text() -> &'static str {
 }
 
 #[get("/badge/{kind}")]
-async fn badge(web::Path(kind): web::Path<String>) -> Option<NamedFile> {
+async fn badge(kind: web::Path<String>) -> Option<NamedFile> {
     // Notice acquire lock in a block to release it ASAP (ie. before OS access to file)
     let status = { &PROBER_STORE.read().unwrap().states.status.as_str() };
 
@@ -90,32 +90,39 @@ async fn badge(web::Path(kind): web::Path<String>) -> Option<NamedFile> {
 }
 
 #[get("/assets/fonts/{folder}/{file}")]
-async fn assets_fonts(web::Path((folder, file)): web::Path<(String, String)>) -> Option<NamedFile> {
-    NamedFile::open(APP_CONF.assets.path.join("fonts").join(folder).join(file)).ok()
+async fn assets_fonts(path: web::Path<(String, String)>) -> Option<NamedFile> {
+    let info = path.into_inner();
+    NamedFile::open(APP_CONF.assets.path.join("fonts").join(info.0).join(info.1)).ok()
 }
 
 #[get("/assets/images/{folder}/{file}")]
 async fn assets_images(
-    web::Path((folder, file)): web::Path<(String, String)>,
+    path: web::Path<(String, String)>,
 ) -> Option<NamedFile> {
-    NamedFile::open(APP_CONF.assets.path.join("images").join(folder).join(file)).ok()
+    let info = path.into_inner();
+    NamedFile::open(APP_CONF.assets.path.join("images").join(info.0).join(info.1)).ok()
 }
 
 #[get("/assets/stylesheets/{file}")]
-async fn assets_stylesheets(web::Path(file): web::Path<String>) -> Option<NamedFile> {
-    NamedFile::open(APP_CONF.assets.path.join("stylesheets").join(file)).ok()
+async fn assets_stylesheets(file: web::Path<String>) -> Option<NamedFile> {
+    NamedFile::open(APP_CONF.assets.path.join("stylesheets").join(file.into_inner())).ok()
 }
 
 #[get("/assets/javascripts/{file}")]
-async fn assets_javascripts(web::Path(file): web::Path<String>) -> Option<NamedFile> {
+async fn assets_javascripts(file: web::Path<String>) -> Option<NamedFile> {
+    let file = file.into_inner();
     NamedFile::open(APP_CONF.assets.path.join("javascripts").join(file)).ok()
 }
 
 // Notice: reporter report route is managed in manager due to authentication needs
 pub async fn reporter_report(
-    web::Path((probe_id, node_id)): web::Path<(String, String)>,
+    path: web::Path<(String, String)>,
     data: Json<ReporterRequestPayload>,
 ) -> HttpResponse {
+    let info = path.into_inner();
+    let probe_id = info.0;
+    let node_id: String = info.1;
+    debug!("reporter report: {}:{}", probe_id, node_id);
     // Route report to handler (depending on its contents)
     if let Some(ref load) = data.load {
         // Load reports should come for 'push' nodes only
@@ -152,10 +159,12 @@ pub async fn reporter_report(
 
 // Notice: reporter flush route is managed in manager due to authentication needs
 pub async fn reporter_flush(
-    web::Path((probe_id, node_id, replica_id)): web::Path<(String, String, String)>,
+    path: web::Path<(String, String, String)>,
 ) -> HttpResponse {
+    let info = path.into_inner();
+    debug!("reporter flush: {}:{}:{}", info.0, info.1, info.2);
     // Flush reports should come for 'push' and 'local' nodes only
-    match handle_flush_report(&probe_id, &node_id, &replica_id) {
+    match handle_flush_report(&info.0, &info.1, &info.2) {
         Ok(()) => HttpResponse::Ok().finish(),
         Err(HandleFlushError::WrongMode) => HttpResponse::PreconditionFailed().finish(),
         Err(HandleFlushError::NotFound) => HttpResponse::NotFound().finish(),
@@ -211,8 +220,9 @@ pub async fn manager_announcement_insert(
 
 // Notice: manager announcement retract route is managed in manager due to authentication needs
 pub async fn manager_announcement_retract(
-    web::Path(announcement_id): web::Path<String>,
+    announcement_id: web::Path<String>,
 ) -> HttpResponse {
+    let announcement_id = announcement_id.into_inner();
     let mut store = ANNOUNCEMENTS_STORE.write().unwrap();
 
     // Find announcement index (if it exists)

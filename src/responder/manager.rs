@@ -7,7 +7,7 @@
 use actix_web::{
     dev::ServiceRequest,
     guard,
-    middleware::{self, normalize::TrailingSlash},
+    middleware::{self},
     rt, web, App, Error as ActixError, HttpServer,
 };
 use actix_web_httpauth::{
@@ -23,7 +23,7 @@ use super::routes;
 use crate::APP_CONF;
 
 pub fn run() {
-    let mut runtime = rt::System::new("responder");
+    let runtime = rt::System::new();
 
     // Prepare templating engine
     let templates: String = APP_CONF
@@ -48,8 +48,8 @@ pub fn run() {
     // Start the HTTP server
     let server = HttpServer::new(move || {
         App::new()
-            .data(tera.clone())
-            .wrap(middleware::NormalizePath::new(TrailingSlash::Trim))
+            .app_data(web::Data::new(tera.clone()))
+            .wrap(middleware::NormalizePath::default())
             .service(routes::assets_javascripts)
             .service(routes::assets_stylesheets)
             .service(routes::assets_images)
@@ -58,7 +58,7 @@ pub fn run() {
             .service(routes::status_text)
             .service(routes::robots)
             .service(routes::index)
-            .data(ConfigAuth::default().realm("Reporter Token"))
+            .app_data(ConfigAuth::default().realm("Reporter Token"))
             .service(
                 web::resource("/reporter/{probe_id}/{node_id}")
                     .wrap(middleware_reporter_auth.clone())
@@ -120,7 +120,7 @@ fn authenticate(
     request: ServiceRequest,
     credentials: BasicAuth,
     token: &str,
-) -> Result<ServiceRequest, ActixError> {
+) -> Result<ServiceRequest, (ActixError, ServiceRequest)> {
     let password = if let Some(password) = credentials.password() {
         &*password
     } else {
@@ -139,20 +139,20 @@ fn authenticate(
 
         *error.status_code_mut() = actix_web::http::StatusCode::FORBIDDEN;
 
-        Err(error.into())
+        Err((error.into(), request))
     }
 }
 
 async fn authenticate_reporter(
     request: ServiceRequest,
     credentials: BasicAuth,
-) -> Result<ServiceRequest, ActixError> {
+) -> Result<ServiceRequest, (ActixError, ServiceRequest)> {
     authenticate(request, credentials, &APP_CONF.server.reporter_token)
 }
 
 async fn authenticate_manager(
     request: ServiceRequest,
     credentials: BasicAuth,
-) -> Result<ServiceRequest, ActixError> {
+) -> Result<ServiceRequest, (ActixError, ServiceRequest)> {
     authenticate(request, credentials, &APP_CONF.server.manager_token)
 }
