@@ -145,6 +145,8 @@ Vigil will be reachable from `http://localhost:8080`.
 
 Use the sample [config.cfg](https://github.com/valeriansaliou/vigil/blob/master/config.cfg) configuration file and adjust it to your own environment.
 
+Note: you can use environment variables with string interpolation in your configuration file. For example: `manager_token: ${VIGIL_MANAGER_TOKEN}`.
+
 **Available configuration options are commented below, with allowed values:**
 
 **[server]**
