@@ -4,9 +4,8 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
-use std::collections::hash_set::HashSet;
-use std::fs::File;
-use std::io::Read;
+use std::{collections::{hash_set::HashSet, HashMap}, fs, env};
+use envsubst::substitute;
 
 use toml;
 
@@ -19,13 +18,12 @@ impl ConfigReader {
     pub fn make() -> Config {
         debug!("reading config file: {}", &APP_ARGS.config);
 
-        let mut file = File::open(&APP_ARGS.config).expect("cannot find config file");
-        let mut conf = String::new();
+        let conf = fs::read_to_string(&APP_ARGS.config)
+        .expect("cannot find config file");
 
-        file.read_to_string(&mut conf)
-            .expect("cannot read config file");
-
-        debug!("read config file: {}", &APP_ARGS.config);
+        // Replace Env
+        let env_vars = env::vars().collect::<HashMap<String, String>>();
+        let conf = substitute(&conf, &env_vars).expect("cannot substitute environment variables");
 
         // Parse configuration
         let config = toml::from_str(&conf).expect("syntax error in config file");
