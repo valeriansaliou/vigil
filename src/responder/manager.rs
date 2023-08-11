@@ -5,7 +5,10 @@
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
 use actix_web::{
-    dev::ServiceRequest, guard, middleware, rt, web, App, Error as ActixError, HttpServer,
+    dev::ServiceRequest,
+    guard,
+    middleware::{self, TrailingSlash},
+    rt, web, App, Error as ActixError, HttpServer,
 };
 use actix_web_httpauth::{
     extractors::{
@@ -46,7 +49,7 @@ pub fn run() {
     let server = HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(tera.clone()))
-            .wrap(middleware::NormalizePath::default())
+            .wrap(middleware::NormalizePath::new(TrailingSlash::Trim))
             .service(routes::assets_javascripts)
             .service(routes::assets_stylesheets)
             .service(routes::assets_images)
