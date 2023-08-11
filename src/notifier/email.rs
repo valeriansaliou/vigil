@@ -16,97 +16,98 @@ use super::generic::{GenericNotifier, Notification, DISPATCH_TIMEOUT_SECONDS};
 use crate::config::config::ConfigNotify;
 use crate::APP_CONF;
 
-#[derive(Default)]
 pub struct EmailNotifier;
 
 impl GenericNotifier for EmailNotifier {
     fn attempt(notify: &ConfigNotify, notification: &Notification) -> Result<(), bool> {
-        let email_config = match &notify.email {
-            Some(cfg) => cfg,
-            None => return Err(false),
-        };
+        if let Some(ref email_config) = notify.email {
+            let nodes_label = notification.replicas.join(", ");
 
-        let nodes_label = notification.replicas.join(", ");
+            // Build up the message text
+            let mut message = String::new();
 
-        // Build up the message text
-        let mut message = String::new();
+            if notification.startup == true {
+                message.push_str(&format!(
+                    "Status startup alert from: {}\n",
+                    APP_CONF.branding.page_title
+                ));
+            } else if notification.changed == true {
+                message.push_str(&format!(
+                    "Status change report from: {}\n",
+                    APP_CONF.branding.page_title
+                ));
+            } else {
+                message.push_str(&format!(
+                    "Status unchanged reminder from: {}\n",
+                    APP_CONF.branding.page_title
+                ));
+            }
 
-        if notification.startup == true {
-            message.push_str(&format!(
-                "Status startup alert from: {}\n",
-                APP_CONF.branding.page_title
-            ));
-        } else if notification.changed == true {
-            message.push_str(&format!(
-                "Status change report from: {}\n",
-                APP_CONF.branding.page_title
-            ));
-        } else {
-            message.push_str(&format!(
-                "Status unchanged reminder from: {}\n",
-                APP_CONF.branding.page_title
-            ));
-        }
+            message.push_str("\n--\n");
+            message.push_str(&format!("Status: {:?}\n", notification.status));
+            message.push_str(&format!("Nodes: {}\n", &nodes_label));
+            message.push_str(&format!("Time: {}\n", &notification.time));
+            message.push_str(&format!("URL: {}", APP_CONF.branding.page_url.as_str()));
 
-        message.push_str("\n--\n");
-        message.push_str(&format!("Status: {:?}\n", notification.status));
-        message.push_str(&format!("Nodes: {}\n", &nodes_label));
-        message.push_str(&format!("Time: {}\n", &notification.time));
-        message.push_str(&format!("URL: {}", APP_CONF.branding.page_url.as_str()));
+            message.push_str("\n--\n");
+            message.push_str("\n");
+            message.push_str("To unsubscribe, please edit your status page configuration.");
 
-        message.push_str("\n--\n");
-        message.push_str("\n");
-        message.push_str("To unsubscribe, please edit your status page configuration.");
+            debug!("will send email notification with message: {}", &message);
 
-        debug!("will send email notification with message: {}", &message);
+            // Build up the email
+            let email_message = Message::builder()
+                .to(Mailbox::new(
+                    None,
+                    email_config.to.parse::<Address>().or(Err(true))?,
+                ))
+                .from(Mailbox::new(
+                    Some(APP_CONF.branding.page_title.to_owned()),
+                    email_config.from.parse::<Address>().or(Err(true))?,
+                ))
+                .subject(format!(
+                    "{} | {}",
+                    notification.status.as_str().to_uppercase(),
+                    &nodes_label
+                ))
+                .body(message)
+                .or(Err(true))?;
 
-        // Build up the email
-        let email_message = Message::builder()
-            .to(Mailbox::new(
-                None,
-                email_config.to.parse::<Address>().or(Err(true))?,
-            ))
-            .from(Mailbox::new(
-                Some(APP_CONF.branding.page_title.to_owned()),
-                email_config.from.parse::<Address>().or(Err(true))?,
-            ))
-            .subject(format!(
-                "{} | {}",
-                notification.status.as_str().to_uppercase(),
-                &nodes_label
-            ))
-            .body(message)
-            .or(Err(true))?;
+            // Create the transport if not present
+            let transport = match acquire_transport(
+                &email_config.smtp_host,
+                email_config.smtp_port,
+                email_config.smtp_username.to_owned(),
+                email_config.smtp_password.to_owned(),
+                email_config.smtp_encrypt,
+            ) {
+                Ok(email_config) => email_config,
+                Err(err) => {
+                    error!("failed to build email transport: {err}");
 
-        // Create the transport if not present
-        let transport = match acquire_transport(
-            &email_config.smtp_host,
-            email_config.smtp_port,
-            email_config.smtp_username.to_owned(),
-            email_config.smtp_password.to_owned(),
-            email_config.smtp_encrypt,
-        ) {
-            Ok(t) => t,
-            Err(e) => {
-                error!("failed to build email transport: {e}");
+                    return Err(true);
+                }
+            };
+
+            // Deliver the message
+            if let Err(err) = transport.send(&email_message) {
+                error!("failed to send email: {err}");
+
                 return Err(true);
             }
-        };
 
-        // Deliver the message
-        if let Err(e) = transport.send(&email_message) {
-            error!("failed to send email: {e}");
-            return Err(true);
+            return Ok(());
         }
 
-        Ok(())
+        Err(false)
     }
 
     fn can_notify(notify: &ConfigNotify, notification: &Notification) -> bool {
-        notify
-            .email
-            .as_ref()
-            .map_or(false, |cfg| notification.expected(cfg.reminders_only))
+        if let Some(ref email_config) = notify.email {
+            notification.expected(email_config.reminders_only)
+        } else {
+            false
+        }
     }
 
     fn name() -> &'static str {
@@ -135,8 +136,8 @@ fn acquire_transport(
 
     // Acquire TLS wrapper (may fail)
     let tls_wrapper = match TlsParameters::new(smtp_host.into()) {
-        Ok(p) if smtp_encrypt => Tls::Required(p),
-        Ok(p) => Tls::Opportunistic(p),
+        Ok(parameters) if smtp_encrypt => Tls::Required(parameters),
+        Ok(parameters) => Tls::Opportunistic(parameters),
         Err(e) => return Err(e),
     };
 
