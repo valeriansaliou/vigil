@@ -91,21 +91,34 @@ async fn badge(kind: web::Path<String>) -> Option<NamedFile> {
 
 #[get("/assets/fonts/{folder}/{file}")]
 async fn assets_fonts(path: web::Path<(String, String)>) -> Option<NamedFile> {
+    // Read path information
     let info = path.into_inner();
-    NamedFile::open(APP_CONF.assets.path.join("fonts").join(info.0).join(info.1)).ok()
+
+    let (folder, file) = (info.0, info.1);
+
+    NamedFile::open(APP_CONF.assets.path.join("fonts").join(folder).join(file)).ok()
 }
 
 #[get("/assets/images/{folder}/{file}")]
-async fn assets_images(
-    path: web::Path<(String, String)>,
-) -> Option<NamedFile> {
+async fn assets_images(path: web::Path<(String, String)>) -> Option<NamedFile> {
+    // Read path information
     let info = path.into_inner();
-    NamedFile::open(APP_CONF.assets.path.join("images").join(info.0).join(info.1)).ok()
+
+    let (folder, file) = (info.0, info.1);
+
+    NamedFile::open(APP_CONF.assets.path.join("images").join(folder).join(file)).ok()
 }
 
 #[get("/assets/stylesheets/{file}")]
 async fn assets_stylesheets(file: web::Path<String>) -> Option<NamedFile> {
-    NamedFile::open(APP_CONF.assets.path.join("stylesheets").join(file.into_inner())).ok()
+    NamedFile::open(
+        APP_CONF
+            .assets
+            .path
+            .join("stylesheets")
+            .join(file.into_inner()),
+    )
+    .ok()
 }
 
 #[get("/assets/javascripts/{file}")]
@@ -119,10 +132,13 @@ pub async fn reporter_report(
     path: web::Path<(String, String)>,
     data: Json<ReporterRequestPayload>,
 ) -> HttpResponse {
+    // Read path information
     let info = path.into_inner();
-    let probe_id = info.0;
-    let node_id: String = info.1;
+
+    let (probe_id, node_id) = (info.0, info.1);
+
     debug!("reporter report: {}:{}", probe_id, node_id);
+
     // Route report to handler (depending on its contents)
     if let Some(ref load) = data.load {
         // Load reports should come for 'push' nodes only
@@ -158,13 +174,16 @@ pub async fn reporter_report(
 }
 
 // Notice: reporter flush route is managed in manager due to authentication needs
-pub async fn reporter_flush(
-    path: web::Path<(String, String, String)>,
-) -> HttpResponse {
+pub async fn reporter_flush(path: web::Path<(String, String, String)>) -> HttpResponse {
+    // Read path information
     let info = path.into_inner();
-    debug!("reporter flush: {}:{}:{}", info.0, info.1, info.2);
+
+    let (probe_id, node_id, replica_id) = (info.0, info.1, info.2);
+
+    debug!("reporter flush: {}:{}:{}", probe_id, node_id, replica_id);
+
     // Flush reports should come for 'push' and 'local' nodes only
-    match handle_flush_report(&info.0, &info.1, &info.2) {
+    match handle_flush_report(&probe_id, &node_id, &replica_id) {
         Ok(()) => HttpResponse::Ok().finish(),
         Err(HandleFlushError::WrongMode) => HttpResponse::PreconditionFailed().finish(),
         Err(HandleFlushError::NotFound) => HttpResponse::NotFound().finish(),
@@ -219,9 +238,7 @@ pub async fn manager_announcement_insert(
 }
 
 // Notice: manager announcement retract route is managed in manager due to authentication needs
-pub async fn manager_announcement_retract(
-    announcement_id: web::Path<String>,
-) -> HttpResponse {
+pub async fn manager_announcement_retract(announcement_id: web::Path<String>) -> HttpResponse {
     let announcement_id = announcement_id.into_inner();
     let mut store = ANNOUNCEMENTS_STORE.write().unwrap();
 

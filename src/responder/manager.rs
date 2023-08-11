@@ -5,10 +5,7 @@
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
 use actix_web::{
-    dev::ServiceRequest,
-    guard,
-    middleware::{self},
-    rt, web, App, Error as ActixError, HttpServer,
+    dev::ServiceRequest, guard, middleware, rt, web, App, Error as ActixError, HttpServer,
 };
 use actix_web_httpauth::{
     extractors::{

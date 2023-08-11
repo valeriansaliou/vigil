@@ -25,6 +25,7 @@ time = { version = "0.3", features = ["formatting"] }
 serde = "1.0"
 serde_derive = "1.0"
 toml = "0.7"
+envsubst = "0.2"
 uuid = { version = "1.1", features = ["v4", "fast-rng"], default-features = false }
 regex = "1.6"
 url = { version = "2.2", default-features = false }
@@ -43,7 +44,6 @@ ping = "0.4"
 run_script = "0.10"
 lettre = { version = "0.10", features = ["smtp-transport", "native-tls", "hostname", "builder"], default-features = false, optional = true }
 libstrophe = { version = "0.17", optional = true }
-envsubst = "0.2"
 
 [features]
 default = ["notifier-email", "notifier-twilio", "notifier-slack", "notifier-zulip", "notifier-telegram", "notifier-pushover", "notifier-gotify", "notifier-matrix", "notifier-webex", "notifier-webhook"]
