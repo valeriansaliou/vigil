@@ -33,7 +33,7 @@ url_serde = { version = "0.2", default-features = false }
 http = "0.2"
 http-serde = "1.1"
 indexmap = { version = "1.9", features = ["serde-1"] }
-actix-web = { version = "4.3" }
+actix-web = "4.3"
 actix-files = "0.6"
 actix-web-httpauth = "0.8"
 tera = { version = "1.19", default-features = false }
