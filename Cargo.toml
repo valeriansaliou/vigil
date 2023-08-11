@@ -32,9 +32,9 @@ url_serde = { version = "0.2", default-features = false }
 http = "0.2"
 http-serde = "1.1"
 indexmap = { version = "1.9", features = ["serde-1"] }
-actix-web = { version = "4" }
-actix-files = "0.6.2"
-actix-web-httpauth = "0.8.0"
+actix-web = { version = "4.3" }
+actix-files = "0.6"
+actix-web-httpauth = "0.8"
 tera = { version = "1.19", default-features = false }
 native-tls = { version = "0.2", features = ["vendored"] }
 openssl-probe = "0.1"
@@ -42,8 +42,8 @@ reqwest = { version = "0.11", features = ["native-tls-vendored", "gzip", "blocki
 ping = "0.4"
 run_script = "0.10"
 lettre = { version = "0.10", features = ["smtp-transport", "native-tls", "hostname", "builder"], default-features = false, optional = true }
-libstrophe = { version = "0.19.3", optional = true }
-envsubst = "0.2.1"
+libstrophe = { version = "0.19", optional = true }
+envsubst = "0.2"
 
 [features]
 default = ["notifier-email", "notifier-twilio", "notifier-slack", "notifier-zulip", "notifier-telegram", "notifier-pushover", "notifier-gotify", "notifier-matrix", "notifier-webex", "notifier-webhook"]
