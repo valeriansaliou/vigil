@@ -65,11 +65,15 @@ impl GenericNotifier for EmailNotifier {
                     Some(APP_CONF.branding.page_title.to_owned()),
                     email_config.from.parse::<Address>().or(Err(true))?,
                 ))
-                .subject(format!(
-                    "{} | {}",
-                    notification.status.as_str().to_uppercase(),
-                    &nodes_label
-                ))
+                .subject(if nodes_label.is_empty() {
+                    notification.status.as_str().to_uppercase()
+                } else {
+                    format!(
+                        "{} | {}",
+                        notification.status.as_str().to_uppercase(),
+                        &nodes_label
+                    )
+                })
                 .body(message)
                 .or(Err(true))?;
 
