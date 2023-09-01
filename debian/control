@@ -1,0 +1,13 @@
+Source: vigil
+Section: net
+Priority: ext
+Maintainer: Valerian Saliou <valerian@valeriansaliou.name>
+Standards-Version: 3.9.4
+Build-Depends: wget, ca-certificates
+Homepage: https://github.com/valeriansaliou/vigil
+
+Package: vigil
+Architecture: any
+Depends: adduser
+Provides: vigil
+Description: Microservices Status Page. Monitors a distributed infrastructure and sends alerts.

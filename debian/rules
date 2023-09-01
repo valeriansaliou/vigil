@@ -1,0 +1,30 @@
+#!/usr/bin/make -f
+
+DISTRIBUTION = $(shell lsb_release -sr)
+VERSION = 1.26.0
+PACKAGEVERSION = $(VERSION)-0~$(DISTRIBUTION)0
+URL = https://github.com/valeriansaliou/vigil/releases/download/v$(VERSION)/
+
+%:
+		dh $@ --with systemd
+
+override_dh_auto_clean:
+override_dh_auto_test:
+override_dh_auto_build:
+override_dh_auto_install:
+		$(eval ENV_ARCH := $(shell dpkg --print-architecture))
+		$(eval ENV_ISA := $(shell if [ "$(ENV_ARCH)" = "amd64" ]; then echo "x86_64"; else echo "$(ENV_ARCH)"; fi))
+		$(eval ENV_TARBALL := v$(VERSION)-$(ENV_ISA).tar.gz)
+
+		echo "Architecture: $(ENV_ARCH)"
+		echo "Instruction Set: $(ENV_ISA)"
+		echo "Target: $(URL)$(ENV_TARBALL)"
+
+		wget -N --progress=dot:mega $(URL)$(ENV_TARBALL)
+		tar -xf $(ENV_TARBALL)
+		strip vigil/vigil
+		mv vigil/config.cfg vigil/vigil.cfg
+		sed -i 's/path = ".\/res\/assets\/"/path = "\/etc\/vigil\/assets\/"/g' vigil/vigil.cfg
+
+override_dh_gencontrol:
+		dh_gencontrol -- -v$(PACKAGEVERSION)
