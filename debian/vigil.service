@@ -10,6 +10,7 @@ ExecStartPre=/sbin/setcap 'cap_net_raw+ep' /bin/vigil
 ExecStart=/usr/bin/vigil -c /etc/vigil.cfg
 Restart=on-failure
 PermissionsStartOnly=true
+LimitNOFILE=infinity
 
 [Install]
 WantedBy=multi-user.target

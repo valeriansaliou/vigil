@@ -163,13 +163,13 @@ You might find it convenient to run Vigil via Docker. You can find the pre-built
 First, pull the `valeriansaliou/vigil` image:
 
 ```bash
-docker pull valeriansaliou/vigil:v1.26.1
+docker pull valeriansaliou/vigil:v1.26.2
 ```
 
 Then, seed it a configuration file and run it (replace `/path/to/your/vigil/config.cfg` with the path to your configuration file):
 
 ```bash
-docker run -p 8080:8080 -v /path/to/your/vigil/config.cfg:/etc/vigil.cfg valeriansaliou/vigil:v1.26.1
+docker run -p 8080:8080 -v /path/to/your/vigil/config.cfg:/etc/vigil.cfg valeriansaliou/vigil:v1.26.2
 ```
 
 In the configuration file, ensure that:
