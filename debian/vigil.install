@@ -1,3 +1,3 @@
 vigil/vigil usr/bin/
-vigil/vigil.cfg etc/
-res/assets/ etc/
+vigil/vigil.cfg etc/vigil/
+vigil/assets/ etc/vigil/

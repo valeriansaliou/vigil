@@ -24,6 +24,8 @@ override_dh_auto_install:
 		tar -xf $(ENV_TARBALL)
 		strip vigil/vigil
 		mv vigil/config.cfg vigil/vigil.cfg
+		mv vigil/res/assets/ vigil/assets/
+		rm -r vigil/res/
 		sed -i 's/path = ".\/res\/assets\/"/path = "\/etc\/vigil\/assets\/"/g' vigil/vigil.cfg
 
 override_dh_gencontrol:
