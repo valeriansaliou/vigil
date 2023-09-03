@@ -103,11 +103,11 @@ Vigil provides [pre-built packages](https://packagecloud.io/valeriansaliou/vigil
 First, add the Vigil APT repository (eg. for Debian `bookworm`):
 
 ```bash
-echo "deb https://packagecloud.io/valeriansaliou/vigil/debian/ bookworm main" > /etc/apt/sources.list.d/valeriansaliou_vigil.list
+echo "deb [signed-by=/usr/share/keyrings/valeriansaliou_vigil.gpg] https://packagecloud.io/valeriansaliou/vigil/debian/ bookworm main" > /etc/apt/sources.list.d/valeriansaliou_vigil.list
 ```
 
 ```bash
-curl --silent -L https://packagecloud.io/valeriansaliou/vigil/gpgkey | apt-key add -
+curl -fsSL https://packagecloud.io/valeriansaliou/vigil/gpgkey | gpg --dearmor -o /usr/share/keyrings/valeriansaliou_vigil.gpg
 ```
 
 ```bash
