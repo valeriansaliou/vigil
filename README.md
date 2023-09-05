@@ -123,7 +123,7 @@ apt-get install vigil
 Then, edit the pre-filled Vigil configuration file:
 
 ```bash
-nano /etc/vigil.cfg
+nano /etc/vigil/vigil.cfg
 ```
 
 Finally, restart Vigil:
