@@ -99,6 +99,12 @@ pub struct ConfigMetrics {
     #[serde(default = "defaults::script_parallelism")]
     pub script_parallelism: u16,
 
+    #[serde(default = "defaults::metrics_script_retry")]
+    pub script_retry: u16,
+
+    #[serde(default = "defaults::metrics_script_retry_delay")]
+    pub script_retry_delay: u64,
+
     #[serde(default = "defaults::metrics_local_delay_dead")]
     pub local_delay_dead: u64,
 }

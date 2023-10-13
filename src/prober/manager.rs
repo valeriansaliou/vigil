@@ -517,7 +517,30 @@ fn proceed_replica_probe_poll_http(
     (false, None)
 }
 
-fn proceed_replica_probe_script(script: &String) -> (Status, Option<Duration>) {
+fn proceed_replica_probe_script_with_retry(script: &String) -> (Status, Option<Duration>) {
+    let (mut status, mut latency, mut retry_count) = (Status::Dead, None, 0);
+
+    while retry_count <= APP_CONF.metrics.script_retry && status == Status::Dead {
+        debug!(
+            "will probe script replica: {:?} with retry count: {}",
+            script, retry_count
+        );
+
+        thread::sleep(Duration::from_millis(APP_CONF.metrics.script_retry_delay));
+
+        let probe_results = proceed_replica_probe_script(script);
+
+        status = probe_results.0;
+        latency = Some(probe_results.1);
+
+        // Increment retry count (for next attempt)
+        retry_count += 1;
+    }
+
+    (status, latency)
+}
+
+fn proceed_replica_probe_script(script: &String) -> (Status, Duration) {
     let start_time = SystemTime::now();
 
     let status = match run_script::run(script, &Vec::new(), &ScriptOptions::new()) {
@@ -541,7 +564,11 @@ fn proceed_replica_probe_script(script: &String) -> (Status, Option<Duration>) {
         }
     };
 
-    (status, SystemTime::now().duration_since(start_time).ok())
+    let probing_duration = SystemTime::now()
+        .duration_since(start_time)
+        .unwrap_or(Duration::from_secs(0));
+
+    (status, probing_duration)
 }
 
 fn proceed_rabbitmq_queue_probe(
@@ -663,7 +690,7 @@ fn dispatch_replica<'a>(probe_replica: &ProbeReplica) {
             node_id = &probe_replica_target.node_id;
             replica_id = &probe_replica_target.replica_id;
 
-            proceed_replica_probe_script(&probe_replica_script.script)
+            proceed_replica_probe_script_with_retry(&probe_replica_script.script)
         }
     };
 
