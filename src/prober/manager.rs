@@ -521,11 +521,25 @@ fn proceed_replica_probe_script(script: &String) -> (Status, Option<Duration>) {
     let start_time = SystemTime::now();
 
     let status = match run_script::run(script, &Vec::new(), &ScriptOptions::new()) {
-        Ok((code, _, _)) => {
-            debug!(
-                "prober script execution succeeded with return code: {}",
-                code
-            );
+        Ok((code, stdout, stderr)) => {
+            if stdout == "" {
+                debug!(
+                    "prober script execution succeeded with return code: {}",
+                    code
+                );
+            } else {
+                debug!(
+                    "prober script execution succeeded with return code: {} (output: {})",
+                    code, stdout
+                );
+            }
+
+            if stderr != "" {
+                info!(
+                    "prober script emitted error data: {}",
+                    stderr
+                );
+            }
 
             // Return code '0' goes for 'healthy', '1' goes for 'sick'; any other code is 'dead'
             match code {
