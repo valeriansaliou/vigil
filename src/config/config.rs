@@ -69,6 +69,9 @@ pub struct ConfigMetrics {
     #[serde(default = "defaults::metrics_poll_retry")]
     pub poll_retry: u64,
 
+    #[serde(default = "defaults::metrics_max_num_poll_retry")]
+    pub max_num_poll_retry: u64,
+
     #[serde(default = "defaults::metrics_poll_http_status_healthy_above")]
     pub poll_http_status_healthy_above: u16,
 
