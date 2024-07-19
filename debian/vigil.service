@@ -6,7 +6,57 @@ After=network.target
 Type=simple
 User=vigil
 Group=vigil
-ExecStartPre=/sbin/setcap 'cap_net_raw+ep' /bin/vigil
+
+RemoveIPC=true
+ProtectHome=true
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectControlGroups=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+RestrictAddressFamilies=AF_INET AF_INET6
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+MemoryDenyWriteExecute=true
+LockPersonality=true
+PrivateDevices=true
+DevicePolicy=closed
+ProtectProc=invisible
+ProtectClock=true
+ProcSubset=pid
+ProtectHostname=true
+ProtectKernelLogs=true
+PrivateUsers=true
+
+# See: https://www.opensourcerers.org/2022/04/25/optimizing-a-systemd-service-for-security/
+# Run: systemd-analyze security garage
+CapabilityBoundingSet=
+
+SystemCallFilter=~@clock @cpu-emulation @debug @module @mount @obsolete
+SystemCallFilter=~@privileged @raw-io @reboot @resources @swap @keyring
+
+SystemCallArchitectures=native
+
+# Allow icmp
+AmbientCapabilities=+CAP_NET_RAW
+
+# sets up a new /dev/ mount for the executed processes and only adds API pseudo devices such as /dev/null, /dev/zero or /dev/random to it,
+# but no physical devices such as /dev/sda, system memory /dev/mem, system ports /dev/port and others.
+# This is useful to turn off physical device access by the executed process
+PrivateDevices=true
+# allows access to standard pseudo devices including /dev/null, /dev/zero, /dev/full, /dev/random, and /dev/urandom
+DevicePolicy=closed
+
+# No devices (except clock: ProtectClock)
+# See: https://github.com/systemd/systemd/issues/23185
+DeviceAllow=
+
+# Vigil may create .sh files to run "scripts" blocks
+PrivateTmp=true
+BindReadOnlyPaths=/etc/vigil
+
 ExecStart=/usr/bin/vigil -c /etc/vigil/vigil.cfg
 Restart=on-failure
 PermissionsStartOnly=true
