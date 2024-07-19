@@ -10,7 +10,7 @@ Group=vigil
 RemoveIPC=true
 ProtectHome=true
 NoNewPrivileges=true
-# # Vigil may create .sh files to run "scripts" blocks
+# Vigil may create .sh files to run "scripts" blocks
 PrivateTmp=true
 ProtectSystem=strict
 ProtectControlGroups=true
@@ -33,20 +33,34 @@ ProtectClock=true
 ProcSubset=pid
 ProtectHostname=true
 ProtectKernelLogs=true
-PrivateUsers=true
+# This will fail icmp pingers if set to true
+PrivateUsers=false
 
-# See: https://www.opensourcerers.org/2022/04/25/optimizing-a-systemd-service-for-security/
-# Run: systemd-analyze security garage
-CapabilityBoundingSet=
-
+# It needs @ipc to run "scripts" blocks
 SystemCallFilter=~@clock @cpu-emulation @debug @module @mount @obsolete
 SystemCallFilter=~@privileged @raw-io @reboot @resources @swap @keyring
+SystemCallFilter=~@pkey
+
+# to return when the system call filter configured with SystemCallFilter= is triggered, instead of terminating the process immediately.
+SystemCallErrorNumber=EPERM
+
+# See: https://www.opensourcerers.org/2022/04/25/optimizing-a-systemd-service-for-security/
+# Run: systemd-analyze security vigil
+# Add this one for ports < 1024
+#CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=CAP_NET_RAW
 
 SystemCallArchitectures=native
 
 # Allow icmp
-AmbientCapabilities=+CAP_NET_RAW
+AmbientCapabilities=CAP_NET_RAW
 
+# sets up a new /dev/ mount for the executed processes and only adds API pseudo devices such as /dev/null, /dev/zero or /dev/random to it,
+# but no physical devices such as /dev/sda, system memory /dev/mem, system ports /dev/port and others.
+# This is useful to turn off physical device access by the executed process
+PrivateDevices=true
+# allows access to standard pseudo devices including /dev/null, /dev/zero, /dev/full, /dev/random, and /dev/urandom
+DevicePolicy=closed
 
 # No devices (except clock: ProtectClock)
 # See: https://github.com/systemd/systemd/issues/23185
@@ -56,7 +70,7 @@ BindReadOnlyPaths=/etc/vigil
 
 ExecStart=/usr/bin/vigil -c /etc/vigil/vigil.cfg
 Restart=on-failure
-PermissionsStartOnly=true
+
 LimitNOFILE=infinity
 
 [Install]
