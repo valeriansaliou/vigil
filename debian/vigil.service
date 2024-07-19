@@ -10,6 +10,7 @@ Group=vigil
 RemoveIPC=true
 ProtectHome=true
 NoNewPrivileges=true
+# # Vigil may create .sh files to run "scripts" blocks
 PrivateTmp=true
 ProtectSystem=strict
 ProtectControlGroups=true
@@ -21,7 +22,11 @@ RestrictRealtime=true
 RestrictSUIDSGID=true
 MemoryDenyWriteExecute=true
 LockPersonality=true
+# sets up a new /dev/ mount for the executed processes and only adds API pseudo devices such as /dev/null, /dev/zero or /dev/random to it,
+# but no physical devices such as /dev/sda, system memory /dev/mem, system ports /dev/port and others.
+# This is useful to turn off physical device access by the executed process
 PrivateDevices=true
+# allows access to standard pseudo devices including /dev/null, /dev/zero, /dev/full, /dev/random, and /dev/urandom
 DevicePolicy=closed
 ProtectProc=invisible
 ProtectClock=true
@@ -42,19 +47,11 @@ SystemCallArchitectures=native
 # Allow icmp
 AmbientCapabilities=+CAP_NET_RAW
 
-# sets up a new /dev/ mount for the executed processes and only adds API pseudo devices such as /dev/null, /dev/zero or /dev/random to it,
-# but no physical devices such as /dev/sda, system memory /dev/mem, system ports /dev/port and others.
-# This is useful to turn off physical device access by the executed process
-PrivateDevices=true
-# allows access to standard pseudo devices including /dev/null, /dev/zero, /dev/full, /dev/random, and /dev/urandom
-DevicePolicy=closed
 
 # No devices (except clock: ProtectClock)
 # See: https://github.com/systemd/systemd/issues/23185
 DeviceAllow=
 
-# Vigil may create .sh files to run "scripts" blocks
-PrivateTmp=true
 BindReadOnlyPaths=/etc/vigil
 
 ExecStart=/usr/bin/vigil -c /etc/vigil/vigil.cfg
