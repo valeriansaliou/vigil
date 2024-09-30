@@ -415,22 +415,31 @@ fn proceed_replica_probe_poll_ssh(host: &str, port: u16) -> (bool, Option<Durati
             if let Some(address_value) = address.next() {
                 debug!("prober poll will fire for tcp target: {}", address_value);
 
-
                 return match TcpStream::connect_timeout(
                     &address_value,
                     Duration::from_secs(APP_CONF.metrics.poll_delay_dead),
                 ) {
                     Ok(tcp) => {
-                        debug!("prober poll success for tcp target: {}", address_value);
-
                         let mut sess = Session::new().unwrap();
                         sess.set_tcp_stream(tcp);
-                        sess.handshake().unwrap();
+                        match sess.handshake() {
+                            Ok(_) => {
+                                debug!(
+                                    "prober poll success for tcp target: {}",
+                                    address_value
+                                );
 
-                        sess.host_key().unwrap();
-                        assert!(!sess.authenticated());
+                                (true, None)
+                            }
+                            Err(err) => {
+                                debug!(
+                                    "SSH connection failed for tcp target: {} (error: {})",
+                                    address_value, err
+                                );
 
-                        (true, None)
+                                (false, None)
+                            }
+                        }
                     }
                     Err(err) => {
                         debug!(
