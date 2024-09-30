@@ -174,7 +174,7 @@
                               {% elif node.mode == "push" %}
                                 Checked via a push probe (Reporter).
                               {% else %}
-                                Checked via a poll probe (HTTP, TCP or ICMP).
+                                Checked via a poll probe (HTTP, SSH, TCP or ICMP).
                               {% endif %}
                             </span>
                           </span>
