@@ -413,7 +413,7 @@ fn proceed_replica_probe_poll_ssh(host: &str, port: u16) -> (bool, Option<Durati
     match address_results {
         Ok(mut address) => {
             if let Some(address_value) = address.next() {
-                debug!("prober poll will fire for tcp target: {}", address_value);
+                debug!("prober poll will fire for ssh target: {}", address_value);
 
                 return match TcpStream::connect_timeout(
                     &address_value,
@@ -433,7 +433,7 @@ fn proceed_replica_probe_poll_ssh(host: &str, port: u16) -> (bool, Option<Durati
                             }
                             Err(err) => {
                                 debug!(
-                                    "SSH connection failed for tcp target: {} (error: {})",
+                                    "prober poll error for ssh target: {} (error: {})",
                                     address_value, err
                                 );
 
@@ -443,7 +443,7 @@ fn proceed_replica_probe_poll_ssh(host: &str, port: u16) -> (bool, Option<Durati
                     }
                     Err(err) => {
                         debug!(
-                            "prober poll error for tcp target: {} (error: {})",
+                            "prober poll error for ssh target: {} (error: {})",
                             address_value, err
                         );
 
@@ -452,14 +452,14 @@ fn proceed_replica_probe_poll_ssh(host: &str, port: u16) -> (bool, Option<Durati
                 };
             } else {
                 debug!(
-                    "prober poll did not resolve any address for tcp replica: {}:{}",
+                    "prober poll did not resolve any address for ssh replica: {}:{}",
                     host, port
                 );
             }
         }
         Err(err) => {
             error!(
-                "prober poll address for tcp replica is invalid: {}:{} (error: {})",
+                "prober poll address for ssh replica is invalid: {}:{} (error: {})",
                 host, port, err
             );
         }
