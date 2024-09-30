@@ -20,6 +20,8 @@ use reqwest::redirect::Policy as RedirectPolicy;
 use reqwest::StatusCode;
 use run_script::{self, ScriptOptions};
 
+use ssh2::Session;
+
 use super::replica::ReplicaURL;
 use super::states::{
     ServiceStates, ServiceStatesNotifier, ServiceStatesProbe, ServiceStatesProbeNode,
@@ -228,6 +230,7 @@ fn proceed_replica_probe_poll(
     let (is_up, poll_duration) = match replica_url {
         &ReplicaURL::ICMP(ref host) => proceed_replica_probe_poll_icmp(host),
         &ReplicaURL::TCP(ref host, port) => proceed_replica_probe_poll_tcp(host, port),
+        &ReplicaURL::SSH(ref host, port) => proceed_replica_probe_poll_ssh(host, port),
         &ReplicaURL::HTTP(ref url) | &ReplicaURL::HTTPS(ref url) => {
             proceed_replica_probe_poll_http(url, http_headers, http_method, http_body, body_match)
         }
@@ -374,6 +377,58 @@ fn proceed_replica_probe_poll_tcp(host: &str, port: u16) -> (bool, Option<Durati
                 ) {
                     Ok(_) => {
                         debug!("prober poll success for tcp target: {}", address_value);
+
+                        (true, None)
+                    }
+                    Err(err) => {
+                        debug!(
+                            "prober poll error for tcp target: {} (error: {})",
+                            address_value, err
+                        );
+
+                        (false, None)
+                    }
+                };
+            } else {
+                debug!(
+                    "prober poll did not resolve any address for tcp replica: {}:{}",
+                    host, port
+                );
+            }
+        }
+        Err(err) => {
+            error!(
+                "prober poll address for tcp replica is invalid: {}:{} (error: {})",
+                host, port, err
+            );
+        }
+    };
+
+    (false, None)
+}
+
+fn proceed_replica_probe_poll_ssh(host: &str, port: u16) -> (bool, Option<Duration>) {
+    let address_results = (host, port).to_socket_addrs();
+
+    match address_results {
+        Ok(mut address) => {
+            if let Some(address_value) = address.next() {
+                debug!("prober poll will fire for tcp target: {}", address_value);
+
+
+                return match TcpStream::connect_timeout(
+                    &address_value,
+                    Duration::from_secs(APP_CONF.metrics.poll_delay_dead),
+                ) {
+                    Ok(tcp) => {
+                        debug!("prober poll success for tcp target: {}", address_value);
+
+                        let mut sess = Session::new().unwrap();
+                        sess.set_tcp_stream(tcp);
+                        sess.handshake().unwrap();
+
+                        sess.host_key().unwrap();
+                        assert!(!sess.authenticated());
 
                         (true, None)
                     }
