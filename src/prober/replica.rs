@@ -10,6 +10,7 @@ use url::{Host, Url};
 pub enum ReplicaURL {
     ICMP(String),
     TCP(String, u16),
+    SSH(String, u16),
     HTTP(String),
     HTTPS(String),
 }
@@ -25,6 +26,12 @@ impl ReplicaURL {
                 "tcp" => match (url.host(), url.port(), url.path_segments()) {
                     (Some(host), Some(port), None) => {
                         Ok(ReplicaURL::TCP(Self::host_string(host), port))
+                    }
+                    _ => Err(()),
+                },
+                "ssh" => match (url.host(), url.port(), url.path_segments()) {
+                    (Some(host), Some(port), None) => {
+                        Ok(ReplicaURL::SSH(Self::host_string(host), port))
                     }
                     _ => Err(()),
                 },

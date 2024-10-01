@@ -44,6 +44,7 @@ ping = "0.4"
 run_script = "0.10"
 lettre = { version = "0.10", features = ["smtp-transport", "native-tls", "hostname", "builder"], default-features = false, optional = true }
 libstrophe = { version = "0.17", optional = true }
+ssh2 = "0.9.4"
 
 [features]
 default = ["notifier-email", "notifier-twilio", "notifier-slack", "notifier-zulip", "notifier-telegram", "notifier-pushover", "notifier-gotify", "notifier-matrix", "notifier-webex", "notifier-webhook"]
