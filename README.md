@@ -70,7 +70,7 @@ Vigil monitors all your infrastructure services. You first need to configure tar
 
 **There are three kinds of services Vigil can monitor:**
 
-* **HTTP / TCP / ICMP services**: Vigil frequently probes an HTTP, TCP or ICMP target and checks for reachability
+* **HTTP / TCP / SSH / ICMP services**: Vigil frequently probes an HTTP, TCP, SSH or ICMP target and checks for reachability
 * **Application services**: Install the Vigil Reporter library eg. on your NodeJS app and get reports when your app gets down, as well as when the host server system is overloaded
 * **Local services**: Install a slave [Vigil Local](https://github.com/valeriansaliou/vigil-local) daemon to monitor services that cannot be reached by the Vigil master server (eg. services that are on a different LAN)
 
@@ -337,8 +337,8 @@ You can also use environment variables with string interpolation in your configu
 
 * `id` (type: _string_, allowed: any unique lowercase string, no default) — Unique identifier of the probed service node (not visible on the status page)
 * `label` (type: _string_, allowed: any string, no default) — Name of the probed service node (visible on the status page)
-* `mode` (type: _string_, allowed: `poll`, `push`, `script`, `local`, no default) — Probe mode for this node (ie. `poll` is direct HTTP, TCP or ICMP poll to the URLs set in `replicas`, while `push` is for Vigil Reporter nodes, `script` is used to execute a shell script and `local` is for Vigil Local nodes)
-* `replicas` (type: _array[string]_, allowed: TCP, ICMP or HTTP URLs, default: empty) — Node replica URLs to be probed (only used if `mode` is `poll`)
+* `mode` (type: _string_, allowed: `poll`, `push`, `script`, `local`, no default) — Probe mode for this node (ie. `poll` is direct HTTP, TCP, SSH or ICMP poll to the URLs set in `replicas`, while `push` is for Vigil Reporter nodes, `script` is used to execute a shell script and `local` is for Vigil Local nodes)
+* `replicas` (type: _array[string]_, allowed: TCP, SSH, ICMP or HTTP URLs, default: empty) — Node replica URLs to be probed (only used if `mode` is `poll`)
 * `scripts` (type: _array[string]_, allowed: shell scripts as source code, default: empty) — Shell scripts to be executed on the system as a Vigil sub-process; they are handy to build custom probes (only used if `mode` is `script`)
 * `http_headers` (type: _map[string, string]_, allowed: any valid header name and value, default: empty) — HTTP headers to add to HTTP requests (eg. `http_headers = { "Authorization" = "Bearer xxxx" }`)
 * `http_method` (type _string_, allowed: `GET`, `HEAD`, `POST`, `PUT`, `PATCH`, no default) — HTTP method to use when polling the endpoint (omitting this will default to using `HEAD` or `GET` depending on the `http_body_healthy_match` configuration value)
@@ -504,7 +504,7 @@ This can easily be fixed by allowing Vigil to create raw sockets:
 setcap 'cap_net_raw+ep' /bin/vigil
 ```
 
-_Note that HTTP and TCP probes do not require those raw socket capabilities._
+_Note that HTTP, TCP and SSH probes do not require those raw socket capabilities._
 
 ## :fire: Report A Vulnerability
 
