@@ -212,6 +212,16 @@
                       </span>
                     </span>
                   {% endfor %}
+
+                  {% if node.link_url %}
+                    <a href="{{ node.link_url | escape }}" class="link font-sans-semibold">
+                      {% if node.link_label %}
+                        {{ node.link_label }}
+                      {% else %}
+                        {{ node.link_url }}
+                      {% endif %}
+                    </a>
+                  {% endif %}
                 </div>
               </li>
             {% endfor %}

@@ -328,7 +328,7 @@ main section.probe ul li label {
 
 main section.probe ul li .node {
   background-color: #F7F8FA;
-  padding: 9px 20px 8px 24px;
+  padding: 9px 14px 8px 24px;
   flex: 0.65;
 }
 
@@ -342,6 +342,19 @@ main section.probe ul li .node .replica {
   padding: 0 8px;
   display: inline-block;
   border-radius: 2px;
+}
+
+main section.probe ul li .node .replica:last-of-type {
+  margin-right: 8px;
+}
+
+main section.probe ul li .node .link {
+  color: #000000;
+  font-size: 12px;
+  line-height: 16px;
+  text-decoration: underline;
+  margin-top: 7px;
+  display: inline-block;
 }
 
 footer {

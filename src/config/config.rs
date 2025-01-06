@@ -309,6 +309,9 @@ pub struct ConfigProbeServiceNode {
     #[serde(default = "defaults::probe_service_node_reveal_replica_name")]
     pub reveal_replica_name: bool,
 
+    pub link_url: Option<SerdeUrl>,
+    pub link_label: Option<String>,
+
     pub rabbitmq_queue: Option<String>,
     pub rabbitmq_queue_nack_healthy_below: Option<u32>,
     pub rabbitmq_queue_nack_dead_above: Option<u32>,
