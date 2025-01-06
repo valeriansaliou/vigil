@@ -93,18 +93,22 @@ pub fn notify_reminder_backoff_limit() -> u16 {
     3
 }
 
+#[cfg(feature = "notifier-email")]
 pub fn notify_email_smtp_host() -> String {
     "localhost".to_string()
 }
 
+#[cfg(feature = "notifier-email")]
 pub fn notify_email_smtp_port() -> u16 {
     587
 }
 
+#[cfg(feature = "notifier-email")]
 pub fn notify_email_smtp_encrypt() -> bool {
     true
 }
 
+#[cfg(feature = "notifier-slack")]
 pub fn notify_slack_mention_channel() -> bool {
     false
 }
