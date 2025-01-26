@@ -77,6 +77,14 @@ pub fn script_parallelism() -> u16 {
     2
 }
 
+pub fn metrics_script_retry() -> u16 {
+    0
+}
+
+pub fn metrics_script_retry_delay() -> u64 {
+    2000
+}
+
 pub fn metrics_local_delay_dead() -> u64 {
     40
 }
