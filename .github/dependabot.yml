@@ -1,0 +1,13 @@
+version: 2
+updates:
+  - package-ecosystem: "cargo"
+    directory: "/"  # Location of Cargo.toml
+    schedule:
+      interval: "weekly"  # Can be daily, weekly, or monthly
+    open-pull-requests-limit: 5
+    rebase-strategy: "auto"
+    reviewers:
+      - your-github-username  # Optional: Add reviewer(s)
+    labels:
+      - "dependencies"
+      - "rust"
