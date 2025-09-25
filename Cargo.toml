@@ -24,7 +24,7 @@ lazy_static = "1.4"
 time = { version = "0.3", features = ["formatting"] }
 serde = "1.0"
 serde_derive = "1.0"
-toml = "0.7"
+toml = "0.9"
 envsubst = "0.2"
 uuid = { version = "1.1", features = ["v4", "fast-rng"], default-features = false }
 regex = "1.6"
@@ -40,8 +40,8 @@ tera = { version = "1.19", default-features = false }
 native-tls = { version = "0.2", features = ["vendored"] }
 openssl-probe = "0.1"
 reqwest = { version = "0.11", features = ["native-tls-vendored", "gzip", "blocking", "json"], default-features = false }
-ping = "0.4"
-run_script = "0.10"
+ping = "0.6"
+run_script = "0.11"
 lettre = { version = "0.10", features = ["smtp-transport", "native-tls", "hostname", "builder"], default-features = false, optional = true }
 libstrophe = { version = "0.17", optional = true }
 
