@@ -189,13 +189,13 @@ fn proceed_replica_probe_poll_with_retry(
 ) -> (Status, Option<Duration>) {
     let (mut status, mut latency, mut retry_count) = (Status::Dead, None, 0);
 
-    while retry_count <= APP_CONF.metrics.max_num_poll_retry && status == Status::Dead {
+    while retry_count <= APP_CONF.metrics.poll_retry && status == Status::Dead {
         debug!(
-            "will probe replica: {:?} with retry count: {}",
-            replica_url, retry_count
+            "will probe replica: {:?} with retry count: {} (after {}ms)",
+            replica_url, retry_count, APP_CONF.metrics.poll_retry_wait
         );
 
-        thread::sleep(Duration::from_secs(APP_CONF.metrics.poll_retry));
+        thread::sleep(Duration::from_millis(APP_CONF.metrics.poll_retry_wait));
 
         let probe_results = proceed_replica_probe_poll(
             replica_url,

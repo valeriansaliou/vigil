@@ -37,8 +37,8 @@ pub fn metrics_poll_retry() -> u64 {
     2
 }
 
-pub fn metrics_max_num_poll_retry() -> u64 {
-    3
+pub fn metrics_poll_retry_wait() -> u64 {
+    500
 }
 
 pub fn metrics_poll_http_status_healthy_above() -> u16 {
