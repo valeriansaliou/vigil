@@ -28,6 +28,8 @@ pub struct TelegramNotifier;
 #[derive(Serialize)]
 struct TelegramPayload<'a> {
     chat_id: TelegramChatID<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    message_thread_id: Option<i64>,
     text: String,
     parse_mode: &'static str,
     disable_web_page_preview: bool,
@@ -98,6 +100,7 @@ impl GenericNotifier for TelegramNotifier {
             // Build payload
             let payload = TelegramPayload {
                 chat_id: chat_id,
+                message_thread_id: telegram.message_thread_id,
                 text: message,
                 parse_mode: "markdown",
                 disable_web_page_preview: true,

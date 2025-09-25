@@ -249,6 +249,7 @@ pub struct ConfigNotifyZulip {
 pub struct ConfigNotifyTelegram {
     pub bot_token: String,
     pub chat_id: String,
+    pub message_thread_id: Option<i64>,
 
     #[serde(default = "defaults::notify_generic_reminders_only")]
     pub reminders_only: bool,
