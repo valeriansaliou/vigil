@@ -287,6 +287,7 @@ You can also use environment variables with string interpolation in your configu
 
 * `bot_token` (type: _string_, allowed: any strings, no default) — [Telegram bot token](https://core.telegram.org/bots/api#authorizing-your-bot)
 * `chat_id` (type: _string_, allowed: any strings, no default) — Chat identifier where you want Vigil to send messages. Can be group chat identifier (eg. `"@foo"`) or user chat identifier (eg. `"123456789"`)
+* `message_thread_id` (type: _string_, allowed: any strings, no default) — Telegram message thread where you want Vigil to send messages (if any)
 
 **[notify.pushover]**
 
