@@ -56,6 +56,7 @@ pub fn run() {
             .service(routes::assets_fonts)
             .service(routes::badge)
             .service(routes::status_text)
+            .service(routes::status_report)
             .service(routes::robots)
             .service(routes::index)
             .app_data(ConfigAuth::default().realm("Reporter Token"))

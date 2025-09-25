@@ -5,7 +5,7 @@
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
 use actix_files::NamedFile;
-use actix_web::{get, web, web::Data, web::Json, HttpResponse};
+use actix_web::{get, web, web::Data, web::Json, HttpResponse, Responder, Result};
 use std::time::{Duration, SystemTime};
 use tera::Tera;
 use time;
@@ -29,6 +29,11 @@ use crate::prober::report::{
 };
 use crate::prober::status::Status;
 use crate::APP_CONF;
+
+#[derive(Serialize)]
+struct StatusReportResponse {
+    health: String,
+}
 
 #[get("/")]
 async fn index(tera: Data<Tera>) -> HttpResponse {
@@ -60,6 +65,15 @@ async fn robots() -> Option<NamedFile> {
 #[get("/status/text")]
 async fn status_text() -> &'static str {
     &PROBER_STORE.read().unwrap().states.status.as_str()
+}
+
+#[get("/status/report")]
+async fn status_report() -> Result<impl Responder> {
+    let health = PROBER_STORE.read().unwrap().states.status.as_str();
+
+    Ok(web::Json(StatusReportResponse {
+        health: health.to_string(),
+    }))
 }
 
 #[get("/badge/{kind}")]
