@@ -41,6 +41,7 @@ native-tls = { version = "0.2", features = ["vendored"] }
 openssl-probe = "0.1"
 reqwest = { version = "0.12", features = ["native-tls-vendored", "gzip", "blocking", "json"], default-features = false }
 ping = "0.6"
+ssh2 = "0.9"
 run_script = "0.11"
 lettre = { version = "0.11", features = ["smtp-transport", "native-tls", "hostname", "builder"], default-features = false, optional = true }
 libstrophe = { version = "0.20", optional = true }
