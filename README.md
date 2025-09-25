@@ -15,7 +15,7 @@ _Tested at Rust version: `rustc 1.90.0 (1159e78c4 2025-09-14)`_
 
 **👉 See a live demo of Vigil on [Crisp Status Page](https://status.crisp.chat/).**
 
-**:newspaper: The Vigil project was announced in [a post on my personal journal](https://journal.valeriansaliou.name/announcing-vigil-how-we-monitor-crisp-at-scale/).**
+**:newspaper: The Vigil project was announced in [a post on my personal journal](https://valeriansaliou.name/blog/announcing-vigil-how-we-monitor-crisp-at-scale/).**
 
 [![Vigil](https://valeriansaliou.github.io/vigil/images/vigil.png)](https://status.crisp.chat/)
 
