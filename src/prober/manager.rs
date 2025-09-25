@@ -36,6 +36,7 @@ use crate::prober::mode::Mode;
 use crate::APP_CONF;
 
 const PROBE_ICMP_TIMEOUT_SECONDS: u64 = 1;
+const SECOND_TO_MILLISECONDS: u32 = 1000;
 
 lazy_static! {
     pub static ref STORE: Arc<RwLock<Store>> = Arc::new(RwLock::new(Store {
@@ -419,14 +420,16 @@ fn proceed_replica_probe_poll_ssh(host: &str, port: u16) -> (bool, Option<Durati
                     Duration::from_secs(APP_CONF.metrics.poll_delay_dead),
                 ) {
                     Ok(tcp) => {
-                        let mut sess = Session::new().unwrap();
-                        sess.set_tcp_stream(tcp);
-                        match sess.handshake() {
+                        let mut session = Session::new().unwrap();
+
+                        session.set_timeout(
+                            APP_CONF.metrics.poll_delay_dead as u32 * SECOND_TO_MILLISECONDS,
+                        );
+                        session.set_tcp_stream(tcp);
+
+                        match session.handshake() {
                             Ok(_) => {
-                                debug!(
-                                    "prober poll success for tcp target: {}",
-                                    address_value
-                                );
+                                debug!("prober poll success for tcp target: {}", address_value);
 
                                 (true, None)
                             }
