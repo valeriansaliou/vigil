@@ -32,7 +32,22 @@ use crate::APP_CONF;
 
 #[derive(Serialize)]
 struct StatusReportResponse {
-    health: String,
+    health: Status,
+    probes: Vec<StatusReportResponseProbe>,
+}
+
+#[derive(Serialize)]
+struct StatusReportResponseProbe {
+    pub name: String,
+    pub status: Status,
+    pub nodes: Vec<StatusReportResponseProbeNode>,
+}
+
+#[derive(Serialize)]
+struct StatusReportResponseProbeNode {
+    pub name: String,
+    pub status: Status,
+    pub replicas: Vec<Status>,
 }
 
 #[get("/")]
@@ -69,10 +84,31 @@ async fn status_text() -> &'static str {
 
 #[get("/status/report")]
 async fn status_report() -> Result<impl Responder> {
-    let health = PROBER_STORE.read().unwrap().states.status.as_str();
+    let states = &PROBER_STORE.read().unwrap().states;
 
     Ok(web::Json(StatusReportResponse {
-        health: health.to_string(),
+        health: states.status.clone(),
+        probes: states
+            .probes
+            .iter()
+            .map(|(_, probe)| StatusReportResponseProbe {
+                name: probe.label.clone(),
+                status: probe.status.clone(),
+                nodes: probe
+                    .nodes
+                    .iter()
+                    .map(|(_, node)| StatusReportResponseProbeNode {
+                        name: node.label.clone(),
+                        status: node.status.clone(),
+                        replicas: node
+                            .replicas
+                            .iter()
+                            .map(|(_, replica)| replica.status.clone())
+                            .collect(),
+                    })
+                    .collect(),
+            })
+            .collect(),
     }))
 }
 
