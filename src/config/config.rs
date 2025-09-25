@@ -69,6 +69,9 @@ pub struct ConfigMetrics {
     #[serde(default = "defaults::metrics_poll_retry")]
     pub poll_retry: u64,
 
+    #[serde(default = "defaults::metrics_poll_retry_wait")]
+    pub poll_retry_wait: u64,
+
     #[serde(default = "defaults::metrics_poll_http_status_healthy_above")]
     pub poll_http_status_healthy_above: u16,
 
@@ -116,16 +119,37 @@ pub struct ConfigNotify {
     #[serde(default = "defaults::notify_reminder_backoff_limit")]
     pub reminder_backoff_limit: u16,
 
+    #[cfg(feature = "notifier-email")]
     pub email: Option<ConfigNotifyEmail>,
+
+    #[cfg(feature = "notifier-twilio")]
     pub twilio: Option<ConfigNotifyTwilio>,
+
+    #[cfg(feature = "notifier-slack")]
     pub slack: Option<ConfigNotifySlack>,
+
+    #[cfg(feature = "notifier-zulip")]
     pub zulip: Option<ConfigNotifyZulip>,
+
+    #[cfg(feature = "notifier-telegram")]
     pub telegram: Option<ConfigNotifyTelegram>,
+
+    #[cfg(feature = "notifier-pushover")]
     pub pushover: Option<ConfigNotifyPushover>,
+
+    #[cfg(feature = "notifier-gotify")]
     pub gotify: Option<ConfigNotifyGotify>,
+
+    #[cfg(feature = "notifier-xmpp")]
     pub xmpp: Option<ConfigNotifyXMPP>,
+
+    #[cfg(feature = "notifier-matrix")]
     pub matrix: Option<ConfigNotifyMatrix>,
+
+    #[cfg(feature = "notifier-webex")]
     pub webex: Option<ConfigNotifyWebEx>,
+
+    #[cfg(feature = "notifier-webhook")]
     pub webhook: Option<ConfigNotifyWebHook>,
 }
 
@@ -162,6 +186,7 @@ pub struct ConfigPluginsRabbitMQ {
     pub queue_loaded_retry_delay: Option<u64>,
 }
 
+#[cfg(feature = "notifier-email")]
 #[derive(Deserialize)]
 pub struct ConfigNotifyEmail {
     pub to: String,
@@ -183,6 +208,7 @@ pub struct ConfigNotifyEmail {
     pub reminders_only: bool,
 }
 
+#[cfg(feature = "notifier-twilio")]
 #[derive(Deserialize)]
 pub struct ConfigNotifyTwilio {
     pub to: Vec<String>,
@@ -194,6 +220,7 @@ pub struct ConfigNotifyTwilio {
     pub reminders_only: bool,
 }
 
+#[cfg(feature = "notifier-slack")]
 #[derive(Deserialize)]
 pub struct ConfigNotifySlack {
     pub hook_url: SerdeUrl,
@@ -205,6 +232,7 @@ pub struct ConfigNotifySlack {
     pub reminders_only: bool,
 }
 
+#[cfg(feature = "notifier-zulip")]
 #[derive(Deserialize)]
 pub struct ConfigNotifyZulip {
     pub bot_email: String,
@@ -216,6 +244,7 @@ pub struct ConfigNotifyZulip {
     pub reminders_only: bool,
 }
 
+#[cfg(feature = "notifier-telegram")]
 #[derive(Deserialize)]
 pub struct ConfigNotifyTelegram {
     pub bot_token: String,
@@ -225,6 +254,7 @@ pub struct ConfigNotifyTelegram {
     pub reminders_only: bool,
 }
 
+#[cfg(feature = "notifier-pushover")]
 #[derive(Deserialize)]
 pub struct ConfigNotifyPushover {
     pub app_token: String,
@@ -234,6 +264,7 @@ pub struct ConfigNotifyPushover {
     pub reminders_only: bool,
 }
 
+#[cfg(feature = "notifier-gotify")]
 #[derive(Deserialize)]
 pub struct ConfigNotifyGotify {
     pub app_url: SerdeUrl,
@@ -243,6 +274,7 @@ pub struct ConfigNotifyGotify {
     pub reminders_only: bool,
 }
 
+#[cfg(feature = "notifier-xmpp")]
 #[derive(Deserialize)]
 pub struct ConfigNotifyXMPP {
     pub to: String,
@@ -253,6 +285,7 @@ pub struct ConfigNotifyXMPP {
     pub reminders_only: bool,
 }
 
+#[cfg(feature = "notifier-matrix")]
 #[derive(Deserialize)]
 pub struct ConfigNotifyMatrix {
     pub homeserver_url: SerdeUrl,
@@ -263,6 +296,7 @@ pub struct ConfigNotifyMatrix {
     pub reminders_only: bool,
 }
 
+#[cfg(feature = "notifier-webex")]
 #[derive(Deserialize)]
 pub struct ConfigNotifyWebEx {
     pub endpoint_url: SerdeUrl,
@@ -273,6 +307,7 @@ pub struct ConfigNotifyWebEx {
     pub reminders_only: bool,
 }
 
+#[cfg(feature = "notifier-webhook")]
 #[derive(Deserialize)]
 pub struct ConfigNotifyWebHook {
     pub hook_url: SerdeUrl,
@@ -308,6 +343,9 @@ pub struct ConfigProbeServiceNode {
 
     #[serde(default = "defaults::probe_service_node_reveal_replica_name")]
     pub reveal_replica_name: bool,
+
+    pub link_url: Option<SerdeUrl>,
+    pub link_label: Option<String>,
 
     pub rabbitmq_queue: Option<String>,
     pub rabbitmq_queue_nack_healthy_below: Option<u32>,

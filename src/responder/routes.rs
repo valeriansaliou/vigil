@@ -5,7 +5,7 @@
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
 use actix_files::NamedFile;
-use actix_web::{get, web, web::Data, web::Json, HttpResponse};
+use actix_web::{get, web, web::Data, web::Json, HttpResponse, Responder, Result};
 use std::time::{Duration, SystemTime};
 use tera::Tera;
 use time;
@@ -29,6 +29,26 @@ use crate::prober::report::{
 };
 use crate::prober::status::Status;
 use crate::APP_CONF;
+
+#[derive(Serialize)]
+struct StatusReportResponse {
+    health: Status,
+    probes: Vec<StatusReportResponseProbe>,
+}
+
+#[derive(Serialize)]
+struct StatusReportResponseProbe {
+    pub name: String,
+    pub status: Status,
+    pub nodes: Vec<StatusReportResponseProbeNode>,
+}
+
+#[derive(Serialize)]
+struct StatusReportResponseProbeNode {
+    pub name: String,
+    pub status: Status,
+    pub replicas: Vec<Status>,
+}
 
 #[get("/")]
 async fn index(tera: Data<Tera>) -> HttpResponse {
@@ -60,6 +80,36 @@ async fn robots() -> Option<NamedFile> {
 #[get("/status/text")]
 async fn status_text() -> &'static str {
     &PROBER_STORE.read().unwrap().states.status.as_str()
+}
+
+#[get("/status/report")]
+async fn status_report() -> Result<impl Responder> {
+    let states = &PROBER_STORE.read().unwrap().states;
+
+    Ok(web::Json(StatusReportResponse {
+        health: states.status.clone(),
+        probes: states
+            .probes
+            .iter()
+            .map(|(_, probe)| StatusReportResponseProbe {
+                name: probe.label.clone(),
+                status: probe.status.clone(),
+                nodes: probe
+                    .nodes
+                    .iter()
+                    .map(|(_, node)| StatusReportResponseProbeNode {
+                        name: node.label.clone(),
+                        status: node.status.clone(),
+                        replicas: node
+                            .replicas
+                            .iter()
+                            .map(|(_, replica)| replica.status.clone())
+                            .collect(),
+                    })
+                    .collect(),
+            })
+            .collect(),
+    }))
 }
 
 #[get("/badge/{kind}")]

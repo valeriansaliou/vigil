@@ -35,7 +35,6 @@ use crate::prober::manager::STORE as PROBER_STORE;
 use crate::prober::mode::Mode;
 use crate::APP_CONF;
 
-const PROBE_HOLD_MILLISECONDS: u64 = 500;
 const PROBE_ICMP_TIMEOUT_SECONDS: u64 = 1;
 
 lazy_static! {
@@ -194,11 +193,11 @@ fn proceed_replica_probe_poll_with_retry(
 
     while retry_count <= APP_CONF.metrics.poll_retry && status == Status::Dead {
         debug!(
-            "will probe replica: {:?} with retry count: {}",
-            replica_url, retry_count
+            "will probe replica: {:?} with retry count: {} (after {}ms)",
+            replica_url, retry_count, APP_CONF.metrics.poll_retry_wait
         );
 
-        thread::sleep(Duration::from_millis(PROBE_HOLD_MILLISECONDS));
+        thread::sleep(Duration::from_millis(APP_CONF.metrics.poll_retry_wait));
 
         let probe_results = proceed_replica_probe_poll(
             replica_url,
@@ -938,6 +937,8 @@ pub fn initialize_store() {
                 http_body: node.http_body.to_owned(),
                 http_body_healthy_match: node.http_body_healthy_match.to_owned(),
                 reveal_replica_name: node.reveal_replica_name,
+                link_url: node.link_url.as_ref().map(|url| url.to_string()),
+                link_label: node.link_label.to_owned(),
                 rabbitmq: node.rabbitmq_queue.as_ref().map(|queue| {
                     ServiceStatesProbeNodeRabbitMQ {
                         queue: queue.to_owned(),

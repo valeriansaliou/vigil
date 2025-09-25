@@ -142,7 +142,9 @@ fn ensure_states() {
 
 fn main() {
     // Ensure OpenSSL root chain is found on current environment
-    openssl_probe::init_ssl_cert_env_vars();
+    unsafe {
+        openssl_probe::init_openssl_env_vars();
+    }
 
     // Initialize shared logger
     let _logger = ConfigLogger::init(

@@ -1,4 +1,4 @@
-FROM rustlang/rust:nightly-buster AS build
+FROM rustlang/rust:nightly-trixie AS build
 
 RUN apt-get update
 RUN apt-get install -y musl-tools

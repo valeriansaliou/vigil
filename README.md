@@ -9,7 +9,7 @@ Vigil is an open-source Status Page you can host on your infrastructure, used to
 
 It is useful in microservices contexts to monitor both apps and backends. If a node goes down in your infrastructure, you receive a status change notification in a Slack channel, Email, Twilio SMS or/and XMPP.
 
-_Tested at Rust version: `rustc 1.71.1 (eb26296b5 2023-08-03)`_
+_Tested at Rust version: `rustc 1.90.0 (1159e78c4 2025-09-14)`_
 
 **🇭🇺 Crafted in Budapest, Hungary.**
 
@@ -163,13 +163,13 @@ You might find it convenient to run Vigil via Docker. You can find the pre-built
 First, pull the `valeriansaliou/vigil` image:
 
 ```bash
-docker pull valeriansaliou/vigil:v1.26.3
+docker pull valeriansaliou/vigil:v1.27.0
 ```
 
 Then, seed it a configuration file and run it (replace `/path/to/your/vigil/config.cfg` with the path to your configuration file):
 
 ```bash
-docker run -p 8080:8080 -v /path/to/your/vigil/config.cfg:/etc/vigil.cfg valeriansaliou/vigil:v1.26.3
+docker run -p 8080:8080 -v /path/to/your/vigil/config.cfg:/etc/vigil.cfg valeriansaliou/vigil:v1.27.0
 ```
 
 In the configuration file, ensure that:
@@ -215,7 +215,8 @@ You can also use environment variables with string interpolation in your configu
 **[metrics]**
 
 * `poll_interval` (type: _integer_, allowed: seconds, default: `120`) — Interval for which to probe nodes in `poll` mode
-* `poll_retry` (type: _integer_, allowed: seconds, default: `2`) — Interval after which to try probe for a second time nodes in `poll` mode (only when the first check fails)
+* `poll_retry` (type: _integer_, allowed: any number, default: `2`) — Number of times to retry probing a failing node in `poll` mode
+* `poll_retry_wait` (type: _integer_, allowed: milliseconds, default: `500`) — Time to hold for before retrying a last failed poll probe (for each `poll_retry` attempted)
 * `poll_http_status_healthy_above` (type: _integer_, allowed: HTTP status code, default: `200`) — HTTP status above which `poll` checks to HTTP replicas reports as `healthy`
 * `poll_http_status_healthy_below` (type: _integer_, allowed: HTTP status code, default: `400`) — HTTP status under which `poll` checks to HTTP replicas reports as `healthy`
 * `poll_delay_dead` (type: _integer_, allowed: seconds, default: `10`) — Delay after which a node in `poll` mode is to be considered `dead` (ie. check response delay)
@@ -345,6 +346,8 @@ You can also use environment variables with string interpolation in your configu
 * `http_body` (type _string_, allowed: any string, no default) — Body to send in the HTTP request when polling an endpoint (this only works if `http_method` is set to `POST`, `PUT` or `PATCH`)
 * `http_body_healthy_match` (type: _string_, allowed: regular expressions, no default) — HTTP response body for which to report node replica as `healthy` (if the body does not match, the replica will be reported as `dead`, even if the status code check passes; the check uses a `GET` rather than the usual `HEAD` if this option is set)
 * `reveal_replica_name` (type: _boolean_, allowed: `true`, `false`, default: `false`) — Whether to reveal replica name on public status page or not (this can be a security risk if a replica URL is to be kept secret)
+* `link_url` (type: _string_, allowed: URL, no default) — Link URL to show next to the node health (this can be used to direct the user to another page to see more details)
+* `link_label` (type: _string_, allowed: any string, no default) — Link label to use for the URL link (if any link is set)
 * `rabbitmq_queue` (type: _string_, allowed: RabbitMQ queue names, no default) — RabbitMQ queue associated to node, which to check against for pending payloads via RabbitMQ API (this helps monitor unacked payloads accumulating in the queue)
 * `rabbitmq_queue_nack_healthy_below` (type: _integer_, allowed: any number, no default) — Maximum number of payloads in RabbitMQ queue associated to node, with status `nack` to consider node `healthy` (this overrides the global `plugins.rabbitmq.queue_nack_healthy_below`)
 * `rabbitmq_queue_nack_dead_above` (type: _integer_, allowed: any number, no default) — Threshold on the number of payloads in RabbitMQ queue associated to node, with status `nack` above which node should be considered `dead` (stalled queue, this overrides the global `plugins.rabbitmq.queue_nack_dead_above`)

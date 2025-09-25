@@ -37,6 +37,10 @@ pub fn metrics_poll_retry() -> u64 {
     2
 }
 
+pub fn metrics_poll_retry_wait() -> u64 {
+    500
+}
+
 pub fn metrics_poll_http_status_healthy_above() -> u16 {
     200
 }
@@ -93,18 +97,22 @@ pub fn notify_reminder_backoff_limit() -> u16 {
     3
 }
 
+#[cfg(feature = "notifier-email")]
 pub fn notify_email_smtp_host() -> String {
     "localhost".to_string()
 }
 
+#[cfg(feature = "notifier-email")]
 pub fn notify_email_smtp_port() -> u16 {
     587
 }
 
+#[cfg(feature = "notifier-email")]
 pub fn notify_email_smtp_encrypt() -> bool {
     true
 }
 
+#[cfg(feature = "notifier-slack")]
 pub fn notify_slack_mention_channel() -> bool {
     false
 }
