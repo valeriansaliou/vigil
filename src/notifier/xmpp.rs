@@ -103,7 +103,7 @@ impl GenericNotifier for XMPPNotifier {
             );
 
             // Connect to XMPP server
-            if let Ok(connection_context) = connection.connect_client(None, None, &fn_handle) {
+            if let Ok(mut connection_context) = connection.connect_client(None, None, &fn_handle) {
                 // Enter context
                 connection_context.run();
 

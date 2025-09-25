@@ -43,7 +43,7 @@ reqwest = { version = "0.12", features = ["native-tls-vendored", "gzip", "blocki
 ping = "0.6"
 run_script = "0.11"
 lettre = { version = "0.11", features = ["smtp-transport", "native-tls", "hostname", "builder"], default-features = false, optional = true }
-libstrophe = { version = "0.17", optional = true }
+libstrophe = { version = "0.20", optional = true }
 
 [features]
 default = ["notifier-email", "notifier-twilio", "notifier-slack", "notifier-zulip", "notifier-telegram", "notifier-pushover", "notifier-gotify", "notifier-matrix", "notifier-webex", "notifier-webhook"]
