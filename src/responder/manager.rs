@@ -17,7 +17,7 @@ use actix_web_httpauth::{
     },
     middleware::HttpAuthentication,
 };
-use rmcp::transport::streamable_http_server::session::never::NeverSessionManager;
+use rmcp::transport::streamable_http_server::session::local::LocalSessionManager;
 use rmcp_actix_web::transport::StreamableHttpService;
 use std::{sync::Arc, time::Duration};
 use tera::Tera;
@@ -52,11 +52,16 @@ pub fn run() {
     );
 
     // Prepare MCP services (if enabled)
+    // Notice: it makes no sense for Vigil to be a stateful MCP server, but \
+    //   unfortunately as of Sept 2025 many MCP client do not seem to support \
+    //   stateless servers yet. Therefore, for the moment, Vigil behaves as a \
+    //   stateful MCP server for wide compatibility. This may be changed to \
+    //   stateless mode and 'NeverSessionManager' in the future.
     let mcp_services = if APP_CONF.server.mcp_server == true {
         Some((StreamableHttpService::builder()
             .service_factory(Arc::new(|| Ok(mcp::Probes::new())))
-            .session_manager(Arc::new(NeverSessionManager::default()))
-            .stateful_mode(false)
+            .session_manager(Arc::new(LocalSessionManager::default()))
+            .stateful_mode(true)
             .sse_keep_alive(MCP_SSE_KEEPALIVE_SECONDS)
             .build(),))
     } else {
