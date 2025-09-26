@@ -31,7 +31,9 @@ impl Probes {
         }
     }
 
-    #[tool(description = "Gets the general health report for all Vigil probes")]
+    #[tool(
+        description = "Returns all Vigil Status Page services and nodes and reports their status (healthy, sick, dead)"
+    )]
     fn get_report(
         &self,
         Parameters(_): Parameters<ProbesRequest>,
@@ -44,7 +46,7 @@ impl Probes {
 impl ServerHandler for Probes {
     fn get_info(&self) -> ServerInfo {
         ServerInfo {
-            instructions: Some("Vigil Probes".into()),
+            instructions: Some("Vigil MCP Server. Use this server to get the status report of all Vigil Status Page services and nodes.".into()),
             capabilities: ServerCapabilities::builder().enable_tools().build(),
             ..Default::default()
         }

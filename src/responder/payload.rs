@@ -8,6 +8,7 @@ use rmcp::schemars;
 
 use crate::prober::manager::STORE as PROBER_STORE;
 use crate::prober::status::Status as HealthStatus;
+use crate::APP_CONF;
 
 #[derive(Deserialize)]
 pub struct ReporterRequestPayload {
@@ -66,7 +67,14 @@ pub struct ManagerProberAlertsIgnoredResolveResponsePayload {
 #[derive(Serialize, schemars::JsonSchema)]
 pub struct StatusReportResponsePayload {
     health: HealthStatus,
+    page: StatusReportResponsePayloadPage,
     probes: Vec<StatusReportResponsePayloadProbe>,
+}
+
+#[derive(Serialize, schemars::JsonSchema)]
+pub struct StatusReportResponsePayloadPage {
+    pub name: String,
+    pub url: String,
 }
 
 #[derive(Serialize, schemars::JsonSchema)]
@@ -89,6 +97,10 @@ impl StatusReportResponsePayload {
 
         StatusReportResponsePayload {
             health: states.status.clone(),
+            page: StatusReportResponsePayloadPage {
+                name: APP_CONF.branding.page_title.to_owned(),
+                url: APP_CONF.branding.page_url.to_string(),
+            },
             probes: states
                 .probes
                 .iter()
