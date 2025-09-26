@@ -6,6 +6,7 @@
 
 mod announcements;
 mod context;
+mod mcp;
 mod payload;
 mod routes;
 

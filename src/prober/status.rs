@@ -4,7 +4,9 @@
 // Copyright: 2018, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
-#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Debug)]
+use rmcp::schemars;
+
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Debug, schemars::JsonSchema)]
 pub enum Status {
     #[serde(rename = "healthy")]
     Healthy,

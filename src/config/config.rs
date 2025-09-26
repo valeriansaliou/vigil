@@ -35,6 +35,9 @@ pub struct ConfigServer {
     #[serde(default = "defaults::server_workers")]
     pub workers: usize,
 
+    #[serde(default = "defaults::server_mcp_server")]
+    pub mcp_server: bool,
+
     pub manager_token: String,
     pub reporter_token: String,
 }

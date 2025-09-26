@@ -17,10 +17,16 @@ use actix_web_httpauth::{
     },
     middleware::HttpAuthentication,
 };
+use rmcp::transport::streamable_http_server::session::never::NeverSessionManager;
+use rmcp_actix_web::transport::StreamableHttpService;
+use std::{sync::Arc, time::Duration};
 use tera::Tera;
 
+use super::mcp;
 use super::routes;
 use crate::APP_CONF;
+
+const MCP_SSE_KEEPALIVE_SECONDS: Duration = Duration::from_secs(30);
 
 pub fn run() {
     let runtime = rt::System::new();
@@ -45,9 +51,25 @@ pub fn run() {
         HttpAuthentication::basic(authenticate_manager),
     );
 
+    // Prepare MCP services (if enabled)
+    let mcp_services = if APP_CONF.server.mcp_server == true {
+        Some((StreamableHttpService::builder()
+            .service_factory(Arc::new(|| Ok(mcp::Probes::new())))
+            .session_manager(Arc::new(NeverSessionManager::default()))
+            .stateful_mode(false)
+            .sse_keep_alive(MCP_SSE_KEEPALIVE_SECONDS)
+            .build(),))
+    } else {
+        info!("mcp server is not enabled (this is an opt-in feature)");
+
+        None
+    };
+
     // Start the HTTP server
     let server = HttpServer::new(move || {
-        App::new()
+        // Mount routes to HTTP server
+        // Notice: this executes as many times as there are HTTP workers.
+        let mut app = App::new()
             .app_data(web::Data::new(tera.clone()))
             .wrap(middleware::NormalizePath::new(TrailingSlash::Trim))
             .service(routes::assets_javascripts)
@@ -107,7 +129,16 @@ pub fn run() {
                     .wrap(middleware_manager_auth.clone())
                     .guard(guard::Put())
                     .to(routes::manager_prober_alerts_ignored_update),
-            )
+            );
+
+        // Add MCP services?
+        if let Some(mcp_services) = mcp_services.clone() {
+            app = app.service(
+                web::scope("/mcp").service(web::scope("/probes").service(mcp_services.0.scope())),
+            );
+        }
+
+        app
     })
     .workers(APP_CONF.server.workers)
     .bind(APP_CONF.server.inet)

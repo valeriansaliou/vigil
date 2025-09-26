@@ -36,6 +36,8 @@ indexmap = { version = "2.11", features = ["serde"] }
 actix-web = "4.3"
 actix-files = "0.6"
 actix-web-httpauth = "0.8"
+rmcp = { version = "0.7", default-features = false }
+rmcp-actix-web = { version = "0.8", features = ["transport-streamable-http"], default-features = false }
 tera = { version = "1.19", default-features = false }
 native-tls = { version = "0.2", features = ["vendored"] }
 openssl-probe = "0.1"

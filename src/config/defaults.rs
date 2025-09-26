@@ -21,6 +21,10 @@ pub fn server_workers() -> usize {
     4
 }
 
+pub fn server_mcp_server() -> bool {
+    false
+}
+
 pub fn assets_path() -> PathBuf {
     PathBuf::from("./res/assets/")
 }

@@ -192,6 +192,7 @@ You can also use environment variables with string interpolation in your configu
 * `log_level` (type: _string_, allowed: `debug`, `info`, `warn`, `error`, default: `error`) — Verbosity of logging, set it to `error` in production
 * `inet` (type: _string_, allowed: IPv4 / IPv6 + port, default: `[::1]:8080`) — Host and TCP port the Vigil public status page should listen on
 * `workers` (type: _integer_, allowed: any number, default: `4`) — Number of workers for the Vigil public status page to run on
+* `mcp_server` (type: _boolean_, allowed: `true`, `false`, default: `false`) — Whether to enable MCP server or not (allows AI Agents to access public data from probes on HTTP path: `/mcp/probes`)
 * `manager_token` (type: _string_, allowed: secret token, default: no default) — Manager secret token (ie. secret password)
 * `reporter_token` (type: _string_, allowed: secret token, default: no default) — Reporter secret token (ie. secret password)
 

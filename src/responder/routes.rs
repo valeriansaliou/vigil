@@ -20,7 +20,7 @@ use super::payload::{
     ManagerAnnouncementInsertRequestPayload, ManagerAnnouncementInsertResponsePayload,
     ManagerAnnouncementsResponsePayload, ManagerProberAlertsIgnoredResolveRequestPayload,
     ManagerProberAlertsIgnoredResolveResponsePayload, ManagerProberAlertsResponsePayload,
-    ManagerProberAlertsResponsePayloadEntry, ReporterRequestPayload,
+    ManagerProberAlertsResponsePayloadEntry, ReporterRequestPayload, StatusReportResponsePayload,
 };
 use crate::prober::manager::{run_dispatch_plugins, STORE as PROBER_STORE};
 use crate::prober::report::{
@@ -29,26 +29,6 @@ use crate::prober::report::{
 };
 use crate::prober::status::Status;
 use crate::APP_CONF;
-
-#[derive(Serialize)]
-struct StatusReportResponse {
-    health: Status,
-    probes: Vec<StatusReportResponseProbe>,
-}
-
-#[derive(Serialize)]
-struct StatusReportResponseProbe {
-    pub name: String,
-    pub status: Status,
-    pub nodes: Vec<StatusReportResponseProbeNode>,
-}
-
-#[derive(Serialize)]
-struct StatusReportResponseProbeNode {
-    pub name: String,
-    pub status: Status,
-    pub replicas: Vec<Status>,
-}
 
 #[get("/")]
 async fn index(tera: Data<Tera>) -> HttpResponse {
@@ -84,32 +64,7 @@ async fn status_text() -> &'static str {
 
 #[get("/status/report")]
 async fn status_report() -> Result<impl Responder> {
-    let states = &PROBER_STORE.read().unwrap().states;
-
-    Ok(web::Json(StatusReportResponse {
-        health: states.status.clone(),
-        probes: states
-            .probes
-            .iter()
-            .map(|(_, probe)| StatusReportResponseProbe {
-                name: probe.label.clone(),
-                status: probe.status.clone(),
-                nodes: probe
-                    .nodes
-                    .iter()
-                    .map(|(_, node)| StatusReportResponseProbeNode {
-                        name: node.label.clone(),
-                        status: node.status.clone(),
-                        replicas: node
-                            .replicas
-                            .iter()
-                            .map(|(_, replica)| replica.status.clone())
-                            .collect(),
-                    })
-                    .collect(),
-            })
-            .collect(),
-    }))
+    Ok(web::Json(StatusReportResponsePayload::build()))
 }
 
 #[get("/badge/{kind}")]
