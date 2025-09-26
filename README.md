@@ -98,7 +98,7 @@ Vigil is built in Rust. To install it, either download a version from the [Vigil
 
 Vigil provides [pre-built packages](https://packagecloud.io/valeriansaliou/vigil) for Debian-based systems (Debian, Ubuntu, etc.).
 
-**Important: Vigil only provides 64 bits packages targeting Debian 11, 12 & 13 for now (codenames: `bullseye`, `bookworm` & `trixie`). You will still be able to use them on other Debian versions, as well as Ubuntu.**
+**Important: Vigil only provides 64 bits packages targeting Debian 11 & 12 for now (codenames: `bullseye` & `bookworm`). You will still be able to use them on other Debian versions, as well as Ubuntu.**
 
 First, add the Vigil APT repository (eg. for Debian `bookworm`):
 
