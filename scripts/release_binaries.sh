@@ -38,7 +38,7 @@ fi
 function release_for_architecture {
     final_tar="v$VIGIL_VERSION-$1.tar.gz"
 
-    rm -rf ./vigil/ && \
+    rm -rf ./vigil/ ./target/ && \
         cross build --target "$2" --release && \
         mkdir ./vigil && \
         cp -p "target/$2/release/vigil" ./vigil/ && \
@@ -64,7 +64,7 @@ pushd "$BASE_DIR" > /dev/null
     echo "Executing release steps for Vigil v$VIGIL_VERSION..."
 
     release_for_architecture "x86_64" "x86_64-unknown-linux-musl" && \
-        release_for_architecture "armv7" "armv7-unknown-linux-musleabihf"
+        release_for_architecture "aarch64" "aarch64-unknown-linux-musl"
     rc=$?
 
     if [ $rc -eq 0 ]; then

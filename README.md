@@ -9,7 +9,7 @@ Vigil is an open-source Status Page you can host on your infrastructure, used to
 
 It is useful in microservices contexts to monitor both apps and backends. If a node goes down in your infrastructure, you receive a status change notification in a Slack channel, Email, Twilio SMS or/and XMPP.
 
-_Tested at Rust version: `rustc 1.90.0 (1159e78c4 2025-09-14)`_
+_Tested at Rust version: `rustc 1.91.1 (ed61e7d7e 2025-11-07)`_
 
 **🇭🇺 Crafted in Budapest, Hungary.**
 
