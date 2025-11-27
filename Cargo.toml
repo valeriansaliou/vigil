@@ -36,13 +36,13 @@ indexmap = { version = "2.11", features = ["serde"] }
 actix-web = "4.3"
 actix-files = "0.6"
 actix-web-httpauth = "0.8"
-rmcp = { version = "0.7", default-features = false }
+rmcp = { version = "0.9", default-features = false }
 rmcp-actix-web = { version = "0.8", features = ["transport-streamable-http"], default-features = false }
 tera = { version = "1.19", default-features = false }
 native-tls = { version = "0.2", features = ["vendored"] }
 openssl-probe = "0.1"
 reqwest = { version = "0.12", features = ["native-tls-vendored", "gzip", "blocking", "json"], default-features = false }
-ping = "0.6"
+ping = "0.7"
 ssh2 = "0.9"
 run_script = "0.11"
 lettre = { version = "0.11", features = ["smtp-transport", "native-tls", "hostname", "builder"], default-features = false, optional = true }
