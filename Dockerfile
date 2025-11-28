@@ -24,7 +24,7 @@ RUN if [ -z "$PREBUILT_TAG" ]; then \
     cargo build --release --target $(cat .toolchain) && \
         mkdir -p ./vigil/ && \
         mv ./target/$(cat .toolchain)/release/vigil ./vigil/ && \
-        cp -rp ./res ./vigil/
+        cp -rp ./res ./vigil/ \
     ; fi
 
 # Pull pre-built binary?
