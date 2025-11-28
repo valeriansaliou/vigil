@@ -9,6 +9,9 @@ jobs:
   build-releases:
     runs-on: ubuntu-latest
 
+    outputs:
+      tag: ${{ steps.current_tag.outputs.tag }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -77,6 +80,7 @@ jobs:
           token: ${{ secrets.PACKAGECLOUD_TOKEN }}
 
   build-docker:
+    needs: build-releases
     runs-on: ubuntu-latest
 
     steps:
@@ -108,6 +112,8 @@ jobs:
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
           push: true
+          build-args: |
+            PREBUILT_TAG=${{ needs.build-releases.outputs.tag }}
           platforms: |
             linux/amd64
             linux/arm64
