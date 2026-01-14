@@ -69,7 +69,7 @@ impl GenericNotifier for TelegramNotifier {
             let mut replicas_count: HashMap<String, u32> = HashMap::new();
 
             for replica in notification.replicas.iter() {
-                let service_and_node = replica.split(":").take(2).collect::<Vec<&str>>().join(":");
+                let service_and_node = replica.split(":").take(3).collect::<Vec<&str>>().join(":");
                 *replicas_count.entry(service_and_node).or_insert(0) += 1;
             }
 
