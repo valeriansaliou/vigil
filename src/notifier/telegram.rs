@@ -4,7 +4,6 @@
 // Copyright: 2019, Valerian Saliou <valerian@valeriansaliou.name>
 // License: Mozilla Public License v2.0 (MPL v2.0)
 
-use std::collections::HashMap;
 use std::time::Duration;
 
 use reqwest::blocking::Client;
