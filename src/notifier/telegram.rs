@@ -66,18 +66,6 @@ impl GenericNotifier for TelegramNotifier {
                 )
             };
 
-            // let mut replicas_count: HashMap<String, u32> = HashMap::new();
-
-            // for replica in notification.replicas.iter() {
-            //     let service_and_node = replica;//.collect::<Vec<&str>>().join(":");
-            //     *replicas_count.entry(service_and_node).or_insert(0) += 1;
-            // }
-
-            // let mut new_text: String = String::new();
-            // for replica in notification.replicas.iter() {
-            //     new_text += format!("- `{}`: {}\n", replica, notification.status.as_str()).as_str();
-            // }
-
             let nodes_count_list_text = notification.replicas
                 .iter()
                 .map(|replica| {
@@ -89,19 +77,6 @@ impl GenericNotifier for TelegramNotifier {
                 })
                 .collect::<Vec<String>>()
                 .join("\n");
-
-            // let nodes_count_list_text = replicas_count
-            //     .iter()
-            //     .map(|(service_and_node, count)| {
-            //         format!(
-            //             "- `{}`: {} {}",
-            //             service_and_node,
-            //             count,
-            //             notification.status.as_str()
-            //         )
-            //     })
-            //     .collect::<Vec<String>>()
-            //     .join("\n");
 
             message.push_str(&nodes_count_list_text);
             message.push_str(&format!("\nLink: {}", APP_CONF.branding.page_url.as_str()));
