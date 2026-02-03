@@ -66,19 +66,14 @@ impl GenericNotifier for TelegramNotifier {
                 )
             };
 
-            let nodes_count_list_text = notification.replicas
+            let nodes_list_text = notification
+                .replicas
                 .iter()
-                .map(|replica| {
-                    format!(
-                        "- `{}`: {}",
-                        replica,
-                        notification.status.as_str()
-                    )
-                })
+                .map(|replica| format!("- `{}`: {}", replica, notification.status.as_str()))
                 .collect::<Vec<String>>()
                 .join("\n");
 
-            message.push_str(&nodes_count_list_text);
+            message.push_str(&nodes_list_text);
             message.push_str(&format!("\nLink: {}", APP_CONF.branding.page_url.as_str()));
 
             debug!("will send Telegram notification with message: {}", &message);
