@@ -104,6 +104,7 @@ pub struct ServiceStatesProbeNodeReplicaReport {
 
 #[derive(Serialize)]
 pub struct ServiceStatesNotifier {
+    pub reminder_escalate_counter: u16,
     pub reminder_backoff_counter: u16,
     pub reminder_ignore_until: Option<SystemTime>,
 }

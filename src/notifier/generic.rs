@@ -19,6 +19,7 @@ pub struct Notification<'a> {
     pub time: String,
     pub replicas: Vec<&'a str>,
     pub changed: bool,
+    pub escalated: Option<u16>,
     pub startup: bool,
 }
 
@@ -77,6 +78,30 @@ impl<'a> Notification<'a> {
         if reminders_only == false || (reminders_only == true && self.changed == false) {
             true
         } else {
+            false
+        }
+    }
+
+    pub fn escalated_for(&self, target_index: usize) -> bool {
+        // In case reminder escalation is enabled and counter is currently active, check if \
+        //   the passed target index is within range of the current escalation count. As the \
+        //   outage persists and the escalation count increments, then the notifier will tend to \
+        //   notify all targets in range at each reminder tick, while on first reminder only the \
+        //   first target will get the high-priority alert (others will still get reminded but \
+        //   under a normal priority alert). This can be used to page (ie. wake-up at night) \
+        //   the defined always-on-call person first, and then if that person does not respond or \
+        //   does not fix the issue in due time, then other targets will get progressively paged \
+        //   one after the other as the outage persists.
+        if self.changed == false {
+            if let Some(escalated) = self.escalated {
+                // Escalation is enabled, only escalate to target if in range
+                target_index < escalated as usize
+            } else {
+                // Escalation is disabled, consider all targets as escalated
+                true
+            }
+        } else {
+            // Status did change, nothing to escalate
             false
         }
     }

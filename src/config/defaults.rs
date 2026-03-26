@@ -101,6 +101,10 @@ pub fn notify_reminder_backoff_limit() -> u16 {
     3
 }
 
+pub fn notify_reminder_escalate() -> bool {
+    false
+}
+
 #[cfg(feature = "notifier-email")]
 pub fn notify_email_smtp_host() -> String {
     "localhost".to_string()

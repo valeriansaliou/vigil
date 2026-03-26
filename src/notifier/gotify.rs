@@ -59,7 +59,8 @@ impl GenericNotifier for GotifyNotifier {
             params.insert("title", &APP_CONF.branding.page_title);
             params.insert("message", &message);
 
-            if notification.changed == false {
+            // Mark as high-priority? (escalated reminder)
+            if notification.escalated_for(0) == true {
                 params.insert("priority", "10");
             }
 

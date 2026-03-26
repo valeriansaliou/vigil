@@ -248,6 +248,7 @@ You can also use environment variables with string interpolation in your configu
 * `reminder_interval` (type: _integer_, allowed: seconds, no default) — Interval at which downtime reminder notifications should be sent (if any)
 * `reminder_backoff_function` (type _string_, allowed: `none`, `linear`, `square`, `cubic`, default: `none`) — If enabled, the downtime reminder interval will get larger as reminders are sent. The value will be `reminder_interval × pow(N, x)` with `N` being the number of reminders sent since the service went down, and `x` being the specified growth factor.
 * `reminder_backoff_limit` (type: _integer_, allowed: any number, default: `3`) — Maximum value for the downtime reminder backoff counter (if a backoff function is enabled).
+* `reminder_escalate` (type: _boolean_, allowed: `true`, `false`, default: `false`) — Whether for high-priority downtime reminders to be sent progressively to the first target, then on next reminder the first & second target, etc. (this can be used to progressively escalate to other persons in the team if a downtime persists — _only supported on multi-target notifiers that send high-priority reminder alerts_)
 
 **[notify.email]**
 

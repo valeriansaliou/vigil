@@ -53,7 +53,7 @@ impl GenericNotifier for PushoverNotifier {
 
             let mut has_sub_delivery_failure = false;
 
-            for user_key in &pushover.user_keys {
+            for (user_index, user_key) in pushover.user_keys.iter().enumerate() {
                 // Build form parameters
                 let mut params: HashMap<&str, &str> = HashMap::new();
 
@@ -72,8 +72,8 @@ impl GenericNotifier for PushoverNotifier {
                 params.insert("url_title", &url_title);
                 params.insert("url", APP_CONF.branding.page_url.as_str());
 
-                // Mark as high-priority? (reminder)
-                if notification.changed == false {
+                // Mark as high-priority? (escalated reminder)
+                if notification.escalated_for(user_index) == true {
                     params.insert("priority", "1");
                 }
 

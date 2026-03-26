@@ -63,6 +63,7 @@ struct BumpedStates {
     status: Status,
     replicas: Vec<String>,
     changed: bool,
+    escalated: Option<u16>,
     startup: bool,
 }
 
@@ -232,8 +233,9 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
     let mut should_notify = (store.states.status != Status::Dead && general_status == Status::Dead)
         || (store.states.status == Status::Dead && general_status != Status::Dead);
 
-    // Reset the backoff counter whenever we are not dead (yet, stored status changed)
+    // Reset all counters whenever we are not dead (yet, stored status changed)
     if has_changed == true && general_status != Status::Dead {
+        store.states.notifier.reminder_escalate_counter = 0;
         store.states.notifier.reminder_backoff_counter = 1;
     }
 
@@ -250,6 +252,8 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
                     {
                         // Notice: we use backoff counter all the time because if it is disabled, \
                         //   then the value is 1 at any time, thus not impacting the interval.
+                        let reminder_escalate_counter =
+                            store.states.notifier.reminder_escalate_counter;
                         let reminder_backoff_counter =
                             store.states.notifier.reminder_backoff_counter;
                         let reminder_ignore_until = store.states.notifier.reminder_ignore_until;
@@ -268,8 +272,9 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
                             };
 
                         debug!(
-                            "checking if should re-notify about unchanged status ({}s / {}↑ / {})",
+                            "checking if should re-notify about unchanged status ({}s / {}x / {}↑ / {})",
                             reminder_interval_backoff.as_secs(),
+                            reminder_escalate_counter,
                             reminder_backoff_counter,
                             if should_ignore_reminders == false {
                                 "✓"
@@ -285,6 +290,18 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
                             info!("should re-notify about unchanged status");
 
                             should_notify = true;
+
+                            // Increment the escalate counter? (reminder escalation is enabled)
+                            if notify.reminder_escalate == true
+                                && reminder_escalate_counter < u16::MAX
+                            {
+                                store.states.notifier.reminder_escalate_counter += 1;
+
+                                debug!(
+                                    "incremented re-notify escalate counter to: {}",
+                                    store.states.notifier.reminder_escalate_counter
+                                );
+                            }
 
                             // Increment the backoff counter? (a backoff function is set, \
                             //   therefore reminders backoff is enabled)
@@ -321,10 +338,19 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
     if should_notify == true {
         store.notified = Some(SystemTime::now());
 
+        // Acquire escalated state (if non-zero)
+        let escalated = if store.states.notifier.reminder_escalate_counter > 0 {
+            Some(store.states.notifier.reminder_escalate_counter)
+        } else {
+            None
+        };
+
+        // Generate bumped states
         Some(BumpedStates {
             status: general_status,
             replicas: bumped_replicas,
             changed: has_changed,
+            escalated: escalated,
             startup: false,
         })
     } else {
@@ -347,6 +373,7 @@ fn dispatch_startup_notification() {
                 status: Status::Healthy,
                 replicas: Vec::new(),
                 changed: true,
+                escalated: None,
                 startup: true,
             });
         }
@@ -359,6 +386,7 @@ fn notify(bumped_states: &BumpedStates) {
         time: time_now_as_string(),
         replicas: Vec::from_iter(bumped_states.replicas.iter().map(String::as_str)),
         changed: bumped_states.changed,
+        escalated: bumped_states.escalated,
         startup: bumped_states.startup,
     };
 

@@ -122,6 +122,9 @@ pub struct ConfigNotify {
     #[serde(default = "defaults::notify_reminder_backoff_limit")]
     pub reminder_backoff_limit: u16,
 
+    #[serde(default = "defaults::notify_reminder_escalate")]
+    pub reminder_escalate: bool,
+
     #[cfg(feature = "notifier-email")]
     pub email: Option<ConfigNotifyEmail>,
 
