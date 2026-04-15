@@ -72,6 +72,8 @@ fn check_child_status(parent_status: &Status, child_status: &Status) -> Option<S
         Some(Status::Dead)
     } else if child_status == &Status::Sick && parent_status != &Status::Dead {
         Some(Status::Sick)
+    } else if child_status == &Status::Partial && parent_status == &Status::Healthy {
+        Some(Status::Partial)
     } else {
         None
     }
@@ -93,6 +95,8 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
             debug!("aggregate node: {}:{}", probe_id, node_id);
 
             let mut node_status = Status::Healthy;
+            let mut dead_replica_count = 0usize;
+            let total_replica_count = node.replicas.len();
 
             for (replica_id, replica) in node.replicas.iter_mut() {
                 let mut replica_status = Status::Healthy;
@@ -177,9 +181,11 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
                     }
                 }
 
-                // Bump node status with worst replica status?
-                if let Some(worst_status) = check_child_status(&node_status, &replica_status) {
-                    node_status = worst_status;
+                // Track replica counts for post-loop node status aggregation
+                if replica_status == Status::Dead {
+                    dead_replica_count += 1;
+                } else if replica_status == Status::Sick && node_status != Status::Dead {
+                    node_status = Status::Sick;
                 }
 
                 debug!(
@@ -193,6 +199,28 @@ fn scan_and_bump_states() -> Option<BumpedStates> {
                 }
 
                 replica.status = replica_status;
+            }
+
+            // Aggregate dead replicas into node status, respecting min_replicas_available
+            if dead_replica_count > 0 {
+                let available_count = total_replica_count - dead_replica_count;
+
+                let min_replicas_available = APP_CONF
+                    .probe
+                    .service
+                    .iter()
+                    .find(|s| s.id == *probe_id)
+                    .and_then(|s| s.node.iter().find(|n| n.id == *node_id))
+                    .and_then(|n| n.min_replicas_available);
+
+                node_status = match min_replicas_available {
+                    Some(min_avail)
+                        if available_count > 0 && available_count >= min_avail =>
+                    {
+                        Status::Partial
+                    }
+                    _ => Status::Dead,
+                };
             }
 
             // Bump probe status with worst node status?
