@@ -148,6 +148,7 @@ fn status_to_color(status: &Status) -> &'static str {
     match status {
         &Status::Healthy => "good",
         &Status::Sick => "warning",
+        &Status::Partial => "warning",
         &Status::Dead => "danger",
     }
 }

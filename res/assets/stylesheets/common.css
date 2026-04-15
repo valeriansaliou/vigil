@@ -218,28 +218,35 @@ a:hover {
   border-color: rgba(14, 176, 51, 0.17);
 }
 
-.badge-status-sick.badge-default {
+.badge-status-sick.badge-default,
+.badge-status-partial.badge-default {
   background-image: url("/assets/images/badges/icon-sick-default.svg");
 }
 
-.badge-status-sick.badge-large {
+.badge-status-sick.badge-large,
+.badge-status-partial.badge-large {
   background-image: url("/assets/images/badges/icon-sick-large.svg");
 }
 
 .status-sick-background,
-.status-sick-background-before:before {
+.status-partial-background,
+.status-sick-background-before:before,
+.status-partial-background-before:before {
   background-color: #F18000;
 }
 
-.status-sick-color {
+.status-sick-color,
+.status-partial-color {
   color: #F18000;
 }
 
-.status-sick-background-subtle {
+.status-sick-background-subtle,
+.status-partial-background-subtle {
   background-color: rgba(241, 128, 0, 0.10);
 }
 
-.status-sick-border-subtle {
+.status-sick-border-subtle,
+.status-partial-border-subtle {
   border-color: rgba(241, 128, 0, 0.17);
 }
 

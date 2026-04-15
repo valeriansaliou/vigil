@@ -62,6 +62,8 @@
             Partial service outage ongoing
           {% elif states.status == "sick" %}
             Minor service slowdown ongoing
+          {% elif states.status == "partial" %}
+            Some services are partially degraded
           {% else %}
             All systems report as healthy
           {% endif %}
@@ -91,6 +93,8 @@
               Looks like some services are not working.
             {% elif states.status == "sick" %}
               Looks like services are under high load.
+            {% elif states.status == "partial" %}
+              Looks like some services are running with reduced capacity.
             {% else %}
               Looks like everything is operating normally.
             {% endif %}
@@ -103,6 +107,8 @@
               Our team has been notified of the issue. If the outage persists,
             {% elif states.status == "sick" %}
               Services are slower than usual at the moment. If you are encountering an issue,
+            {% elif states.status == "partial" %}
+              Some service nodes are running at reduced availability. If you are encountering an issue,
             {% else %}
               All systems are healthy at the moment. If you are encountering an issue,
             {% endif %}

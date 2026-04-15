@@ -120,6 +120,7 @@ fn status_to_color(status: &Status) -> &'static str {
     match status {
         &Status::Healthy => "#54A158",
         &Status::Sick => "#D5A048",
+        &Status::Partial => "#D5A048",
         &Status::Dead => "#C4291C",
     }
 }
