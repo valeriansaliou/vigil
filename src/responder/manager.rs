@@ -72,75 +72,103 @@ pub fn run() {
 
     // Start the HTTP server
     let server = HttpServer::new(move || {
+        macro_rules! register_routes {
+            ($target:expr) => {
+                $target
+                    .service(routes::assets_javascripts)
+                    .service(routes::assets_stylesheets)
+                    .service(routes::assets_images)
+                    .service(routes::assets_fonts)
+                    .service(routes::badge)
+                    .service(routes::status_text)
+                    .service(routes::status_report)
+                    .service(routes::robots)
+                    .service(routes::index)
+                    .app_data(ConfigAuth::default().realm("Reporter Token"))
+                    .service(
+                        web::resource("/reporter/{probe_id}/{node_id}")
+                            .wrap(middleware_reporter_auth.clone())
+                            .guard(guard::Post())
+                            .to(routes::reporter_report),
+                    )
+                    .service(
+                        web::resource("/reporter/{probe_id}/{node_id}/{replica_id}")
+                            .wrap(middleware_reporter_auth.clone())
+                            .guard(guard::Delete())
+                            .to(routes::reporter_flush),
+                    )
+                    .service(
+                        web::resource("/manager/announcements")
+                            .wrap(middleware_manager_auth.clone())
+                            .guard(guard::Get())
+                            .to(routes::manager_announcements),
+                    )
+                    .service(
+                        web::resource("/manager/announcement")
+                            .wrap(middleware_manager_auth.clone())
+                            .guard(guard::Post())
+                            .to(routes::manager_announcement_insert),
+                    )
+                    .service(
+                        web::resource("/manager/announcement/{announcement_id}")
+                            .wrap(middleware_manager_auth.clone())
+                            .guard(guard::Delete())
+                            .to(routes::manager_announcement_retract),
+                    )
+                    .service(
+                        web::resource("/manager/prober/alerts")
+                            .wrap(middleware_manager_auth.clone())
+                            .guard(guard::Get())
+                            .to(routes::manager_prober_alerts),
+                    )
+                    .service(
+                        web::resource("/manager/prober/alerts/ignored")
+                            .wrap(middleware_manager_auth.clone())
+                            .guard(guard::Get())
+                            .to(routes::manager_prober_alerts_ignored_resolve),
+                    )
+                    .service(
+                        web::resource("/manager/prober/alerts/ignored")
+                            .wrap(middleware_manager_auth.clone())
+                            .guard(guard::Put())
+                            .to(routes::manager_prober_alerts_ignored_update),
+                    )
+            };
+        }
+
         // Mount routes to HTTP server
         // Notice: this executes as many times as there are HTTP workers.
         let mut app = App::new()
             .app_data(web::Data::new(tera.clone()))
-            .wrap(middleware::NormalizePath::new(TrailingSlash::Trim))
-            .service(routes::assets_javascripts)
-            .service(routes::assets_stylesheets)
-            .service(routes::assets_images)
-            .service(routes::assets_fonts)
-            .service(routes::badge)
-            .service(routes::status_text)
-            .service(routes::status_report)
-            .service(routes::robots)
-            .service(routes::index)
-            .app_data(ConfigAuth::default().realm("Reporter Token"))
-            .service(
-                web::resource("/reporter/{probe_id}/{node_id}")
-                    .wrap(middleware_reporter_auth.clone())
-                    .guard(guard::Post())
-                    .to(routes::reporter_report),
-            )
-            .service(
-                web::resource("/reporter/{probe_id}/{node_id}/{replica_id}")
-                    .wrap(middleware_reporter_auth.clone())
-                    .guard(guard::Delete())
-                    .to(routes::reporter_flush),
-            )
-            .service(
-                web::resource("/manager/announcements")
-                    .wrap(middleware_manager_auth.clone())
-                    .guard(guard::Get())
-                    .to(routes::manager_announcements),
-            )
-            .service(
-                web::resource("/manager/announcement")
-                    .wrap(middleware_manager_auth.clone())
-                    .guard(guard::Post())
-                    .to(routes::manager_announcement_insert),
-            )
-            .service(
-                web::resource("/manager/announcement/{announcement_id}")
-                    .wrap(middleware_manager_auth.clone())
-                    .guard(guard::Delete())
-                    .to(routes::manager_announcement_retract),
-            )
-            .service(
-                web::resource("/manager/prober/alerts")
-                    .wrap(middleware_manager_auth.clone())
-                    .guard(guard::Get())
-                    .to(routes::manager_prober_alerts),
-            )
-            .service(
-                web::resource("/manager/prober/alerts/ignored")
-                    .wrap(middleware_manager_auth.clone())
-                    .guard(guard::Get())
-                    .to(routes::manager_prober_alerts_ignored_resolve),
-            )
-            .service(
-                web::resource("/manager/prober/alerts/ignored")
-                    .wrap(middleware_manager_auth.clone())
-                    .guard(guard::Put())
-                    .to(routes::manager_prober_alerts_ignored_update),
-            );
+            .wrap(middleware::NormalizePath::new(TrailingSlash::Trim));
 
-        // Add MCP services?
-        if let Some(mcp_services) = mcp_services.clone() {
-            app = app.service(
-                web::scope("/mcp").service(web::scope("/probes").service(mcp_services.0.scope())),
-            );
+        let path_prefix = APP_CONF.server.path_prefix.as_deref()
+            .map(|s| s.trim())
+            .filter(|s| !s.is_empty());
+
+        if let Some(prefix) = path_prefix {
+            let prefix_with_slash = if prefix.starts_with('/') {
+                prefix.to_string()
+            } else {
+                format!("/{}", prefix)
+            };
+
+            let mut scope = web::scope(&prefix_with_slash);
+            scope = register_routes!(scope);
+            scope = scope.route("", web::get().to(routes::index_raw));
+            if let Some(mcp_services) = mcp_services.clone() {
+                scope = scope.service(
+                    web::scope("/mcp").service(web::scope("/probes").service(mcp_services.0.scope())),
+                );
+            }
+            app = app.service(scope);
+        } else {
+            app = register_routes!(app);
+            if let Some(mcp_services) = mcp_services.clone() {
+                app = app.service(
+                    web::scope("/mcp").service(web::scope("/probes").service(mcp_services.0.scope())),
+                );
+            }
         }
 
         app

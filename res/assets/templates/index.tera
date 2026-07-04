@@ -14,13 +14,14 @@
 
     <title>{{ config.page_title | escape }}</title>
 
-    <link rel="stylesheet" href="/assets/stylesheets/common.css?v={{ config.runtime_version | escape }}" type="text/css" />
-    <link rel="stylesheet" href="/assets/stylesheets/index.css?v={{ config.runtime_version | escape }}" type="text/css" />
+    <link rel="stylesheet" href="{{ config.path_prefix }}/assets/stylesheets/common.css?v={{ config.runtime_version | escape }}" type="text/css" />
+    <link rel="stylesheet" href="{{ config.path_prefix }}/assets/stylesheets/index.css?v={{ config.runtime_version | escape }}" type="text/css" />
 
-    <script src="/assets/javascripts/index.js?v={{ config.runtime_version | escape }}" type="text/javascript"></script>
+    <script src="{{ config.path_prefix }}/assets/javascripts/index.js?v={{ config.runtime_version | escape }}" type="text/javascript"></script>
 
     <script type="text/javascript">
       window.STATUS_GENERAL = "{{ states.status | escape }}";
+      window.PATH_PREFIX = "{{ config.path_prefix | safe }}";
     </script>
 
     {% if config.custom_html %}
@@ -32,7 +33,7 @@
     <header>
       <div class="wrapper">
         <div class="header-inner">
-          <a href="/" class="logo">
+          <a href="{{ config.path_prefix }}/" class="logo">
             <img src="{{ config.logo_url | escape }}" alt="" />
 
             <span class="logo-label font-sans-semibold">Status</span>

@@ -27,6 +27,19 @@ lazy_static! {
         website_url: APP_CONF.branding.website_url.to_owned(),
         support_url: APP_CONF.branding.support_url.to_owned(),
         custom_html: APP_CONF.branding.custom_html.to_owned(),
+        path_prefix: match APP_CONF.server.path_prefix.as_deref()
+            .map(|s| s.trim())
+            .filter(|s| !s.is_empty())
+        {
+            Some(prefix) => {
+                if prefix.starts_with('/') {
+                    prefix.to_string()
+                } else {
+                    format!("/{}", prefix)
+                }
+            }
+            None => "".to_string(),
+        },
     };
     pub static ref INDEX_ENVIRONMENT: IndexContextEnvironment = IndexContextEnvironment::default();
 }
@@ -93,6 +106,7 @@ pub struct IndexContextConfig {
     pub website_url: SerdeUrl,
     pub support_url: SerdeUrl,
     pub custom_html: Option<String>,
+    pub path_prefix: String,
 }
 
 #[derive(Serialize)]

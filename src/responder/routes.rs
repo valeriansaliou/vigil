@@ -32,6 +32,10 @@ use crate::APP_CONF;
 
 #[get("/")]
 async fn index(tera: Data<Tera>) -> HttpResponse {
+    index_raw(tera).await
+}
+
+pub async fn index_raw(tera: Data<Tera>) -> HttpResponse {
     // Notice acquire lock in a block to release it ASAP (ie. before template renders)
     let context = {
         IndexContext {

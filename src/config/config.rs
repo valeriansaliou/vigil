@@ -38,6 +38,9 @@ pub struct ConfigServer {
     #[serde(default = "defaults::server_mcp_server")]
     pub mcp_server: bool,
 
+    #[serde(default)]
+    pub path_prefix: Option<String>,
+
     pub manager_token: String,
     pub reporter_token: String,
 }

@@ -22,7 +22,7 @@ var IndexManager = (function() {
     __schedule_refresh : function() {
       setTimeout(function() {
         IndexManager.__load(
-          "/status/text/", "text",
+          (window.PATH_PREFIX || "") + "/status/text/", "text",
 
           IndexManager.__handle_status_text_done_from_request,
           IndexManager.__handle_status_text_error
@@ -41,7 +41,7 @@ var IndexManager = (function() {
         window.STATUS_GENERAL = status;
 
         IndexManager.__load(
-          "/", "document",
+          (window.PATH_PREFIX || "") + "/", "document",
 
           IndexManager.__handle_base_done,
           IndexManager.__handle_base_error

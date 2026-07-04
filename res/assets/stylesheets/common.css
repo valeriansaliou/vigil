@@ -2,28 +2,28 @@
 
 @font-face {
   font-family: "Vigil Open Sans Light";
-  src: url("/assets/fonts/open_sans/open_sans_light.woff2") format("woff2"), url("/assets/fonts/open_sans/open_sans_light.woff") format("woff");
+  src: url("../fonts/open_sans/open_sans_light.woff2") format("woff2"), url("../fonts/open_sans/open_sans_light.woff") format("woff");
   font-weight: 100;
   font-style: normal;
 }
 
 @font-face {
   font-family: "Vigil Open Sans Regular";
-  src: url("/assets/fonts/open_sans/open_sans_regular.woff2") format("woff2"), url("/assets/fonts/open_sans/open_sans_regular.woff") format("woff");
+  src: url("../fonts/open_sans/open_sans_regular.woff2") format("woff2"), url("../fonts/open_sans/open_sans_regular.woff") format("woff");
   font-weight: 400;
   font-style: normal;
 }
 
 @font-face {
   font-family: "Vigil Open Sans Semibold";
-  src: url("/assets/fonts/open_sans/open_sans_semibold.woff2") format("woff2"), url("/assets/fonts/open_sans/open_sans_semibold.woff") format("woff");
+  src: url("../fonts/open_sans/open_sans_semibold.woff2") format("woff2"), url("../fonts/open_sans/open_sans_semibold.woff") format("woff");
   font-weight: 600;
   font-style: normal;
 }
 
 @font-face {
   font-family: "Vigil Open Sans Bold";
-  src: url("/assets/fonts/open_sans/open_sans_bold.woff2") format("woff2"), url("/assets/fonts/open_sans/open_sans_bold.woff") format("woff");
+  src: url("../fonts/open_sans/open_sans_bold.woff2") format("woff2"), url("../fonts/open_sans/open_sans_bold.woff") format("woff");
   font-weight: 700;
   font-style: normal;
 }
@@ -194,11 +194,11 @@ a:hover {
 }
 
 .badge.badge-status-healthy.badge-default {
-  background-image: url("/assets/images/badges/icon-healthy-default.svg");
+  background-image: url("../images/badges/icon-healthy-default.svg");
 }
 
 .badge.badge-status-healthy.badge-large {
-  background-image: url("/assets/images/badges/icon-healthy-large.svg");
+  background-image: url("../images/badges/icon-healthy-large.svg");
 }
 
 .status-healthy-background,
@@ -220,12 +220,12 @@ a:hover {
 
 .badge-status-sick.badge-default,
 .badge-status-partial.badge-default {
-  background-image: url("/assets/images/badges/icon-sick-default.svg");
+  background-image: url("../images/badges/icon-sick-default.svg");
 }
 
 .badge-status-sick.badge-large,
 .badge-status-partial.badge-large {
-  background-image: url("/assets/images/badges/icon-sick-large.svg");
+  background-image: url("../images/badges/icon-sick-large.svg");
 }
 
 .status-sick-background,
@@ -251,11 +251,11 @@ a:hover {
 }
 
 .badge-status-dead.badge-default {
-  background-image: url("/assets/images/badges/icon-dead-default.svg");
+  background-image: url("../images/badges/icon-dead-default.svg");
 }
 
 .badge-status-dead.badge-large {
-  background-image: url("/assets/images/badges/icon-dead-large.svg");
+  background-image: url("../images/badges/icon-dead-large.svg");
 }
 
 .status-dead-background,
