@@ -142,7 +142,10 @@ pub fn run() {
             .app_data(web::Data::new(tera.clone()))
             .wrap(middleware::NormalizePath::new(TrailingSlash::Trim));
 
-        let path_prefix = APP_CONF.server.path_prefix.as_deref()
+        let path_prefix = APP_CONF
+            .server
+            .path_prefix
+            .as_deref()
             .map(|s| s.trim())
             .filter(|s| !s.is_empty());
 
@@ -158,7 +161,8 @@ pub fn run() {
             scope = scope.route("", web::get().to(routes::index_raw));
             if let Some(mcp_services) = mcp_services.clone() {
                 scope = scope.service(
-                    web::scope("/mcp").service(web::scope("/probes").service(mcp_services.0.scope())),
+                    web::scope("/mcp")
+                        .service(web::scope("/probes").service(mcp_services.0.scope())),
                 );
             }
             app = app.service(scope);
@@ -166,7 +170,8 @@ pub fn run() {
             app = register_routes!(app);
             if let Some(mcp_services) = mcp_services.clone() {
                 app = app.service(
-                    web::scope("/mcp").service(web::scope("/probes").service(mcp_services.0.scope())),
+                    web::scope("/mcp")
+                        .service(web::scope("/probes").service(mcp_services.0.scope())),
                 );
             }
         }
