@@ -1,0 +1,75 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "vigil.fullname" . }}
+  labels:
+    {{- include "vigil.labels" . | nindent 4 }}
+data:
+  vigil.cfg: |
+    [server]
+
+    log_level = "{{ .Values.vigil.log_level }}"
+    inet = "0.0.0.0:8080"
+    workers = 4
+    reporter_token = "{{ .Values.vigil.token }}"
+
+    [assets]
+
+    path = "./res/assets/"
+
+    [branding]
+
+    page_title = "{{ .Values.vigil.page_title }}"
+    page_url = "{{ .Values.vigil.page_url }}"
+    company_name = "{{ .Values.vigil.company_name }}"
+    icon_color = "{{ .Values.vigil.icon_color }}"
+    icon_url = "{{ .Values.vigil.icon_url }}"
+    logo_color = "{{ .Values.vigil.logo_color }}"
+    logo_url = "{{ .Values.vigil.logo_url }}"
+    website_url = "{{ .Values.vigil.website_url }}"
+    support_url = "{{ .Values.vigil.support_url }}"
+    custom_html = "{{ .Values.vigil.customer_html }}"
+
+    [metrics]
+
+    poll_interval = {{ .Values.vigil.poll_interval }}
+    poll_retry = {{ .Values.vigil.poll_retry }}
+    poll_http_status_healthy_above = {{ .Values.vigil.poll_http_status_healthy_above }}
+    poll_http_status_healthy_below = {{ .Values.vigil.poll_http_status_healthy_below }}
+    poll_delay_dead = {{ .Values.vigil.poll_delay_dead }}
+    poll_delay_sick = {{ .Values.vigil.poll_delay_sick }}
+    push_delay_dead = {{ .Values.vigil.push_delay_dead }}
+    push_system_cpu_sick_above = {{ .Values.vigil.push_system_cpu_sick_above }}
+    push_system_ram_sick_above = {{ .Values.vigil.push_system_ram_sick_above }}
+    script_interval = {{ .Values.vigil.script_interval }}
+    local_delay_dead = {{ .Values.vigil.local_delay_dead }}
+
+    [plugins]
+
+    [plugins.rabbitmq]
+
+    api_url = "http://127.0.0.1:15672"
+    auth_username = "rabbitmq-administrator"
+    auth_password = "RABBITMQ_ADMIN_PASSWORD"
+    virtualhost = "crisp"
+
+    queue_ready_healthy_below = 500
+    queue_nack_healthy_below = 100
+    queue_ready_dead_above = 20000
+    queue_nack_dead_above = 5000
+    queue_loaded_retry_delay = 500
+
+    [notify]
+
+    startup_notification = {{ .Values.vigil.startup_notification }}
+    reminder_interval = {{ .Values.vigil.reminder_interval }}
+
+    [notify.slack]
+
+    hook_url = "{{ .Values.vigil.hook_url }}"
+    mention_channel = {{ .Values.vigil.mention_channel }}
+
+
+    [probe]
+
+{{ .Values.vigil.additionConfig | indent 4 }}
